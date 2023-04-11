@@ -1,3 +1,18 @@
+use std::env;
+use std::process;
+
+use lox::Lox;
+
 fn main() {
-    println!("Hello, world!");
+    let mut interpreter = Lox::new();
+
+    let args: Vec<String> = env::args().collect();
+    match args.len() {
+        2 => interpreter.run_file(&args[1]),
+        1 => interpreter.run_promt(),
+        _ => {
+            println!("Usage: twilox [script]");
+            process::exit(64);
+        },
+    }
 }
