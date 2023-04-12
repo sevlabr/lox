@@ -12,6 +12,6 @@ fn main() {
         _ => {
             println!("Usage: twilox [script]");
             process::exit(64);
-        },
+        }
     }
 }

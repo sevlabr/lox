@@ -23,23 +23,52 @@ pub static KEYWORDS: phf::Map<&'static str, TokenType> = phf_map! {
 #[derive(Clone, Debug)]
 pub enum TokenType {
     // Single-character tokens.
-    LeftParen, RightParen, LeftBrace, RightBrace,
-    Comma, Dot, Minus, Plus, Semicolon, Slash, Star,
+    LeftParen,
+    RightParen,
+    LeftBrace,
+    RightBrace,
+    Comma,
+    Dot,
+    Minus,
+    Plus,
+    Semicolon,
+    Slash,
+    Star,
 
     // One or two character tokens.
-    Bang, BangEqual,
-    Equal, EqualEqual,
-    Greater, GreaterEqual,
-    Less, LessEqual,
+    Bang,
+    BangEqual,
+    Equal,
+    EqualEqual,
+    Greater,
+    GreaterEqual,
+    Less,
+    LessEqual,
 
     // Literals.
-    Identifier, String, Number,
+    Identifier,
+    String,
+    Number,
 
     // Keywords.
-    And, Class, Else, False, Fun, For, If, Nil, Or,
-    Print, Return, Super, This, True, Var, While,
+    And,
+    Class,
+    Else,
+    False,
+    Fun,
+    For,
+    If,
+    Nil,
+    Or,
+    Print,
+    Return,
+    Super,
+    This,
+    True,
+    Var,
+    While,
 
-    Eof
+    Eof,
 }
 
 pub struct Token {
@@ -51,11 +80,12 @@ pub struct Token {
 
 impl Token {
     pub fn new(tok_type: TokenType, lexeme: &str, literal: Literal, line: usize) -> Self {
-        Token { tok_type, lexeme: lexeme.to_string(), literal, line }
-    }
-
-    pub fn to_string(&self) -> String {
-        format!("{} {:?} {} {:?}", self.line, self.tok_type, self.lexeme, self.literal)
+        Token {
+            tok_type,
+            lexeme: lexeme.to_string(),
+            literal,
+            line,
+        }
     }
 
     pub fn lexeme(&self) -> &str {
@@ -65,7 +95,11 @@ impl Token {
 
 impl fmt::Display for Token {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{} {:?} {} {:?}", self.line, self.tok_type, self.lexeme, self.literal)
+        write!(
+            f,
+            "{} {:?} {} {:?}",
+            self.line, self.tok_type, self.lexeme, self.literal
+        )
     }
 }
 

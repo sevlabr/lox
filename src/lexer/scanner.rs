@@ -1,4 +1,4 @@
-use crate::lexer::token::{KEYWORDS, Token, TokenType, Literal};
+use crate::lexer::token::{Literal, Token, TokenType, KEYWORDS};
 use crate::Lox;
 
 pub struct Scanner<'a> {
@@ -12,8 +12,8 @@ pub struct Scanner<'a> {
 }
 
 impl Scanner<'_> {
-    pub fn new<'a>(interpreter: &'a mut Lox, source: &str,) -> Scanner<'a> {
-        Scanner{
+    pub fn new<'a>(interpreter: &'a mut Lox, source: &str) -> Scanner<'a> {
+        Scanner {
             source: source.to_string(),
             tokens: vec![],
             start: 0,
@@ -34,12 +34,8 @@ impl Scanner<'_> {
             self.scan_token();
         }
 
-        self.tokens.push(Token::new(
-            TokenType::Eof,
-            "",
-            Literal::None,
-            self.line,
-        ));
+        self.tokens
+            .push(Token::new(TokenType::Eof, "", Literal::None, self.line));
     }
 
     fn scan_token(&mut self) {
@@ -56,34 +52,46 @@ impl Scanner<'_> {
             ';' => self.add_token(TokenType::Semicolon),
             '*' => self.add_token(TokenType::Star),
 
-            '!' => if self.peek('=') {
-                        self.add_token(TokenType::BangEqual)
-                    } else {
-                        self.add_token(TokenType::Bang)
-                    },
-            '=' => if self.peek('=') {
-                        self.add_token(TokenType::EqualEqual)
-                    } else {
-                        self.add_token(TokenType::Equal)
-                    },
-            '<' => if self.peek('=') {
-                        self.add_token(TokenType::LessEqual)
-                    } else {
-                        self.add_token(TokenType::Less)
-                    },
-            '>' => if self.peek('=') {
-                        self.add_token(TokenType::GreaterEqual)
-                    } else {
-                        self.add_token(TokenType::Greater)
-                    },
-            
-            '/' => if self.peek('/') {
-                        // A comment goes until the end of the line.
-                        while self.look_ahead() != '\n' && !self.is_end() { self.advance(); }
-                    } else {
-                        self.add_token(TokenType::Slash)
+            '!' => {
+                if self.peek('=') {
+                    self.add_token(TokenType::BangEqual)
+                } else {
+                    self.add_token(TokenType::Bang)
+                }
+            }
+            '=' => {
+                if self.peek('=') {
+                    self.add_token(TokenType::EqualEqual)
+                } else {
+                    self.add_token(TokenType::Equal)
+                }
+            }
+            '<' => {
+                if self.peek('=') {
+                    self.add_token(TokenType::LessEqual)
+                } else {
+                    self.add_token(TokenType::Less)
+                }
+            }
+            '>' => {
+                if self.peek('=') {
+                    self.add_token(TokenType::GreaterEqual)
+                } else {
+                    self.add_token(TokenType::Greater)
+                }
+            }
+
+            '/' => {
+                if self.peek('/') {
+                    // A comment goes until the end of the line.
+                    while self.look_ahead() != '\n' && !self.is_end() {
+                        self.advance();
                     }
-            
+                } else {
+                    self.add_token(TokenType::Slash)
+                }
+            }
+
             ' ' | '\r' | '\t' => (),
             '\n' => self.line += 1,
 
@@ -98,32 +106,51 @@ impl Scanner<'_> {
     }
 
     fn advance(&mut self) -> char {
-        let c = self.source.chars().nth(self.current).expect("Failed advancing character!");
+        let c = self
+            .source
+            .chars()
+            .nth(self.current)
+            .expect("Failed advancing character!");
         self.current += 1;
         c
     }
 
     fn peek(&mut self, expected: char) -> bool {
-        if self.is_end() { return false }
-        let next_char = self.source
-                        .chars()
-                        .nth(self.current)
-                        .expect("Failed peeking next character!");
-        if next_char != expected { return false }
+        if self.is_end() {
+            return false;
+        }
+        let next_char = self
+            .source
+            .chars()
+            .nth(self.current)
+            .expect("Failed peeking next character!");
+        if next_char != expected {
+            return false;
+        }
 
         self.current += 1;
-        return true
+        true
     }
 
     // TODO: add helper fucntion to shorten str[idx] line
     fn look_ahead(&self) -> char {
-        if self.is_end() { return '\0' }
-        self.source.chars().nth(self.current).expect("Failed looking ahead the character!")
+        if self.is_end() {
+            return '\0';
+        }
+        self.source
+            .chars()
+            .nth(self.current)
+            .expect("Failed looking ahead the character!")
     }
 
     fn look_ahead_next(&self) -> char {
-        if self.current + 1 >= self.source.len() { return '\0' }
-        self.source.chars().nth(self.current + 1).expect("Failed looking ahead the next character!")
+        if self.current + 1 >= self.source.len() {
+            return '\0';
+        }
+        self.source
+            .chars()
+            .nth(self.current + 1)
+            .expect("Failed looking ahead the next character!")
     }
 
     fn add_token(&mut self, tok_type: TokenType) {
@@ -131,59 +158,79 @@ impl Scanner<'_> {
     }
 
     fn add_token_literal(&mut self, tok_type: TokenType, literal: Literal) {
-        let text: String = self.source.chars().skip(self.start).take(self.current - self.start).collect();
-        self.tokens.push(Token::new(
-            tok_type,
-            &text,
-            literal,
-            self.line,
-        ));
+        let text: String = self
+            .source
+            .chars()
+            .skip(self.start)
+            .take(self.current - self.start)
+            .collect();
+        self.tokens
+            .push(Token::new(tok_type, &text, literal, self.line));
     }
 
     fn consume_string(&mut self) {
         while self.look_ahead() != '"' && !self.is_end() {
-            if self.look_ahead() == '\n' { self.line += 1 }
+            if self.look_ahead() == '\n' {
+                self.line += 1
+            }
             self.advance();
         }
 
         if self.is_end() {
             self.interpreter.error(self.line, "Unterminated string!");
-            return
+            return;
         }
 
         // The closing ".
         self.advance();
 
         // Trim the surrounding quotes.
-        let value: String = self.source
-                                .chars()
-                                .skip(self.start + 1)
-                                .take(self.current - 2 - self.start)
-                                .collect();
+        let value: String = self
+            .source
+            .chars()
+            .skip(self.start + 1)
+            .take(self.current - 2 - self.start)
+            .collect();
         self.add_token_literal(TokenType::String, Literal::String(value));
     }
 
     fn consume_number(&mut self) {
-        while self.is_digit(self.look_ahead()) { self.advance(); }
+        while self.is_digit(self.look_ahead()) {
+            self.advance();
+        }
 
         // Look for a fractional part.
         if self.look_ahead() == '.' && self.is_digit(self.look_ahead_next()) {
             // Consume the "."
             self.advance();
 
-            while self.is_digit(self.look_ahead()) { self.advance(); }
+            while self.is_digit(self.look_ahead()) {
+                self.advance();
+            }
         }
 
-        let number: String = self.source.chars().skip(self.start).take(self.current - self.start).collect();
+        let number: String = self
+            .source
+            .chars()
+            .skip(self.start)
+            .take(self.current - self.start)
+            .collect();
         let number: f64 = number.trim().parse().expect("Failed parsing number!");
         self.add_token_literal(TokenType::Number, Literal::Number(number))
     }
 
     fn identifier(&mut self) {
-        while self.is_alphanum(self.look_ahead()) { self.advance(); }
+        while self.is_alphanum(self.look_ahead()) {
+            self.advance();
+        }
 
         // TODO: wrap this str[beg:end] to a function
-        let text: String = self.source.chars().skip(self.start).take(self.current - self.start).collect();
+        let text: String = self
+            .source
+            .chars()
+            .skip(self.start)
+            .take(self.current - self.start)
+            .collect();
         let tok_type = match KEYWORDS.get(&text) {
             Some(t) => t.clone(),
             None => TokenType::Identifier,
@@ -196,15 +243,15 @@ impl Scanner<'_> {
     }
 
     fn is_digit(&self, c: char) -> bool {
-        '0' <= c && c <= '9'
+        ('0'..='9').contains(&c)
     }
 
     fn is_alphanum(&self, c: char) -> bool {
         let mut alphanum = false;
         match c {
             'a'..='z' | 'A'..='Z' | '_' | '0'..='9' => alphanum = true,
-            _ => ()
+            _ => (),
         }
-        return alphanum
+        alphanum
     }
 }

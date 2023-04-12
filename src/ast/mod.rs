@@ -14,14 +14,10 @@ impl Visitor<String> for AstPrinter {
             Expr::Binary(l, op, r) => {
                 // TODO: change "&**" to smth elegant
                 self.parenthesize(op.lexeme(), vec![&**l, &**r])
-            },
-            Expr::Grouping(ge) => {
-                self.parenthesize("group", vec![&**ge])
-            },
+            }
+            Expr::Grouping(ge) => self.parenthesize("group", vec![&**ge]),
             Expr::LiteralExpr(l) => format!("{l}"),
-            Expr::Unary(op, r) => {
-                self.parenthesize(op.lexeme(), vec![&**r])
-            },
+            Expr::Unary(op, r) => self.parenthesize(op.lexeme(), vec![&**r]),
         }
     }
 }
@@ -33,7 +29,7 @@ impl AstPrinter {
         pretty_expr.push_str(name);
         for e in exprs {
             pretty_expr.push(' ');
-            pretty_expr.push_str(&self.visit_expr(&e));
+            pretty_expr.push_str(&self.visit_expr(e));
         }
         pretty_expr.push(')');
         pretty_expr
@@ -56,13 +52,15 @@ mod tests {
                 Box::new(Expr::LiteralExpr(Literal::Number(123.0))),
             )),
             Token::new(TokenType::Star, "*", Literal::None, 1),
-            Box::new(Expr::Grouping(
-                Box::new(Expr::LiteralExpr(Literal::Number(45.67))),
-            )),
+            Box::new(Expr::Grouping(Box::new(Expr::LiteralExpr(
+                Literal::Number(45.67),
+            )))),
         );
         let ref_result = "(* (- 123) (group 45.67))";
-        assert_eq!(printer.visit_expr(&expression), ref_result,
-                    "Failed printing simple AST!"
+        assert_eq!(
+            printer.visit_expr(&expression),
+            ref_result,
+            "Failed printing simple AST!"
         );
     }
 }
