@@ -1,16 +1,17 @@
+pub mod ast;
+pub mod lexer;
+
+use lexer::scanner::Scanner;
 use std::fs;
 use std::process;
 use std::io::{self, Write};
-
-pub mod lexer;
-use lexer::scanner::Scanner;
 
 pub struct Lox {
     had_error: bool
 }
 
 impl Lox {
-    pub fn new() -> Lox { Lox { had_error: false } }
+    pub fn new() -> Self { Lox { had_error: false } }
 
     pub fn run_file(&mut self, path: &str) {
         let contents = fs::read_to_string(path)

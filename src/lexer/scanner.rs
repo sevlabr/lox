@@ -1,5 +1,4 @@
 use crate::lexer::token::{KEYWORDS, Token, TokenType, Literal};
-
 use crate::Lox;
 
 pub struct Scanner<'a> {
@@ -37,7 +36,7 @@ impl Scanner<'_> {
 
         self.tokens.push(Token::new(
             TokenType::Eof,
-            "".to_string(),
+            "",
             Literal::None,
             self.line,
         ));
@@ -135,7 +134,7 @@ impl Scanner<'_> {
         let text: String = self.source.chars().skip(self.start).take(self.current - self.start).collect();
         self.tokens.push(Token::new(
             tok_type,
-            text,
+            &text,
             literal,
             self.line,
         ));

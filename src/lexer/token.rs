@@ -1,5 +1,5 @@
-use std::fmt;
 use phf::phf_map;
+use std::fmt;
 
 pub static KEYWORDS: phf::Map<&'static str, TokenType> = phf_map! {
     "and" => TokenType::And,
@@ -20,7 +20,7 @@ pub static KEYWORDS: phf::Map<&'static str, TokenType> = phf_map! {
     "while"  => TokenType::While,
 };
 
-#[derive(Debug, Clone)]
+#[derive(Clone, Debug)]
 pub enum TokenType {
     // Single-character tokens.
     LeftParen, RightParen, LeftBrace, RightBrace,
@@ -49,6 +49,26 @@ pub struct Token {
     line: usize,
 }
 
+impl Token {
+    pub fn new(tok_type: TokenType, lexeme: &str, literal: Literal, line: usize) -> Self {
+        Token { tok_type, lexeme: lexeme.to_string(), literal, line }
+    }
+
+    pub fn to_string(&self) -> String {
+        format!("{} {:?} {} {:?}", self.line, self.tok_type, self.lexeme, self.literal)
+    }
+
+    pub fn lexeme(&self) -> &str {
+        &self.lexeme
+    }
+}
+
+impl fmt::Display for Token {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{} {:?} {} {:?}", self.line, self.tok_type, self.lexeme, self.literal)
+    }
+}
+
 #[derive(Debug)]
 pub enum Literal {
     None,
@@ -56,18 +76,12 @@ pub enum Literal {
     Number(f64),
 }
 
-impl Token {
-    pub fn new(tok_type: TokenType, lexeme: String, literal: Literal, line: usize) -> Token {
-        Token { tok_type, lexeme, literal, line }
-    }
-
-    pub fn to_string(&self) -> String {
-        format!("{} {:?} {} {:?}", self.line, self.tok_type, self.lexeme, self.literal)
-    }
-}
-
-impl fmt::Display for Token {
+impl fmt::Display for Literal {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{} {:?} {} {:?}", self.line, self.tok_type, self.lexeme, self.literal)
+        match self {
+            Literal::None => write!(f, "nil"),
+            Literal::String(s) => write!(f, "{s}"),
+            Literal::Number(n) => write!(f, "{n}"),
+        }
     }
 }

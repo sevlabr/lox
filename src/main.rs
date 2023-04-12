@@ -1,7 +1,6 @@
+use lox::Lox;
 use std::env;
 use std::process;
-
-use lox::Lox;
 
 fn main() {
     let mut interpreter = Lox::new();
