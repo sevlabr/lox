@@ -1,5 +1,5 @@
-use crate::lexer::token::{Literal, Token, TokenType};
 use crate::ast::expr::Expr;
+use crate::lexer::token::{Literal, Token, TokenType};
 use crate::Lox;
 use std::error::Error;
 use std::fmt::Display;
@@ -23,8 +23,12 @@ pub struct Parser<'a> {
 }
 
 impl Parser<'_> {
-    pub fn new<'a>(interpreter: &'a mut Lox, tokens: Vec<Token>) -> Parser<'a> {
-        Parser { tokens, current: 0, interpreter }
+    pub fn new(interpreter: &mut Lox, tokens: Vec<Token>) -> Parser {
+        Parser {
+            tokens,
+            current: 0,
+            interpreter,
+        }
     }
 
     pub fn parse(&mut self) -> Option<Expr> {
@@ -111,13 +115,13 @@ impl Parser<'_> {
     fn primary(&mut self) -> Result<Expr, ParseError> {
         // TODO: turn to match expression
         if self.match_tokens(&vec![TokenType::False]) {
-            return Ok(Expr::LiteralExpr(Literal::Bool(false)))
+            return Ok(Expr::LiteralExpr(Literal::Bool(false)));
         }
         if self.match_tokens(&vec![TokenType::True]) {
-            return Ok(Expr::LiteralExpr(Literal::Bool(true)))
+            return Ok(Expr::LiteralExpr(Literal::Bool(true)));
         }
         if self.match_tokens(&vec![TokenType::Nil]) {
-            return Ok(Expr::LiteralExpr(Literal::None))
+            return Ok(Expr::LiteralExpr(Literal::None));
         }
 
         let tok_types = vec![TokenType::Number, TokenType::String];
@@ -130,7 +134,7 @@ impl Parser<'_> {
                         "Expected Number or String but found: {}.",
                         self.previous().get_literal()
                     )
-                },
+                }
             };
             return Ok(exp);
         }
@@ -141,7 +145,7 @@ impl Parser<'_> {
                 Ok(_) => (),
                 Err(err) => return Err(err),
             };
-            return Ok(Expr::Grouping(Box::new(exp)))
+            return Ok(Expr::Grouping(Box::new(exp)));
         }
 
         let token = self.peek().clone();
@@ -149,7 +153,7 @@ impl Parser<'_> {
         // panic!("Expected `primary` but found: {:?}.", self.previous().get_type());
     }
 
-    fn consume<'a>(&mut self, tok_type: TokenType, message: &'a str) -> Result<Token, ParseError> {
+    fn consume(&mut self, tok_type: TokenType, message: &str) -> Result<Token, ParseError> {
         if self.check(&tok_type) {
             return Ok(self.advance().clone());
         }
@@ -168,7 +172,7 @@ impl Parser<'_> {
 
         while !self.is_end() {
             if *self.previous().get_type() == TokenType::Semicolon {
-                return
+                return;
             }
 
             let tok_types = vec![
@@ -182,7 +186,7 @@ impl Parser<'_> {
                 TokenType::Return,
             ];
             if tok_types.iter().any(|tt| tt == self.peek().get_type()) {
-                return
+                return;
             }
 
             self.advance();
@@ -221,10 +225,14 @@ impl Parser<'_> {
     }
 
     fn peek(&self) -> &Token {
-        self.tokens.get(self.current).expect("Failed peeking Token!")
+        self.tokens
+            .get(self.current)
+            .expect("Failed peeking Token!")
     }
 
     fn previous(&self) -> &Token {
-        self.tokens.get(self.current - 1).expect("Failed peeking previous Token!")
+        self.tokens
+            .get(self.current - 1)
+            .expect("Failed peeking previous Token!")
     }
 }

@@ -4,8 +4,8 @@ pub mod parser;
 
 use ast::{AstPrinter, Visitor};
 use lexer::scanner::Scanner;
-use parser::Parser;
 use lexer::token::{Token, TokenType};
+use parser::Parser;
 use std::fs;
 use std::io::{self, Write};
 use std::process;
@@ -63,7 +63,7 @@ impl Lox {
 
         // Stop if there was a syntax error.
         if self.had_error {
-            return
+            return;
         }
 
         let printer = AstPrinter;
@@ -106,7 +106,7 @@ impl Lox {
 
 #[cfg(test)]
 mod test_parser_basic {
-    use crate::{AstPrinter, Scanner, Parser, Lox, Visitor};
+    use crate::{AstPrinter, Lox, Parser, Scanner, Visitor};
 
     fn run(source: &str) -> String {
         let mut interpreter = Lox::new();
@@ -129,10 +129,7 @@ mod test_parser_basic {
     #[test]
     fn test_basic() {
         let source = "1 - (2 + 3) / 7 != \"name\"";
-        assert_eq!(
-            run(source),
-            "(!= (- 1 (/ (group (+ 2 3)) 7)) name)",
-        );
+        assert_eq!(run(source), "(!= (- 1 (/ (group (+ 2 3)) 7)) name)",);
 
         let source = "-1 + 3 * 4 - 6 / 3.0 * 9 * (10 * 11) >= \"a\" + \"c\" * (-20)";
         assert_eq!(
@@ -144,15 +141,9 @@ mod test_parser_basic {
     #[test]
     fn test_weird() {
         let source = "1 +- 2";
-        assert_eq!(
-            run(source),
-            "(+ 1 (- 2))",
-        );
+        assert_eq!(run(source), "(+ 1 (- 2))",);
 
         let source = "896 - 1)";
-        assert_eq!(
-            run(source),
-            "(- 896 1)",
-        );
+        assert_eq!(run(source), "(- 896 1)",);
     }
 }

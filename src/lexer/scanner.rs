@@ -101,7 +101,9 @@ impl Scanner<'_> {
 
             'a'..='z' | 'A'..='Z' | '_' => self.identifier(),
 
-            _ => self.interpreter.lex_error(self.line, "Unexpected character!"),
+            _ => self
+                .interpreter
+                .lex_error(self.line, "Unexpected character!"),
         }
     }
 
@@ -177,7 +179,8 @@ impl Scanner<'_> {
         }
 
         if self.is_end() {
-            self.interpreter.lex_error(self.line, "Unterminated string!");
+            self.interpreter
+                .lex_error(self.line, "Unterminated string!");
             return;
         }
 
