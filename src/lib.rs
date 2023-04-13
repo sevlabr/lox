@@ -19,19 +19,16 @@ pub trait Visitor<T> {
 pub struct Lox {
     had_error: bool,
     had_runtime_error: bool,
-}
 
-impl Default for Lox {
-    fn default() -> Self {
-        Self::new()
-    }
+    evaluator: Evaluator,
 }
 
 impl Lox {
-    pub fn new() -> Self {
+    pub fn new(evaluator: Evaluator) -> Self {
         Lox {
             had_error: false,
             had_runtime_error: false,
+            evaluator,
         }
     }
 
@@ -79,11 +76,13 @@ impl Lox {
             return;
         }
 
-        let mut evaluator = Evaluator::new(self);
         match expression {
-            Some(exp) => match evaluator.interpret(exp) {
-                Some(obj) => println!("{}", obj),
-                None => println!("Failed expression evaluation!"),
+            Some(exp) => match self.evaluator.evaluate(&exp) {
+                Ok(obj) => println!("{}", obj),
+                Err(err) => {
+                    self.runtime_error(err);
+                    println!("Failed expression evaluation!");
+                }
             },
             None => println!("Failed parsing!"),
         };
@@ -154,10 +153,11 @@ impl Lox {
 
 #[cfg(test)]
 mod test_parser_basic {
-    use crate::{AstPrinter, Lox, Parser, Scanner, Visitor};
+    use crate::{AstPrinter, Evaluator, Lox, Parser, Scanner, Visitor};
 
     fn run(source: &str) -> String {
-        let mut interpreter = Lox::new();
+        let evaluator = Evaluator;
+        let mut interpreter = Lox::new(evaluator);
 
         let mut scanner = Scanner::new(&mut interpreter, &source);
         scanner.scan_tokens();
@@ -200,7 +200,8 @@ mod test_parser_basic {
     fn test_error() {
         let source = "23.123 - + 2";
 
-        let mut interpreter = Lox::new();
+        let evaluator = Evaluator;
+        let mut interpreter = Lox::new(evaluator);
 
         let mut scanner = Scanner::new(&mut interpreter, &source);
         scanner.scan_tokens();

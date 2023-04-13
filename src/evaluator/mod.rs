@@ -1,6 +1,5 @@
 use crate::ast::expr::Expr;
 use crate::lexer::token::{Literal, Token, TokenType};
-use crate::Lox;
 use crate::Visitor;
 use std::error::Error;
 use std::fmt::Display;
@@ -65,11 +64,15 @@ impl Display for Object {
     }
 }
 
-pub struct Evaluator<'a> {
-    interpreter: &'a mut Lox,
+pub struct Evaluator;
+
+impl Default for Evaluator {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
-impl Visitor<Result<Object, RuntimeError>> for Evaluator<'_> {
+impl Visitor<Result<Object, RuntimeError>> for Evaluator {
     fn visit_expr(&self, e: &Expr) -> Result<Object, RuntimeError> {
         match e {
             Expr::LiteralExpr(l) => match l {
@@ -145,24 +148,12 @@ impl Visitor<Result<Object, RuntimeError>> for Evaluator<'_> {
     }
 }
 
-impl Evaluator<'_> {
-    pub fn new(interpreter: &mut Lox) -> Evaluator {
-        Evaluator { interpreter }
+impl Evaluator {
+    fn new() -> Evaluator {
+        Evaluator
     }
 
-    pub fn interpret(&mut self, exp: Expr) -> Option<Object> {
-        let value = self.evaluate(&exp);
-
-        match value {
-            Ok(v) => Some(v),
-            Err(err) => {
-                self.interpreter.runtime_error(err);
-                None
-            }
-        }
-    }
-
-    fn evaluate(&self, exp: &Expr) -> Result<Object, RuntimeError> {
+    pub fn evaluate(&self, exp: &Expr) -> Result<Object, RuntimeError> {
         self.visit_expr(exp)
     }
 
