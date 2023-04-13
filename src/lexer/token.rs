@@ -20,7 +20,7 @@ pub static KEYWORDS: phf::Map<&'static str, TokenType> = phf_map! {
     "while"  => TokenType::While,
 };
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum TokenType {
     // Single-character tokens.
     LeftParen,
@@ -71,6 +71,7 @@ pub enum TokenType {
     Eof,
 }
 
+#[derive(Clone)]
 pub struct Token {
     tok_type: TokenType,
     lexeme: String,
@@ -88,8 +89,20 @@ impl Token {
         }
     }
 
-    pub fn lexeme(&self) -> &str {
+    pub fn get_lexeme(&self) -> &str {
         &self.lexeme
+    }
+
+    pub fn get_type(&self) -> &TokenType {
+        &self.tok_type
+    }
+
+    pub fn get_literal(&self) -> &Literal {
+        &self.literal
+    }
+
+    pub fn get_line(&self) -> usize {
+        self.line
     }
 }
 
@@ -103,11 +116,12 @@ impl fmt::Display for Token {
     }
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub enum Literal {
     None,
     String(String),
     Number(f64),
+    Bool(bool),
 }
 
 impl fmt::Display for Literal {
@@ -116,6 +130,7 @@ impl fmt::Display for Literal {
             Literal::None => write!(f, "nil"),
             Literal::String(s) => write!(f, "{s}"),
             Literal::Number(n) => write!(f, "{n}"),
+            Literal::Bool(b) => write!(f, "{b}"),
         }
     }
 }

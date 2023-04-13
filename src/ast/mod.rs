@@ -6,18 +6,18 @@ pub trait Visitor<T> {
     fn visit_expr(&self, e: &Expr) -> T;
 }
 
-struct AstPrinter;
+pub struct AstPrinter;
 
 impl Visitor<String> for AstPrinter {
     fn visit_expr(&self, e: &Expr) -> String {
         match e {
             Expr::Binary(l, op, r) => {
                 // TODO: change "&**" to smth elegant
-                self.parenthesize(op.lexeme(), vec![&**l, &**r])
+                self.parenthesize(op.get_lexeme(), vec![&**l, &**r])
             }
             Expr::Grouping(ge) => self.parenthesize("group", vec![&**ge]),
             Expr::LiteralExpr(l) => format!("{l}"),
-            Expr::Unary(op, r) => self.parenthesize(op.lexeme(), vec![&**r]),
+            Expr::Unary(op, r) => self.parenthesize(op.get_lexeme(), vec![&**r]),
         }
     }
 }
