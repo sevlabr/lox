@@ -2,7 +2,7 @@ use phf::phf_map;
 use std::fmt;
 
 pub static KEYWORDS: phf::Map<&'static str, TokenType> = phf_map! {
-    "and" => TokenType::And,
+    "and"    => TokenType::And,
     "class"  => TokenType::Class,
     "else"   => TokenType::Else,
     "false"  => TokenType::False,
@@ -71,7 +71,7 @@ pub enum TokenType {
     Eof,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Token {
     tok_type: TokenType,
     lexeme: String,
@@ -118,10 +118,10 @@ impl fmt::Display for Token {
 
 #[derive(Clone, Debug)]
 pub enum Literal {
-    None,
-    String(String),
-    Number(f64),
     Bool(bool),
+    Number(f64),
+    String(String),
+    None,
 }
 
 impl fmt::Display for Literal {

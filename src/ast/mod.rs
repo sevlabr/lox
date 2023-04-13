@@ -1,10 +1,7 @@
 pub mod expr;
 
+use crate::Visitor;
 use expr::*;
-
-pub trait Visitor<T> {
-    fn visit_expr(&self, e: &Expr) -> T;
-}
 
 pub struct AstPrinter;
 
