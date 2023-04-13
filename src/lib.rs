@@ -29,7 +29,10 @@ impl Default for Lox {
 
 impl Lox {
     pub fn new() -> Self {
-        Lox { had_error: false, had_runtime_error: false }
+        Lox {
+            had_error: false,
+            had_runtime_error: false,
+        }
     }
 
     pub fn run_file(&mut self, path: &str) {
@@ -78,11 +81,9 @@ impl Lox {
 
         let mut evaluator = Evaluator::new(self);
         match expression {
-            Some(exp) => {
-                match evaluator.interpret(exp) {
-                    Some(obj) => println!("{}", obj.to_string()),
-                    None => println!("Failed expression evaluation!"),
-                }
+            Some(exp) => match evaluator.interpret(exp) {
+                Some(obj) => println!("{}", obj),
+                None => println!("Failed expression evaluation!"),
             },
             None => println!("Failed parsing!"),
         };

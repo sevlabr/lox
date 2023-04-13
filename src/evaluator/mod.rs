@@ -1,7 +1,7 @@
 use crate::ast::expr::Expr;
 use crate::lexer::token::{Literal, Token, TokenType};
-use crate::Visitor;
 use crate::Lox;
+use crate::Visitor;
 use std::error::Error;
 use std::fmt::Display;
 
@@ -15,13 +15,20 @@ impl Error for RuntimeError {}
 
 impl Display for RuntimeError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "RuntimeError for Token: <{}>. Message: {}", self.token, self.message)
+        write!(
+            f,
+            "RuntimeError for Token: <{}>. Message: {}",
+            self.token, self.message
+        )
     }
 }
 
 impl RuntimeError {
     fn new(t: &Token, msg: &str) -> RuntimeError {
-        RuntimeError { token: t.clone(), message: msg.to_string() }
+        RuntimeError {
+            token: t.clone(),
+            message: msg.to_string(),
+        }
     }
 
     pub fn get_message(&self) -> String {
@@ -42,18 +49,18 @@ pub enum Object {
     None,
 }
 
-impl Object {
-    pub fn to_string(&self) -> String {
+impl Display for Object {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Object::Bool(b) => b.to_string(),
+            Object::Bool(b) => write!(f, "{b}"),
             Object::Number(n) => {
                 if n.fract() == 0.0 {
-                    return (*n as i64).to_string();
+                    return write!(f, "{}", (*n as i64));
                 }
-                return n.to_string();
-            },
-            Object::String(s) => s.clone(),
-            Object::None => "nil".to_string()
+                write!(f, "{}", (*n))
+            }
+            Object::String(s) => write!(f, "{s}"),
+            Object::None => write!(f, "nil"),
         }
     }
 }
@@ -65,13 +72,11 @@ pub struct Evaluator<'a> {
 impl Visitor<Result<Object, RuntimeError>> for Evaluator<'_> {
     fn visit_expr(&self, e: &Expr) -> Result<Object, RuntimeError> {
         match e {
-            Expr::LiteralExpr(l) => {
-                match l {
-                    Literal::Bool(b) => Ok(Object::Bool(*b)),
-                    Literal::Number(n) => Ok(Object::Number(*n)),
-                    Literal::String(s) => Ok(Object::String(s.clone())),
-                    Literal::None => Ok(Object::None),
-                }
+            Expr::LiteralExpr(l) => match l {
+                Literal::Bool(b) => Ok(Object::Bool(*b)),
+                Literal::Number(n) => Ok(Object::Number(*n)),
+                Literal::String(s) => Ok(Object::String(s.clone())),
+                Literal::None => Ok(Object::None),
             },
             Expr::Grouping(exp) => self.evaluate(exp),
             Expr::Unary(op, right) => {
@@ -80,29 +85,45 @@ impl Visitor<Result<Object, RuntimeError>> for Evaluator<'_> {
                 match op.get_type() {
                     TokenType::Minus => Ok(Object::Number(-self.cast_num(op, r)?)),
                     TokenType::Bang => Ok(Object::Bool(!self.is_truthy(r))),
-                    _ => Ok(Object::None)
+                    _ => Ok(Object::None),
                 }
-            },
+            }
             Expr::Binary(left, op, right) => {
                 let l = self.evaluate(left)?;
                 let r = self.evaluate(right)?;
 
                 match op.get_type() {
-                    TokenType::Greater => Ok(Object::Bool(self.cast_num(op, l)? > self.cast_num(op, r)?)),
-                    TokenType::GreaterEqual => Ok(Object::Bool(self.cast_num(op, l)? >= self.cast_num(op, r)?)),
-                    TokenType::Less => Ok(Object::Bool(self.cast_num(op, l)? < self.cast_num(op, r)?)),
-                    TokenType::LessEqual => Ok(Object::Bool(self.cast_num(op, l)? <= self.cast_num(op, r)?)),
+                    TokenType::Greater => {
+                        Ok(Object::Bool(self.cast_num(op, l)? > self.cast_num(op, r)?))
+                    }
+                    TokenType::GreaterEqual => {
+                        Ok(Object::Bool(self.cast_num(op, l)? >= self.cast_num(op, r)?))
+                    }
+                    TokenType::Less => {
+                        Ok(Object::Bool(self.cast_num(op, l)? < self.cast_num(op, r)?))
+                    }
+                    TokenType::LessEqual => {
+                        Ok(Object::Bool(self.cast_num(op, l)? <= self.cast_num(op, r)?))
+                    }
 
                     TokenType::BangEqual => Ok(Object::Bool(!self.is_equal(l, r))),
                     TokenType::EqualEqual => Ok(Object::Bool(self.is_equal(l, r))),
 
-                    TokenType::Minus => Ok(Object::Number(self.cast_num(op, l)? - self.cast_num(op, r)?)),
-                    TokenType::Slash => Ok(Object::Number(self.cast_num(op, l)? / self.cast_num(op, r)?)),
-                    TokenType::Star => Ok(Object::Number(self.cast_num(op, l)? * self.cast_num(op, r)?)),
+                    TokenType::Minus => Ok(Object::Number(
+                        self.cast_num(op, l)? - self.cast_num(op, r)?,
+                    )),
+                    TokenType::Slash => Ok(Object::Number(
+                        self.cast_num(op, l)? / self.cast_num(op, r)?,
+                    )),
+                    TokenType::Star => Ok(Object::Number(
+                        self.cast_num(op, l)? * self.cast_num(op, r)?,
+                    )),
 
                     TokenType::Plus => {
                         if self.is_num(&l) && self.is_num(&r) {
-                            return Ok(Object::Number(self.cast_num(op, l)? + self.cast_num(op, r)?));
+                            return Ok(Object::Number(
+                                self.cast_num(op, l)? + self.cast_num(op, r)?,
+                            ));
                         }
 
                         if self.is_str(&l) && self.is_str(&r) {
@@ -111,7 +132,10 @@ impl Visitor<Result<Object, RuntimeError>> for Evaluator<'_> {
                             return Ok(Object::String(concatenated_str));
                         }
 
-                        return Err(RuntimeError::new(op, "Operands must be two numbers or two strings."));
+                        Err(RuntimeError::new(
+                            op,
+                            "Operands must be two numbers or two strings.",
+                        ))
                     }
 
                     _ => Ok(Object::None),
@@ -127,61 +151,52 @@ impl Evaluator<'_> {
     }
 
     pub fn interpret(&mut self, exp: Expr) -> Option<Object> {
-        let value = self.evaluate(&Box::new(exp));
+        let value = self.evaluate(&exp);
 
         match value {
             Ok(v) => Some(v),
             Err(err) => {
                 self.interpreter.runtime_error(err);
-                return None;
+                None
             }
         }
     }
 
-    fn evaluate(&self, exp: &Box<Expr>) -> Result<Object, RuntimeError> {
-        self.visit_expr(&*exp)
+    fn evaluate(&self, exp: &Expr) -> Result<Object, RuntimeError> {
+        self.visit_expr(exp)
     }
 
     fn cast_num(&self, op: &Token, obj: Object) -> Result<f64, RuntimeError> {
         match obj {
             Object::Number(n) => Ok(n),
-            _ => Err(RuntimeError::new(op, "Operand must be a number."))
+            _ => Err(RuntimeError::new(op, "Operand must be a number.")),
         }
     }
 
     fn cast_str(&self, op: &Token, obj: Object) -> Result<String, RuntimeError> {
         match obj {
             Object::String(s) => Ok(s),
-            _ => Err(RuntimeError::new(op, "Operand must be a string."))
+            _ => Err(RuntimeError::new(op, "Operand must be a string.")),
         }
     }
 
     fn is_num(&self, obj: &Object) -> bool {
-        match obj {
-            Object::Number(_) => true,
-            _ => false
-        }
+        matches!(obj, Object::Number(_))
     }
 
     fn is_str(&self, obj: &Object) -> bool {
-        match obj {
-            Object::String(_) => true,
-            _ => false
-        }
+        matches!(obj, Object::String(_))
     }
 
     fn is_none(&self, obj: &Object) -> bool {
-        match obj {
-            Object::None => true,
-            _ => false
-        }
+        matches!(obj, Object::None)
     }
 
     fn is_truthy(&self, obj: Object) -> bool {
         match obj {
             Object::None => false,
             Object::Bool(b) => b,
-            _ => true
+            _ => true,
         }
     }
 
@@ -193,6 +208,6 @@ impl Evaluator<'_> {
             return false;
         }
 
-        return l == r;
+        l == r
     }
 }
