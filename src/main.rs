@@ -1,10 +1,11 @@
-use lox::evaluator::Evaluator;
+use lox::evaluator::{environment::Environment, Evaluator};
 use lox::Lox;
 use std::env;
 use std::process;
 
 fn main() {
-    let evaluator = Evaluator;
+    let environment = Environment::new();
+    let evaluator = Evaluator::new(environment);
     let mut interpreter = Lox::new(evaluator);
 
     let args: Vec<String> = env::args().collect();

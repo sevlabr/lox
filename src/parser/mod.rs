@@ -1,4 +1,5 @@
 use crate::ast::expr::Expr;
+use crate::ast::stmt::Stmt;
 use crate::lexer::token::{Literal, Token, TokenType};
 use crate::Lox;
 use std::error::Error;
@@ -31,15 +32,99 @@ impl Parser<'_> {
         }
     }
 
-    pub fn parse(&mut self) -> Option<Expr> {
-        match self.expression() {
-            Ok(exp) => Some(exp),
-            Err(_err) => None,
+    pub fn parse(&mut self) -> Vec<Option<Stmt>> {
+        let mut statements = Vec::new();
+        while !self.is_end() {
+            statements.push(self.declaration())
         }
+
+        statements
     }
 
     fn expression(&mut self) -> Result<Expr, ParseError> {
-        self.equality()
+        self.assignment()
+    }
+
+    fn assignment(&mut self) -> Result<Expr, ParseError> {
+        let exp = self.equality()?;
+
+        if self.match_tokens(&vec![TokenType::Equal]) {
+            let equals = self.previous().clone();
+            let value = self.assignment()?;
+
+            match exp {
+                Expr::Variable(name) => {
+                    return Ok(Expr::Assign(name, Box::new(value)));
+                }
+                _ => {
+                    self.error(&equals, "Invalid assignment target.");
+                }
+            }
+        }
+
+        Ok(exp)
+    }
+
+    fn declaration(&mut self) -> Option<Stmt> {
+        if self.match_tokens(&vec![TokenType::Var]) {
+            match self.var_declaration() {
+                Ok(s) => return Some(s),
+                Err(_) => {
+                    // println!("{err}");
+                    self.synchronize();
+                    return None;
+                }
+            }
+        }
+
+        match self.statement() {
+            Ok(s) => Some(s),
+            Err(_) => {
+                // println!("{err}");
+                self.synchronize();
+                None
+            }
+        }
+    }
+
+    fn statement(&mut self) -> Result<Stmt, ParseError> {
+        if self.match_tokens(&vec![TokenType::Print]) {
+            return self.print_stmt();
+        }
+        self.expression_stmt()
+    }
+
+    fn print_stmt(&mut self) -> Result<Stmt, ParseError> {
+        let value = self.expression()?;
+        match self.consume(TokenType::Semicolon, "Expect ';' after value.") {
+            Ok(_) => (),
+            Err(err) => return Err(err),
+        };
+        Ok(Stmt::Print(value))
+    }
+
+    fn var_declaration(&mut self) -> Result<Stmt, ParseError> {
+        let name = self.consume(TokenType::Identifier, "Expect variable name.")?;
+
+        let mut initializer = Expr::LiteralExpr(Literal::None);
+        if self.match_tokens(&vec![TokenType::Equal]) {
+            initializer = self.expression()?;
+        }
+
+        self.consume(
+            TokenType::Semicolon,
+            "Expect ';' after variable declaration.",
+        )?;
+        Ok(Stmt::Var(name, initializer))
+    }
+
+    fn expression_stmt(&mut self) -> Result<Stmt, ParseError> {
+        let exp = self.expression()?;
+        match self.consume(TokenType::Semicolon, "Expect ';' after value.") {
+            Ok(_) => (),
+            Err(err) => return Err(err),
+        };
+        Ok(Stmt::Expression(exp))
     }
 
     // TODO: combine 'equality, comparison, term and factor'
@@ -139,6 +224,10 @@ impl Parser<'_> {
             return Ok(exp);
         }
 
+        if self.match_tokens(&vec![TokenType::Identifier]) {
+            return Ok(Expr::Variable(self.previous().clone()));
+        }
+
         if self.match_tokens(&vec![TokenType::LeftParen]) {
             let exp = self.expression()?;
             match self.consume(TokenType::RightParen, "Expect ')' after expression!") {
@@ -167,7 +256,7 @@ impl Parser<'_> {
         ParseError
     }
 
-    fn _synchronize(&mut self) {
+    fn synchronize(&mut self) {
         self.advance();
 
         while !self.is_end() {

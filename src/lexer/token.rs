@@ -71,7 +71,7 @@ pub enum TokenType {
     Eof,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct Token {
     tok_type: TokenType,
     lexeme: String,
@@ -116,7 +116,7 @@ impl fmt::Display for Token {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum Literal {
     Bool(bool),
     Number(f64),

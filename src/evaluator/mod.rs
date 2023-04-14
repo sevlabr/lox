@@ -1,6 +1,10 @@
+pub mod environment;
+
 use crate::ast::expr::Expr;
+use crate::ast::stmt::Stmt;
 use crate::lexer::token::{Literal, Token, TokenType};
 use crate::Visitor;
+use environment::Environment;
 use std::error::Error;
 use std::fmt::Display;
 
@@ -40,7 +44,7 @@ impl RuntimeError {
 }
 
 // TODO: probably Literal is enough.
-#[derive(PartialEq)]
+#[derive(Clone, PartialEq)]
 pub enum Object {
     Bool(bool),
     Number(f64),
@@ -64,16 +68,12 @@ impl Display for Object {
     }
 }
 
-pub struct Evaluator;
-
-impl Default for Evaluator {
-    fn default() -> Self {
-        Self::new()
-    }
+pub struct Evaluator {
+    environment: Environment,
 }
 
-impl Visitor<Result<Object, RuntimeError>> for Evaluator {
-    fn visit_expr(&self, e: &Expr) -> Result<Object, RuntimeError> {
+impl Visitor<Result<Object, RuntimeError>, Result<(), RuntimeError>> for Evaluator {
+    fn visit_expr(&mut self, e: &Expr) -> Result<Object, RuntimeError> {
         match e {
             Expr::LiteralExpr(l) => match l {
                 Literal::Bool(b) => Ok(Object::Bool(*b)),
@@ -91,6 +91,9 @@ impl Visitor<Result<Object, RuntimeError>> for Evaluator {
                     _ => Ok(Object::None),
                 }
             }
+
+            Expr::Variable(name) => self.environment.get(name.clone()),
+
             Expr::Binary(left, op, right) => {
                 let l = self.evaluate(left)?;
                 let r = self.evaluate(right)?;
@@ -144,17 +147,51 @@ impl Visitor<Result<Object, RuntimeError>> for Evaluator {
                     _ => Ok(Object::None),
                 }
             }
+
+            Expr::Assign(name, value) => {
+                let val = self.evaluate(value)?;
+                self.environment.assign(name, val.clone())?;
+                Ok(val)
+            }
+        }
+    }
+
+    fn visit_stmt(&mut self, s: &Stmt) -> Result<(), RuntimeError> {
+        match s {
+            Stmt::Expression(exp) => {
+                self.evaluate(exp)?;
+                Ok(())
+            }
+            Stmt::Print(exp) => {
+                let value = self.evaluate(exp)?;
+                println!("{value}");
+                Ok(())
+            }
+            Stmt::Var(name, initializer) => {
+                let mut value = Object::None;
+                if *initializer != Expr::LiteralExpr(Literal::None) {
+                    value = self.evaluate(initializer)?;
+                }
+
+                self.environment
+                    .define(name.get_lexeme().to_string(), value);
+                Ok(())
+            }
         }
     }
 }
 
 impl Evaluator {
-    fn new() -> Evaluator {
-        Evaluator
+    pub fn new(environment: Environment) -> Evaluator {
+        Evaluator { environment }
     }
 
-    pub fn evaluate(&self, exp: &Expr) -> Result<Object, RuntimeError> {
+    pub fn evaluate(&mut self, exp: &Expr) -> Result<Object, RuntimeError> {
         self.visit_expr(exp)
+    }
+
+    pub fn execute(&mut self, s: &Stmt) -> Result<(), RuntimeError> {
+        self.visit_stmt(s)
     }
 
     fn cast_num(&self, op: &Token, obj: Object) -> Result<f64, RuntimeError> {
