@@ -83,10 +83,10 @@ impl Lox {
                     Ok(_) => (),
                     Err(err) => {
                         self.runtime_error(err);
-                        println!("Failed expression evaluation!");
+                        eprintln!("Failed expression evaluation!");
                     }
                 },
-                None => println!("Found None instead of Stmt while evaluation!"),
+                None => eprintln!("Found None instead of Stmt while evaluation!"),
             }
         }
     }
@@ -110,7 +110,7 @@ impl Lox {
                 Some(s) => {
                     println!("{}", printer.visit_stmt(&s))
                 }
-                None => println!("Failed while printing AST. (None Stmt)."),
+                None => eprintln!("Failed while printing AST. (None Stmt)."),
             }
         }
     }
@@ -138,7 +138,7 @@ impl Lox {
         err_msg.push_str(&line.to_string());
         err_msg.push(']');
 
-        println!("{err_msg}");
+        eprintln!("{err_msg}");
 
         self.had_runtime_error = true;
     }
@@ -153,7 +153,7 @@ impl Lox {
     }
 
     fn report(&mut self, line: usize, err_type: &str, msg: &str) {
-        println!("[line {line}] Error{err_type}: {msg}");
+        eprintln!("[line {line}] Error{err_type}: {msg}");
         self.had_error = true;
     }
 }
@@ -164,7 +164,7 @@ mod test_parser_basic {
     use crate::{AstPrinter, Evaluator, Lox, Parser, Scanner, Visitor};
 
     fn run(source: &str) -> String {
-        let environment = Environment::new();
+        let environment = Environment::new(None);
         let evaluator = Evaluator::new(environment);
         let mut interpreter = Lox::new(evaluator);
 

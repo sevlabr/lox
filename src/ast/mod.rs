@@ -56,6 +56,17 @@ impl Visitor<String, String> for AstPrinter {
                 ];
                 self.parenthesize_with_transform("var", &parts)
             }
+            Stmt::Block(stmts) => {
+                let mut pretty_str = String::new();
+                pretty_str.push_str("block ");
+
+                for stmt in stmts {
+                    pretty_str.push_str(&self.visit_stmt(stmt));
+                }
+
+                pretty_str.push(')');
+                pretty_str
+            }
         }
     }
 }

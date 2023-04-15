@@ -3,26 +3,42 @@ use crate::evaluator::RuntimeError;
 use crate::lexer::token::Token;
 use std::collections::HashMap;
 
+#[derive(Clone)]
 pub struct Environment {
+    enclosing: Option<Box<Environment>>,
     values: HashMap<String, Object>,
 }
 
-impl Default for Environment {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl Environment {
-    pub fn new() -> Environment {
+    pub fn new(enclosing: Option<Box<Environment>>) -> Environment {
         Environment {
+            enclosing,
             values: HashMap::new(),
+        }
+    }
+
+    pub fn enclosing(&self) -> Option<Box<Environment>> {
+        self.enclosing.clone()
+    }
+
+    pub fn from_inner(environment: Option<Box<Environment>>) -> Environment {
+        match environment {
+            Some(env) => Environment {
+                enclosing: env.enclosing(),
+                values: env.values,
+            },
+            None => Environment::new(None),
         }
     }
 
     pub fn assign(&mut self, name: &Token, value: Object) -> Result<(), RuntimeError> {
         if self.values.contains_key(name.get_lexeme()) {
             self.values.insert(name.get_lexeme().to_string(), value);
+            return Ok(());
+        }
+
+        if let Some(env) = &mut self.enclosing {
+            env.assign(name, value)?;
             return Ok(());
         }
 
@@ -40,6 +56,10 @@ impl Environment {
     pub fn get(&self, name: Token) -> Result<Object, RuntimeError> {
         if self.values.contains_key(name.get_lexeme()) {
             return Ok(self.values.get(name.get_lexeme()).cloned().unwrap());
+        }
+
+        if let Some(env) = &self.enclosing {
+            return env.get(name);
         }
 
         let mut msg = String::new();

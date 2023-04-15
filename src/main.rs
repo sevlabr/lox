@@ -4,7 +4,7 @@ use std::env;
 use std::process;
 
 fn main() {
-    let environment = Environment::new();
+    let environment = Environment::new(None);
     let evaluator = Evaluator::new(environment);
     let mut interpreter = Lox::new(evaluator);
 
@@ -13,7 +13,7 @@ fn main() {
         2 => interpreter.run_file(&args[1]),
         1 => interpreter.run_promt(),
         _ => {
-            println!("Usage: lox [script]");
+            eprintln!("Usage: lox [script]");
             process::exit(64);
         }
     }

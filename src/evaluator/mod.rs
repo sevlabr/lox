@@ -68,6 +68,7 @@ impl Display for Object {
     }
 }
 
+#[derive(Clone)]
 pub struct Evaluator {
     environment: Environment,
 }
@@ -167,6 +168,14 @@ impl Visitor<Result<Object, RuntimeError>, Result<(), RuntimeError>> for Evaluat
                 println!("{value}");
                 Ok(())
             }
+            Stmt::Block(statements) => {
+                self.execute_block(
+                    statements,
+                    // TODO: cloning is inefficient, change to ref
+                    Environment::new(Some(Box::new(self.environment.clone()))),
+                )?;
+                Ok(())
+            }
             Stmt::Var(name, initializer) => {
                 let mut value = Object::None;
                 if *initializer != Expr::LiteralExpr(Literal::None) {
@@ -192,6 +201,30 @@ impl Evaluator {
 
     pub fn execute(&mut self, s: &Stmt) -> Result<(), RuntimeError> {
         self.visit_stmt(s)
+    }
+
+    fn execute_block(
+        &mut self,
+        statements: &Vec<Stmt>,
+        env: Environment,
+    ) -> Result<(), RuntimeError> {
+        // TODO: cloning is inefficient, change to ref
+        // let previous = self.environment.clone();
+        self.environment = env;
+        for statement in statements {
+            match self.execute(statement) {
+                Ok(_) => continue,
+                Err(err) => {
+                    let previous = self.environment.enclosing();
+                    self.environment = Environment::from_inner(previous);
+                    return Err(err);
+                }
+            }
+        }
+
+        let previous = self.environment.enclosing();
+        self.environment = Environment::from_inner(previous);
+        Ok(())
     }
 
     fn cast_num(&self, op: &Token, obj: Object) -> Result<f64, RuntimeError> {

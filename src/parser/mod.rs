@@ -91,6 +91,11 @@ impl Parser<'_> {
         if self.match_tokens(&vec![TokenType::Print]) {
             return self.print_stmt();
         }
+
+        if self.match_tokens(&vec![TokenType::LeftBrace]) {
+            return self.block();
+        }
+
         self.expression_stmt()
     }
 
@@ -125,6 +130,19 @@ impl Parser<'_> {
             Err(err) => return Err(err),
         };
         Ok(Stmt::Expression(exp))
+    }
+
+    fn block(&mut self) -> Result<Stmt, ParseError> {
+        let mut statements: Vec<Stmt> = Vec::new();
+
+        while !self.check(&TokenType::RightBrace) && !self.is_end() {
+            if let Some(dec) = self.declaration() {
+                statements.push(dec);
+            }
+        }
+
+        self.consume(TokenType::RightBrace, "Expect '}' after block.")?;
+        Ok(Stmt::Block(statements))
     }
 
     // TODO: combine 'equality, comparison, term and factor'
@@ -215,10 +233,8 @@ impl Parser<'_> {
                 Literal::Number(n) => Expr::LiteralExpr(Literal::Number(n)),
                 Literal::String(s) => Expr::LiteralExpr(Literal::String(s)),
                 _ => {
-                    panic!(
-                        "Expected Number or String but found: {}.",
-                        self.previous().get_literal()
-                    )
+                    let tok = self.previous().clone();
+                    return Err(self.error(&tok, "Expected Number or String."));
                 }
             };
             return Ok(exp);
