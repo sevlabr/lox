@@ -82,13 +82,26 @@ impl Visitor<Result<Object, RuntimeError>, Result<(), RuntimeError>> for Evaluat
                 Literal::String(s) => Ok(Object::String(s.clone())),
                 Literal::None => Ok(Object::None),
             },
+            Expr::Logical(left, op, right) => {
+                let l = self.evaluate(left)?;
+
+                if *op.get_type() == TokenType::Or {
+                    if self.is_truthy(&l) {
+                        return Ok(l);
+                    }
+                } else if !self.is_truthy(&l) {
+                    return Ok(l);
+                }
+
+                Ok(self.evaluate(right)?)
+            }
             Expr::Grouping(exp) => self.evaluate(exp),
             Expr::Unary(op, right) => {
                 let r = self.evaluate(right)?;
 
                 match op.get_type() {
                     TokenType::Minus => Ok(Object::Number(-self.cast_num(op, r)?)),
-                    TokenType::Bang => Ok(Object::Bool(!self.is_truthy(r))),
+                    TokenType::Bang => Ok(Object::Bool(!self.is_truthy(&r))),
                     _ => Ok(Object::None),
                 }
             }
@@ -163,6 +176,16 @@ impl Visitor<Result<Object, RuntimeError>, Result<(), RuntimeError>> for Evaluat
                 self.evaluate(exp)?;
                 Ok(())
             }
+            Stmt::If(condition, then_branch, else_branch) => {
+                let cond = self.evaluate(condition)?;
+                if self.is_truthy(&cond) {
+                    self.execute(then_branch)?;
+                }
+                if let Some(s) = else_branch {
+                    self.execute(s)?;
+                }
+                Ok(())
+            }
             Stmt::Print(exp) => {
                 let value = self.evaluate(exp)?;
                 println!("{value}");
@@ -184,6 +207,14 @@ impl Visitor<Result<Object, RuntimeError>, Result<(), RuntimeError>> for Evaluat
 
                 self.environment
                     .define(name.get_lexeme().to_string(), value);
+                Ok(())
+            }
+            Stmt::While(condition, body) => {
+                let mut cond = self.evaluate(condition)?;
+                while self.is_truthy(&cond) {
+                    self.execute(body)?;
+                    cond = self.evaluate(condition)?;
+                }
                 Ok(())
             }
         }
@@ -253,10 +284,10 @@ impl Evaluator {
         matches!(obj, Object::None)
     }
 
-    fn is_truthy(&self, obj: Object) -> bool {
+    fn is_truthy(&self, obj: &Object) -> bool {
         match obj {
             Object::None => false,
-            Object::Bool(b) => b,
+            Object::Bool(b) => *b,
             _ => true,
         }
     }

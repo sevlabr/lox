@@ -11,9 +11,9 @@ pub struct AstPrinter;
 #[allow(dead_code)]
 enum PrintObj {
     Exp(Expr),
-    St(Stmt), // Unused
+    St(Stmt),
     Tok(Token),
-    List(Vec<PrintObj>), // Unused
+    List(Vec<PrintObj>), // Not used
 }
 
 impl Visitor<String, String> for AstPrinter {
@@ -28,13 +28,11 @@ impl Visitor<String, String> for AstPrinter {
                 ];
                 self.parenthesize_with_transform("=", &parts)
             }
-            Expr::Binary(l, op, r) => {
-                // TODO: change "&**" to smth elegant
-                self.parenthesize(op.get_lexeme(), vec![&**l, &**r])
-            }
-            Expr::Grouping(ge) => self.parenthesize("group", vec![&**ge]),
+            Expr::Binary(l, op, r) => self.parenthesize(op.get_lexeme(), vec![l, r]),
+            Expr::Grouping(ge) => self.parenthesize("group", vec![ge]),
             Expr::LiteralExpr(l) => format!("{l}"),
-            Expr::Unary(op, r) => self.parenthesize(op.get_lexeme(), vec![&**r]),
+            Expr::Logical(l, op, r) => self.parenthesize(op.get_lexeme(), vec![l, r]),
+            Expr::Unary(op, r) => self.parenthesize(op.get_lexeme(), vec![r]),
             Expr::Variable(t) => t.get_lexeme().to_string(),
         }
     }
@@ -66,6 +64,26 @@ impl Visitor<String, String> for AstPrinter {
 
                 pretty_str.push(')');
                 pretty_str
+            }
+            Stmt::If(condition, then_branch, else_branch) => {
+                let mut parts = vec![
+                    PrintObj::Exp(condition.clone()),
+                    PrintObj::St(*then_branch.clone()),
+                ];
+                match else_branch {
+                    Some(else_stmt) => {
+                        parts.push(PrintObj::St(*else_stmt.clone()));
+                        self.parenthesize_with_transform("if-else", &parts)
+                    }
+                    None => self.parenthesize_with_transform("if", &parts),
+                }
+            }
+            Stmt::While(condition, body) => {
+                let parts = vec![
+                    PrintObj::Exp(condition.clone()),
+                    PrintObj::St(*body.clone()),
+                ];
+                self.parenthesize_with_transform("while", &parts)
             }
         }
     }
