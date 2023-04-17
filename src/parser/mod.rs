@@ -315,7 +315,40 @@ impl Parser<'_> {
             return Ok(Expr::Unary(operator, Box::new(right)));
         }
 
-        self.primary()
+        self.call()
+    }
+
+    fn call(&mut self) -> Result<Expr, ParseError> {
+        let mut exp = self.primary()?;
+
+        loop {
+            if self.match_tokens(&vec![TokenType::LeftParen]) {
+                exp = self.finish_call(exp)?;
+            } else {
+                break;
+            }
+        }
+
+        Ok(exp)
+    }
+
+    fn finish_call(&mut self, callee: Expr) -> Result<Expr, ParseError> {
+        let mut arguments = Vec::new();
+        if !self.check(&TokenType::RightParen) {
+            loop {
+                if arguments.len() >= 255 {
+                    let tok = self.peek().clone();
+                    self.error(&tok, "Can't have more than 255 arguments.");
+                }
+                arguments.push(self.expression()?);
+                if !self.match_tokens(&vec![TokenType::Comma]) {
+                    break;
+                }
+            }
+        }
+
+        let paren = self.consume(TokenType::RightParen, "Expect ')' after arguments.")?;
+        Ok(Expr::Call(Box::new(callee), paren, arguments))
     }
 
     fn primary(&mut self) -> Result<Expr, ParseError> {

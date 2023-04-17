@@ -4,6 +4,7 @@ use crate::lexer::token::{Literal, Token};
 pub enum Expr {
     Assign(Token, Box<Expr>),
     Binary(Box<Expr>, Token, Box<Expr>),
+    Call(Box<Expr>, Token, Vec<Expr>),
     Grouping(Box<Expr>),
     LiteralExpr(Literal),
     Logical(Box<Expr>, Token, Box<Expr>),

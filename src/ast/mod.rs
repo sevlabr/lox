@@ -8,12 +8,11 @@ use stmt::*;
 
 pub struct AstPrinter;
 
-#[allow(dead_code)]
 enum PrintObj {
     Exp(Expr),
     St(Stmt),
     Tok(Token),
-    List(Vec<PrintObj>), // Not used
+    List(Vec<PrintObj>),
 }
 
 impl Visitor<String, String> for AstPrinter {
@@ -29,6 +28,17 @@ impl Visitor<String, String> for AstPrinter {
                 self.parenthesize_with_transform("=", &parts)
             }
             Expr::Binary(l, op, r) => self.parenthesize(op.get_lexeme(), vec![l, r]),
+            Expr::Call(callee, _, arguments) => {
+                let mut args: Vec<PrintObj> = Vec::new();
+                for argument in arguments {
+                    args.push(PrintObj::Exp(argument.clone()));
+                }
+                let parts = vec![
+                    PrintObj::Exp(*callee.clone()),
+                    PrintObj::List(args),
+                ];
+                self.parenthesize_with_transform("call", &parts)
+            },
             Expr::Grouping(ge) => self.parenthesize("group", vec![ge]),
             Expr::LiteralExpr(l) => format!("{l}"),
             Expr::Logical(l, op, r) => self.parenthesize(op.get_lexeme(), vec![l, r]),
