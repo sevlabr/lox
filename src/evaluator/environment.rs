@@ -1,3 +1,4 @@
+use crate::evaluator::native::Clock;
 use crate::evaluator::Object;
 use crate::evaluator::RuntimeError;
 use crate::lexer::token::Token;
@@ -11,10 +12,11 @@ pub struct Environment {
 
 impl Environment {
     pub fn new(enclosing: Option<Box<Environment>>) -> Environment {
-        Environment {
-            enclosing,
-            values: HashMap::new(),
-        }
+        let mut values = HashMap::new();
+        // globals
+        values.insert("clock".to_string(), Object::Time(Clock));
+
+        Environment { enclosing, values }
     }
 
     pub fn enclosing(&self) -> Option<Box<Environment>> {

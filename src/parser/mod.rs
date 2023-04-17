@@ -66,11 +66,22 @@ impl Parser<'_> {
     }
 
     fn declaration(&mut self) -> Option<Stmt> {
+        if self.match_tokens(&vec![TokenType::Fun]) {
+            match self.function("function") {
+                Ok(s) => return Some(s),
+                Err(_) => {
+                    // eprintln!("{err}");
+                    self.synchronize();
+                    return None;
+                }
+            }
+        }
+
         if self.match_tokens(&vec![TokenType::Var]) {
             match self.var_declaration() {
                 Ok(s) => return Some(s),
                 Err(_) => {
-                    // println!("{err}");
+                    // eprintln!("{err}");
                     self.synchronize();
                     return None;
                 }
@@ -80,7 +91,7 @@ impl Parser<'_> {
         match self.statement() {
             Ok(s) => Some(s),
             Err(_) => {
-                // println!("{err}");
+                // eprintln!("{err}");
                 self.synchronize();
                 None
             }
@@ -211,7 +222,53 @@ impl Parser<'_> {
         Ok(Stmt::Expression(exp))
     }
 
+    fn function(&mut self, kind: &str) -> Result<Stmt, ParseError> {
+        let mut message = String::new();
+        message.push_str("Expect ");
+        message.push_str(kind);
+        message.push_str(" name.");
+        let name = self.consume(TokenType::Identifier, &message)?;
+
+        message = String::new();
+        message.push_str("Expect '(' after ");
+        message.push_str(kind);
+        message.push_str(" name.");
+        self.consume(TokenType::LeftParen, &message)?;
+
+        let mut parameters: Vec<Token> = Vec::new();
+        if !self.check(&TokenType::RightParen) {
+            loop {
+                if parameters.len() >= 255 {
+                    let tok = self.peek().clone();
+                    self.error(&tok, "Can't have more than 255 parameters.");
+                }
+
+                parameters.push(self.consume(TokenType::Identifier, "Expect parameter name.")?);
+
+                if !self.match_tokens(&vec![TokenType::Comma]) {
+                    break;
+                }
+            }
+        }
+
+        self.consume(TokenType::RightParen, "Expect ')' after parameters.")?;
+
+        message = String::new();
+        message.push_str("Expect '{' before ");
+        message.push_str(kind);
+        message.push_str(" body.");
+        self.consume(TokenType::LeftBrace, &message)?;
+
+        let body = self.block_statements()?;
+        Ok(Stmt::Function(name, parameters, body))
+    }
+
     fn block(&mut self) -> Result<Stmt, ParseError> {
+        let statements = self.block_statements()?;
+        Ok(Stmt::Block(statements))
+    }
+
+    fn block_statements(&mut self) -> Result<Vec<Stmt>, ParseError> {
         let mut statements: Vec<Stmt> = Vec::new();
 
         while !self.check(&TokenType::RightBrace) && !self.is_end() {
@@ -221,7 +278,7 @@ impl Parser<'_> {
         }
 
         self.consume(TokenType::RightBrace, "Expect '}' after block.")?;
-        Ok(Stmt::Block(statements))
+        Ok(statements)
     }
 
     fn or(&mut self) -> Result<Expr, ParseError> {

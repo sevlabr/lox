@@ -33,12 +33,9 @@ impl Visitor<String, String> for AstPrinter {
                 for argument in arguments {
                     args.push(PrintObj::Exp(argument.clone()));
                 }
-                let parts = vec![
-                    PrintObj::Exp(*callee.clone()),
-                    PrintObj::List(args),
-                ];
+                let parts = vec![PrintObj::Exp(*callee.clone()), PrintObj::List(args)];
                 self.parenthesize_with_transform("call", &parts)
-            },
+            }
             Expr::Grouping(ge) => self.parenthesize("group", vec![ge]),
             Expr::LiteralExpr(l) => format!("{l}"),
             Expr::Logical(l, op, r) => self.parenthesize(op.get_lexeme(), vec![l, r]),
@@ -69,6 +66,28 @@ impl Visitor<String, String> for AstPrinter {
                 pretty_str.push_str("block ");
 
                 for stmt in stmts {
+                    pretty_str.push_str(&self.visit_stmt(stmt));
+                }
+
+                pretty_str.push(')');
+                pretty_str
+            }
+            Stmt::Function(name, params, body) => {
+                let mut pretty_str = String::new();
+                pretty_str.push_str("(fun ");
+                pretty_str.push_str(name.get_lexeme());
+                pretty_str.push('(');
+
+                for (i, param) in params.iter().enumerate() {
+                    if i != 0 {
+                        pretty_str.push(' ');
+                    }
+                    pretty_str.push_str(param.get_lexeme());
+                }
+
+                pretty_str.push(')');
+
+                for stmt in body {
                     pretty_str.push_str(&self.visit_stmt(stmt));
                 }
 

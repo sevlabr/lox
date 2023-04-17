@@ -7,7 +7,7 @@ use crate::ast::stmt::Stmt;
 use crate::lexer::token::{Literal, Token, TokenType};
 use crate::Visitor;
 use environment::Environment;
-use function::Callable;
+use function::Function;
 use native::Clock;
 use std::error::Error;
 use std::fmt::Display;
@@ -47,54 +47,22 @@ impl RuntimeError {
     }
 }
 
+#[derive(Clone, PartialEq)]
 pub enum Object {
     Bool(bool),
-    Callable(Box<dyn Callable>),
+    Fun(Function),
+    Time(Clock),
     Number(f64),
     String(String),
     None,
-}
-
-impl Callable for Object {
-    fn arity(&self) -> usize {
-        match self {
-            Object::Callable(c) => c.arity(),
-            _ => panic!("arity() is defined only for Callable.")
-        }
-    }
-
-    fn call(&self, evaluator: &Evaluator, arguments: Vec<Object>) -> Object {
-        match self {
-            Object::Callable(c) => c.call(evaluator, arguments),
-            _ => panic!("call() is defined only for Callable.")
-        }
-    }
-
-    fn stringify(&self) -> String {
-        match self {
-            Object::Callable(c) => c.stringify(),
-            _ => panic!("string() is defined only for Callable.")
-        }
-    }
-}
-
-impl Clone for Object {
-    fn clone(&self) -> Self {
-        match self {
-            Self::Bool(b) => Self::Bool(*b),
-            Self::Callable(_) => panic!("Callable can't be cloned."),
-            Self::Number(n) => Self::Number(*n),
-            Self::String(s) => Self::String(s.clone()),
-            Self::None => Self::None
-        }
-    }
 }
 
 impl Display for Object {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Object::Bool(b) => write!(f, "{b}"),
-            Object::Callable(c) => write!(f, "Callable: {}.", c),
+            Object::Fun(fun) => write!(f, "Function: {}.", fun),
+            Object::Time(c) => write!(f, "Function: {}.", c),
             Object::Number(n) => {
                 if n.fract() == 0.0 {
                     return write!(f, "{}", (*n as i64));
@@ -107,45 +75,35 @@ impl Display for Object {
     }
 }
 
-impl PartialEq for Object {
-    fn eq(&self, other: &Self) -> bool {
-        match self {
-            Self::Bool(bl) => {
-                match other {
-                    Self::Bool(br) => bl == br,
-                    _ => false
-                }
-            },
-            Self::Callable(_) => false,
-            Self::Number(nl) => {
-                match other {
-                    Self::Number(nr) => nl == nr,
-                    _ => false
-                }
-            }
-            Self::String(sl) => {
-                match other {
-                    Self::String(sr) => sl == sr,
-                    _ => false
-                }
-            }
-            Self::None => {
-                match other {
-                    Self::None => true,
-                    _ => false
-                }
-            }
-        }
-    }
-}
-
 impl Object {
     fn is_callable(&self, tok: &Token) -> Result<(), RuntimeError> {
         match self {
-            Object::Callable(_) => Ok(()),
-            _ => {
-                Err(RuntimeError::new(tok, "Can only call functions and classes."))
-            }
+            Object::Fun(_) => Ok(()),
+            Object::Time(_) => Ok(()),
+            _ => Err(RuntimeError::new(
+                tok,
+                "Can only call functions and classes.",
+            )),
+        }
+    }
+
+    fn arity(&self) -> usize {
+        match self {
+            Object::Fun(f) => f.arity(),
+            Object::Time(c) => c.arity(),
+            _ => panic!("arity() is defined only for Function and clock()."),
+        }
+    }
+
+    fn call(
+        &self,
+        evaluator: &mut Evaluator,
+        arguments: Vec<Object>,
+    ) -> Result<Object, RuntimeError> {
+        match self {
+            Object::Fun(f) => f.call(evaluator, arguments),
+            Object::Time(c) => c.call(evaluator, arguments),
+            _ => panic!("call() is defined only for Function and clock()."),
         }
     }
 }
@@ -153,7 +111,6 @@ impl Object {
 #[derive(Clone)]
 pub struct Evaluator {
     environment: Environment,
-    globals: Environment,
 }
 
 impl Visitor<Result<Object, RuntimeError>, Result<(), RuntimeError>> for Evaluator {
@@ -247,7 +204,7 @@ impl Visitor<Result<Object, RuntimeError>, Result<(), RuntimeError>> for Evaluat
 
             Expr::Call(callee_expr, tok, args) => {
                 let callee = self.evaluate(callee_expr)?;
-                
+
                 let mut arguments: Vec<Object> = Vec::new();
                 for arg in args {
                     arguments.push(self.evaluate(arg)?);
@@ -267,7 +224,7 @@ impl Visitor<Result<Object, RuntimeError>, Result<(), RuntimeError>> for Evaluat
                     return Err(RuntimeError::new(tok, &message));
                 }
 
-                Ok(callee.call(self, arguments))
+                Ok(callee.call(self, arguments)?)
             }
 
             Expr::Assign(name, value) => {
@@ -282,6 +239,12 @@ impl Visitor<Result<Object, RuntimeError>, Result<(), RuntimeError>> for Evaluat
         match s {
             Stmt::Expression(exp) => {
                 self.evaluate(exp)?;
+                Ok(())
+            }
+            fun @ Stmt::Function(name, _, _) => {
+                let function = Function::new(name, fun.clone())?;
+                self.environment
+                    .define(name.get_lexeme().to_string(), Object::Fun(function));
                 Ok(())
             }
             Stmt::If(condition, then_branch, else_branch) => {
@@ -331,11 +294,7 @@ impl Visitor<Result<Object, RuntimeError>, Result<(), RuntimeError>> for Evaluat
 
 impl Evaluator {
     pub fn new(environment: Environment) -> Evaluator {
-        let mut globals = Environment::new(None);
-        globals.define("clock".to_string(), Object::Callable(Box::new(Clock)));
-
-        Evaluator { environment, globals }
-        // Evaluator { environment: globals, globals: environment }
+        Evaluator { environment }
     }
 
     pub fn evaluate(&mut self, exp: &Expr) -> Result<Object, RuntimeError> {
