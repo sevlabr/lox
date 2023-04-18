@@ -83,7 +83,8 @@ impl Lox {
                     Ok(_) => (),
                     Err(err) => {
                         self.runtime_error(err);
-                        eprintln!("Failed expression evaluation!");
+                        // eprintln!("Failed expression evaluation!");
+                        eprintln!("Runtime error!");
                     }
                 },
                 None => eprintln!("Found None instead of Stmt while evaluation!"),

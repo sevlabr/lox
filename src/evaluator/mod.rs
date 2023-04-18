@@ -16,6 +16,8 @@ use std::fmt::Display;
 pub struct RuntimeError {
     token: Token,
     message: String,
+    value: Object,
+    is_return: bool,
 }
 
 impl Error for RuntimeError {}
@@ -35,6 +37,8 @@ impl RuntimeError {
         RuntimeError {
             token: t.clone(),
             message: msg.to_string(),
+            value: Object::None,
+            is_return: false,
         }
     }
 
@@ -45,9 +49,22 @@ impl RuntimeError {
     pub fn get_token(&self) -> Token {
         self.token.clone()
     }
+
+    fn make_return(&mut self, value: Object) {
+        self.value = value;
+        self.is_return = true;
+    }
+
+    pub fn is_return(&self) -> bool {
+        self.is_return
+    }
+
+    pub fn get_value(&self) -> Object {
+        self.value.clone()
+    }
 }
 
-#[derive(Clone, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum Object {
     Bool(bool),
     Fun(Function),
@@ -261,6 +278,15 @@ impl Visitor<Result<Object, RuntimeError>, Result<(), RuntimeError>> for Evaluat
                 let value = self.evaluate(exp)?;
                 println!("{value}");
                 Ok(())
+            }
+            Stmt::Return(keyword, value) => {
+                let val = match value {
+                    Expr::LiteralExpr(Literal::None) => Object::None,
+                    _ => self.evaluate(value)?,
+                };
+                let mut return_val = RuntimeError::new(keyword, "Return value, not an error.");
+                return_val.make_return(val);
+                Err(return_val)
             }
             Stmt::Block(statements) => {
                 self.execute_block(

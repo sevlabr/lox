@@ -48,6 +48,10 @@ impl Visitor<String, String> for AstPrinter {
         match s {
             Stmt::Print(exp) => self.parenthesize("print", vec![exp]),
             Stmt::Expression(exp) => self.parenthesize(";", vec![exp]),
+            Stmt::Return(_, value) => match value {
+                Expr::LiteralExpr(Literal::None) => "(return)".to_string(),
+                _ => self.parenthesize("return", vec![value]),
+            },
             Stmt::Var(name, initializer) => {
                 if *initializer == Expr::LiteralExpr(Literal::None) {
                     let parts = vec![PrintObj::Tok(name.clone())];

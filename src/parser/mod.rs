@@ -111,6 +111,10 @@ impl Parser<'_> {
             return self.print_stmt();
         }
 
+        if self.match_tokens(&vec![TokenType::Return]) {
+            return self.return_stmt();
+        }
+
         if self.match_tokens(&vec![TokenType::While]) {
             return self.while_stmt();
         }
@@ -188,6 +192,17 @@ impl Parser<'_> {
             Err(err) => return Err(err),
         };
         Ok(Stmt::Print(value))
+    }
+
+    fn return_stmt(&mut self) -> Result<Stmt, ParseError> {
+        let keyword = self.previous().clone();
+        let mut value = Expr::LiteralExpr(Literal::None);
+        if !self.check(&TokenType::Semicolon) {
+            value = self.expression()?;
+        }
+
+        self.consume(TokenType::Semicolon, "Expect ';' after return value.")?;
+        Ok(Stmt::Return(keyword, value))
     }
 
     fn var_declaration(&mut self) -> Result<Stmt, ParseError> {

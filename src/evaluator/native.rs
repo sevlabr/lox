@@ -2,7 +2,7 @@ use super::{Evaluator, Object, RuntimeError};
 use std::fmt;
 use std::time::{SystemTime, UNIX_EPOCH};
 
-#[derive(Clone, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct Clock;
 
 impl Clock {

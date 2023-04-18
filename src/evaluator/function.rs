@@ -2,7 +2,7 @@ use crate::evaluator::{environment::Environment, Evaluator, Object, RuntimeError
 use crate::{ast::stmt::Stmt, Token};
 use std::fmt;
 
-#[derive(Clone, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct Function {
     name: Token,
     parameters: Vec<Token>,
@@ -42,8 +42,15 @@ impl Function {
             )
         }
 
-        evaluator.execute_block(&self.body, env)?;
-        Ok(Object::None)
+        match evaluator.execute_block(&self.body, env) {
+            Ok(_) => Ok(Object::None),
+            Err(err) => {
+                if err.is_return() {
+                    return Ok(err.get_value());
+                }
+                Err(err)
+            }
+        }
     }
 
     fn stringify(&self) -> String {
