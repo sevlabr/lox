@@ -1,0 +1,62 @@
+
+---------------SIMPLE---------------
+Hi, Dear Reader!
+Function: <fun add>.
+6
+1
+2
+3
+Time - 10 - clock()
+-10
+Hi, Dear Reader!
+Function: <fun add_100>.
+Clock inside fun test
+1
+End test
+-900
+Clock inside fun test
+1
+End test
+99
+nil
+Hi, Dear Reader!
+Argument outside test
+53
+End argument outside test
+d - clock()
+0
+-10
+Function: <native fun 'clock'>.
+11
+---------------END SIMPLE---------------
+
+---------------PROCEDURE---------------
+don't return anything
+nil
+---------------END PROCEDURE---------------
+
+---------------COUNT---------------
+1
+2
+---------------END COUNT---------------
+
+---------------FIBONACCI---------------
+0
+1
+1
+2
+3
+5
+8
+13
+21
+34
+
+Time (seconds):
+0
+
+---------------END FIBONACCI---------------
+
+---------------COUNTER CLOSURE---------------
+---------------END COUNTER CLOSURE---------------
+

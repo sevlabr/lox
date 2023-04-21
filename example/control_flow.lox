@@ -1,0 +1,117 @@
+if (true) {
+    print "This is true";
+}
+
+var a = 1;
+if (a == 1) {
+    print "a equals 1";
+}
+
+a = -2.21;
+if (a >= 0) {
+    print "a >= 0";
+} else {
+    print "a <= 0";
+}
+
+a = "str";
+if (a != "str") {
+    print "Should not be executed";
+}
+print a;
+print a == "str";
+
+// Errors
+// if true {
+//     print "smth";
+// }
+
+// if (true {
+//     print "smth";
+// }
+
+// Braces are optional
+if (true)
+    print "works";
+    print "also works";
+
+if (false)
+    print "no";
+else
+    print "yes";
+
+// Or/and
+print "hi" or 2;
+print nil or "yes";
+
+var foo = 3.14;
+var bar = "bar";
+if (foo <= 3.1415 and bar == "bar") {
+    print "pi bar";
+}
+
+if (foo <= 3.0 or bar == "bar") {
+    print "not pi bar";
+}
+
+if (foo <= 3.0 and bar != "bar" or nil or "true str") {
+    print "non-empty str -> true";
+}
+
+if ("") {
+    print "also, empty str -> true";
+}
+
+// RErr: Operand must be a number.
+// if (foo <= 3.0 and bar != "bar" or nil or "str" <= 3) {
+//     print "non-empty str -> true";
+// }
+
+// While
+var i = 0;
+while (i < 5) {
+    print i;
+    i = i + 1;
+}
+
+// Error cases
+// var i = 0;
+// while (i < 5) {
+//     i = i + 1;
+//     if (i == 3) {
+//         i = i + "string"; // RErr: Operands must be two numbers or two strings.
+//     }
+// }
+
+// var i = 0;
+// while (i < 5) {
+//     var k = i + 1;
+//     i = i + 1;
+// }
+// print k; // RErr: Undefined variable 'k'.
+
+print "First 21 Fibonacci numbers:";
+{
+    var a = 0;
+    var temp;
+
+    for (var b = 1; a < 10000; b = temp + b) {
+        print a;
+        temp = a;
+        a = b;
+    }
+}
+print "Completed!";
+
+var foo = 1;
+for (; foo >= -2; foo = foo - 1) {
+    print foo;
+}
+
+var foo = 1;
+for (; foo >= -2;) {
+    print foo;
+    foo = foo - 1;
+}
+
+// for (;;) {} // Infinite loop

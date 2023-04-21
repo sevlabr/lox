@@ -1,0 +1,119 @@
+print "Hello, Lox!";
+var a = 1;
+var b = 2;
+// Calculations
+var c = a + b / 2;
+print c;
+
+print "one";
+print true;
+print 2 + 1;
+
+var beverage = "espresso";
+print beverage;
+
+var foo = "before";
+print foo;
+var foo = "after";
+print foo;
+
+var n;
+print n;
+
+// Basic errors
+// print 1 - + 1; // Err: Expect expression (must report both 24 and 26)
+
+// print 1 + 2 / + 1; // Err: Expect expression (must report both 24 and 26)
+
+// print 1 * "s"; // RErr: Operand must be a number (now it does not stop execution, change later)
+
+// Scopes
+var a = "global a";
+var b = "global b";
+var c = "global c";
+var d = "global d";
+{
+  var a = "outer a";
+  var b = "outer b";
+  var c = "outer c";
+  {
+    var a = "inner a";
+    var b = "inner b";
+    {
+      var a = "inside a";
+      print a;
+      print b;
+      print c;
+      print d;
+    }
+    print a;
+    print b;
+    print c;
+    print d;
+  }
+  print a;
+  print b;
+  print c;
+  print d;
+}
+print a;
+print b;
+print c;
+print d;
+
+// Scopes errors
+// print bar; RErr: Undefined variable 'bar' (now it does not stop execution, change later)
+
+var bar = 2;
+var s1 = "s1";
+var s2 = "s3";
+{
+  var foo = 3;
+  print foo + bar;
+  // print 1 - + 1; // Err: Expect expression (must report 58, 62, 69)
+  s1 = "s2";
+  {
+    // print no / bar; // RErr: Undefined variable 'no' (now it does not stop execution, change later)
+    print "no no" + " yes yes";
+    // print 1 + 2 / + 1; // Err: Expect expression (must report 58, 62, 69)
+    print bar - foo - 1.5;
+    {
+      bar = 100000;
+    }
+    s2 = "s4";
+  }
+  // var k = 1 // No semicolon // Err: Expect ';' after variable declaration (must report 58, 62, 69)
+}
+print "-----";
+print bar;
+print s1;
+print s2;
+print "-----";
+
+// Assigning
+var a = -2;
+print a;
+// a = "foo" // Err: Error at 'print': Expect ';' after value.
+a = 10;
+print a;
+var b = "tea";
+b = "good tea";
+print b;
+print b = "beer";
+
+// Assigning Errors
+// noSuchVar = 10; // RErr: Undefined variable 'noSuchVar' (now it does not stop execution, change later)
+
+// Interesting case
+var a = 1;
+{
+  var a = a + 2;
+  print a; // 3 (like in Rust)
+}
+print a; // 1 (like in Rust)
+
+{
+  var var1 = 42;
+}
+
+// print var1; // RErr: Undefined variable 'var1' (now it does not stop execution, change later)

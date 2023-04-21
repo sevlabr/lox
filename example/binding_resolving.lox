@@ -1,0 +1,39 @@
+var a = "outer";
+{
+    var a = "inner";
+    print a;
+}
+
+var a = "outer";
+{
+    print a;
+    var a = "inner";
+}
+
+var a = "global";
+{
+    fun showA() {
+        print a;
+    }
+
+    showA();
+    var a = "block";
+    showA();
+}
+
+var a = "outer";
+{
+    var a = a;
+    print a;
+}
+
+fun bad() {
+    var a = "first";
+    print a;
+    var a = "second";
+    print a;
+}
+
+bad();
+
+// return "at top level"; // RErr: Return value, not an error.

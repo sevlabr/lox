@@ -1,0 +1,160 @@
+print "";
+print "---------------SIMPLE---------------";
+
+fun sayHi(first, last) {
+    print "Hi, " + first + " " + last + "!";
+}
+
+sayHi("Dear", "Reader");
+
+fun add(a, b) {
+    print a + b;
+}
+
+print add; // "Function: <fun add>".
+
+fun add(a, b, c) {
+    print a + b + c;
+}
+
+add(1, 2, 3);
+// add(1, 2, 3, 4); // RErr: Expected 3 arguments but got 4.
+// add(1, 2);       // RErr: Expected 3 arguments but got 2.
+
+fun count(n) {
+    if (n > 1) count(n - 1);
+    print n;
+}
+
+count(3);
+
+var a = 1;
+{
+    var c = clock() - 10;
+    print "Time - 10 - clock()";
+    print c - clock();
+    var f = clock;
+    {
+        a = a + 10;
+        var d = f();
+        {
+            fun add_100(a) {
+                print "Clock inside fun test";
+                print clock() - clock() + 1;
+                print "End test";
+                print a + 100;
+            }
+            {
+                {
+                    sayHi("Dear", "Reader");
+                    print add_100;
+                    add_100(-1000);
+                    print add_100(-1); // nil
+                    sayHi("Dear", "Reader");
+                }
+                fun test_argument_outside(arg) {
+                    print "Argument outside test";
+                    print arg + a;
+                    print "End argument outside test";
+                }
+                {
+                    test_argument_outside(42); // 42 + 1 + 10 = 53
+                }
+            }
+        }
+        // print add_100; // Undefined variable 'add_100'.
+        print "d - clock()";
+        print d - clock();
+    }
+    // print d - clock(); // Undefined variable 'd'.
+    print c - clock();
+    print f;
+}
+print a;
+
+// Err
+// fn abs(a) {
+//     print "Hi";
+// }
+
+// Expect '(' after function name. OR Expect ')' after parameters.
+// fun abs(a) { // Error at 'print': Expect '{' before function body. // Error: Unexpected character! (for '(' and ')')
+//     print "Hi"; // Expect ';' after value.
+// } // Error at end: Expect '}' after block.
+
+print "---------------END SIMPLE---------------";
+print "";
+
+print "---------------PROCEDURE---------------";
+
+fun procedure() {
+    print "don't return anything";
+}
+
+var result = procedure();
+print result; // nil
+
+print "---------------END PROCEDURE---------------";
+print "";
+
+print "---------------COUNT---------------";
+
+fun count(n) {
+  while (n < 100) {
+    if (n == 3) return n; // <--
+    print n;
+    n = n + 1;
+  }
+}
+
+count(1);
+
+print "---------------END COUNT---------------";
+print "";
+
+print "---------------FIBONACCI---------------";
+
+var start = clock();
+
+fun fib(n) {
+  if (n <= 1) return n;
+  return fib(n - 2) + fib(n - 1);
+}
+
+// 20: 5 sec; 30: 625 sec;
+for (var i = 0; i < 10; i = i + 1) {
+  print fib(i);
+}
+
+print "";
+print "Time (seconds):";
+print clock() - start;
+print "";
+
+// start = clock();
+// print fib(30); // 404 sec (~25 times slower than python 3.11);
+// print "Time (seconds) for fib(30):";
+// print clock() - start;
+// print "";
+
+print "---------------END FIBONACCI---------------";
+print "";
+
+print "---------------COUNTER CLOSURE---------------";
+
+fun makeCounter() {
+  var i = 0;
+  fun count() {
+    i = i + 1;
+    print i;
+  }
+
+  return count;
+}
+
+var counter = makeCounter();
+// counter(); // "1".
+// counter(); // "2".
+
+print "---------------END COUNTER CLOSURE---------------";
+print "";
