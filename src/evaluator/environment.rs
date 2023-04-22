@@ -4,7 +4,7 @@ use crate::evaluator::RuntimeError;
 use crate::lexer::token::Token;
 use std::collections::HashMap;
 
-#[derive(Clone)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct Environment {
     enclosing: Option<Box<Environment>>,
     values: HashMap<String, Object>,
@@ -19,8 +19,16 @@ impl Environment {
         Environment { enclosing, values }
     }
 
+    pub fn values(&self) -> HashMap<String, Object> {
+        self.values.clone()
+    }
+
     pub fn enclosing(&self) -> Option<Box<Environment>> {
         self.enclosing.clone()
+    }
+
+    pub fn set_values(&mut self, values: HashMap<String, Object>) {
+        self.values = values;
     }
 
     pub fn from_inner(environment: Option<Box<Environment>>) -> Environment {

@@ -1,0 +1,40 @@
+fun makeCounter() {
+  var i = 0;
+  fun count() {
+    i = i + 1;
+    print i;
+    return i; // return does not change behaviour (it's good)
+  }
+
+  return count;
+}
+
+var counter = makeCounter();
+counter(); // "1".
+counter(); // "2".
+counter(); // "3".
+
+{
+    counter();
+    counter();
+    counter();
+}
+
+print counter();
+
+fun do_smth() {
+    counter();
+}
+
+fun do_other() {
+    // BUG: must make new counter and not use the global one
+    var c = makeCounter();
+    c();
+}
+
+do_smth();
+do_smth();
+do_other();
+do_other();
+do_smth();
+do_other();

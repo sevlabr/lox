@@ -1,0 +1,117 @@
+var glob = 1;
+
+fun make_glob() {
+    var i = 2;
+    fun i2() {
+        i = i + 2;
+        print "i2";
+        print i;
+        return i;
+    }
+
+    return i2;
+}
+
+fun take_arg(a, b, c) {
+    return a + b + c;
+}
+
+fun make_inner(arg1, arg2) {
+    var a = arg1 + arg2; // -9.6
+    fun make(arg1) {
+        var b = 0 + arg1; // 42
+        var i2 = make_glob(); // 4 BUG: stays 4 here for all calls, but must increment by 2 on line 27 (probably, closure restarts in a new block)
+        fun inner(arg3) {
+            a = a - 1; // -10.6; -11.6; -12.6
+            b = b - 3; // 39; 36; 33
+            var res = i2() + take_arg(a, b, arg1 + arg2) / arg3; // 6.838095238; 3.352380952 (-2); -43.6 (-4)
+            print res;
+
+            if (res > 0) {
+                print "res is more than 0";
+            } else {
+                print "res is less than 0 or equals 0";
+            }
+        }
+
+        return inner;
+    }
+
+    return make;
+}
+
+fun make_str_line(len, msg) {
+    var str = "";
+    for (var i = 0; i < len; i = i + 1) {
+        str = str + "-";
+    }
+    str = str + " " + msg + " ";
+    for (var i = 0; i < len; i = i + 1) {
+        str = str + "-";
+    }
+    
+    return str;
+}
+
+fun pretty(f, arg) {
+    print make_str_line(10, "Crazy function test");
+    f(arg);
+    print make_str_line(10, "End crazy function test");
+}
+
+fun crazy(len) {
+    {
+        var i2_f = make_glob();
+        var baz = -111;
+        
+        var l = 0;
+        while (l < len) {
+            l = l + 1;
+            print l;
+        }
+        {
+            {
+                var make = make_inner(1.2, -10.8);
+                {
+                    print "Start madness";
+                }
+
+                var foo = make(42);
+
+                {
+                    var bar = foo(21);
+                    bar = foo(-21);
+                    bar = foo(-1);
+                    print bar; // nil
+
+                    var lol = i2_f() + glob; // 4 + 1 = 5
+                    var kek = i2_f() + baz; // 6 - 111 = -105
+                    print "Lul = lol / kek:";
+                    {
+                        var lul = lol / kek; // -0.047619048
+                        print lul;
+                    }
+                }
+                foo(-1);
+                print i2_f();
+
+                print "End madness";
+            }
+            print i2_f();
+        }
+
+        print i2_f();
+        print i2_f();
+
+        while (l < 2 * len) {
+            l = l + 1;
+            print l;
+        }
+    }
+}
+
+var start = clock();
+pretty(crazy, 8);
+var stop = clock() - start;
+print "Time:";
+print stop;

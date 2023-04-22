@@ -108,11 +108,8 @@ impl Scanner<'_> {
     }
 
     fn advance(&mut self) -> char {
-        let c = self
-            .source
-            .chars()
-            .nth(self.current)
-            .expect("Failed advancing character!");
+        let message = format!("Failed advancing character: {}!", self.current);
+        let c = self.source.chars().nth(self.current).expect(&message);
         self.current += 1;
         c
     }

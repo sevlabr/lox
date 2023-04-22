@@ -113,7 +113,7 @@ impl Object {
     }
 
     fn call(
-        &self,
+        &mut self,
         evaluator: &mut Evaluator,
         arguments: Vec<Object>,
     ) -> Result<Object, RuntimeError> {
@@ -220,7 +220,7 @@ impl Visitor<Result<Object, RuntimeError>, Result<(), RuntimeError>> for Evaluat
             }
 
             Expr::Call(callee_expr, tok, args) => {
-                let callee = self.evaluate(callee_expr)?;
+                let mut callee = self.evaluate(callee_expr)?;
 
                 let mut arguments: Vec<Object> = Vec::new();
                 for arg in args {
@@ -259,7 +259,7 @@ impl Visitor<Result<Object, RuntimeError>, Result<(), RuntimeError>> for Evaluat
                 Ok(())
             }
             fun @ Stmt::Function(name, _, _) => {
-                let function = Function::new(name, fun.clone())?;
+                let function = Function::new(name, fun.clone(), self.environment.clone())?;
                 self.environment
                     .define(name.get_lexeme().to_string(), Object::Fun(function));
                 Ok(())
@@ -268,6 +268,7 @@ impl Visitor<Result<Object, RuntimeError>, Result<(), RuntimeError>> for Evaluat
                 let cond = self.evaluate(condition)?;
                 if self.is_truthy(&cond) {
                     self.execute(then_branch)?;
+                    return Ok(());
                 }
                 if let Some(s) = else_branch {
                     self.execute(s)?;
@@ -353,6 +354,43 @@ impl Evaluator {
         let previous = self.environment.enclosing();
         self.environment = Environment::from_inner(previous);
         Ok(())
+    }
+
+    fn execute_block_fun(
+        &mut self,
+        statements: &Vec<Stmt>,
+        env: Environment,
+        depth: usize,
+    ) -> (Result<(), RuntimeError>, Environment) {
+        // TODO: cloning is inefficient, change to ref
+        // let previous = self.environment.clone();
+        self.environment = env;
+        for statement in statements {
+            match self.execute(statement) {
+                Ok(_) => continue,
+                Err(err) => {
+                    let mut previous = self.environment.enclosing();
+                    if depth >= 1 {
+                        for _ in 1..depth {
+                            previous = previous.unwrap().enclosing();
+                        }
+                    }
+                    let closure = self.environment.clone();
+                    self.environment = Environment::from_inner(previous);
+                    return (Err(err), closure);
+                }
+            }
+        }
+
+        let mut previous = self.environment.enclosing();
+        if depth >= 1 {
+            for _ in 1..depth {
+                previous = previous.unwrap().enclosing();
+            }
+        }
+        let closure = self.environment.clone();
+        self.environment = Environment::from_inner(previous);
+        (Ok(()), closure)
     }
 
     fn cast_num(&self, op: &Token, obj: Object) -> Result<f64, RuntimeError> {

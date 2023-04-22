@@ -121,7 +121,7 @@ fun fib(n) {
   return fib(n - 2) + fib(n - 1);
 }
 
-// 20: 5 sec; 30: 625 sec;
+// 20: 5 sec (before adding closures), now 18 sec; 30: 625 sec (before adding closures);
 for (var i = 0; i < 10; i = i + 1) {
   print fib(i);
 }
@@ -132,7 +132,7 @@ print clock() - start;
 print "";
 
 // start = clock();
-// print fib(30); // 404 sec (~25 times slower than python 3.11);
+// print fib(30); // 404 sec (before adding closures) (~25 times slower than python 3.11);
 // print "Time (seconds) for fib(30):";
 // print clock() - start;
 // print "";
@@ -153,8 +153,9 @@ fun makeCounter() {
 }
 
 var counter = makeCounter();
-// counter(); // "1".
-// counter(); // "2".
+counter(); // "1".
+counter(); // "2".
+counter(); // "3".
 
 print "---------------END COUNTER CLOSURE---------------";
 print "";
