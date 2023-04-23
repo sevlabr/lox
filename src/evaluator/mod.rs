@@ -9,6 +9,7 @@ use crate::Visitor;
 use environment::Environment;
 use function::Function;
 use native::Clock;
+use std::collections::HashMap;
 use std::error::Error;
 use std::fmt::Display;
 
@@ -128,6 +129,7 @@ impl Object {
 #[derive(Clone)]
 pub struct Evaluator {
     environment: Environment,
+    _locals: HashMap<Expr, usize>,
 }
 
 impl Visitor<Result<Object, RuntimeError>, Result<(), RuntimeError>> for Evaluator {
@@ -135,7 +137,7 @@ impl Visitor<Result<Object, RuntimeError>, Result<(), RuntimeError>> for Evaluat
         match e {
             Expr::LiteralExpr(l) => match l {
                 Literal::Bool(b) => Ok(Object::Bool(*b)),
-                Literal::Number(n) => Ok(Object::Number(*n)),
+                Literal::Number(n) => Ok(Object::Number(n.get())),
                 Literal::String(s) => Ok(Object::String(s.clone())),
                 Literal::None => Ok(Object::None),
             },
@@ -163,7 +165,13 @@ impl Visitor<Result<Object, RuntimeError>, Result<(), RuntimeError>> for Evaluat
                 }
             }
 
-            Expr::Variable(name) => self.environment.get(name.clone()),
+            _exp @ Expr::Variable(name) => {
+                // Resolver is switched OFF during evaluation
+                self.environment.get(name.clone())
+
+                // Resolver is switched on during evaluation
+                // self._lookup_var(name.clone(), _exp.clone())
+            }
 
             Expr::Binary(left, op, right) => {
                 let l = self.evaluate(left)?;
@@ -246,7 +254,29 @@ impl Visitor<Result<Object, RuntimeError>, Result<(), RuntimeError>> for Evaluat
 
             Expr::Assign(name, value) => {
                 let val = self.evaluate(value)?;
+
+                // Resolver is switched ON during evaluation
+                // let distance = self._locals.get(value);
+                // if let Some(d) = distance {
+                //     self.environment._assign_at(*d, name.clone(), val.clone());
+                // } else {
+                //     // The old way
+                //     // self.environment.assign(name, val.clone())?;
+                //     let global_values = self.environment._ref_mut_global_values();
+                //     if global_values.contains_key(name.get_lexeme()) {
+                //         global_values.insert(name.get_lexeme().to_string(), val.clone());
+                //     } else {
+                //         let mut msg = String::new();
+                //         msg.push_str("Undefined variable '");
+                //         msg.push_str(name.get_lexeme());
+                //         msg.push_str("'.");
+                //         return Err(RuntimeError::new(name, &msg));
+                //     }
+                // }
+
+                // Resolver is switched OFF during evaluation
                 self.environment.assign(name, val.clone())?;
+
                 Ok(val)
             }
         }
@@ -321,7 +351,14 @@ impl Visitor<Result<Object, RuntimeError>, Result<(), RuntimeError>> for Evaluat
 
 impl Evaluator {
     pub fn new(environment: Environment) -> Evaluator {
-        Evaluator { environment }
+        Evaluator {
+            environment,
+            _locals: HashMap::new(),
+        }
+    }
+
+    pub fn set_locals(&mut self, locals: HashMap<Expr, usize>) {
+        self._locals = locals;
     }
 
     pub fn evaluate(&mut self, exp: &Expr) -> Result<Object, RuntimeError> {
@@ -391,6 +428,16 @@ impl Evaluator {
         let closure = self.environment.clone();
         self.environment = Environment::from_inner(previous);
         (Ok(()), closure)
+    }
+
+    fn _lookup_var(&self, name: Token, exp: Expr) -> Result<Object, RuntimeError> {
+        let distance = self._locals.get(&exp);
+        if let Some(d) = distance {
+            return self.environment._get_at(*d, name.get_lexeme());
+        }
+        // The old way
+        // self.environment.get(name)
+        self.environment._ref_global().get(name)
     }
 
     fn cast_num(&self, op: &Token, obj: Object) -> Result<f64, RuntimeError> {

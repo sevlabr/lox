@@ -1,0 +1,5 @@
+    Finished dev [unoptimized + debuginfo] target(s) in 0.01s
+     Running `target/debug/lox example/semantic.lox`
+[line 3] Error at 'a': Can't read local variable in its own initializer.
+[line 8] Error at 'b': Already a variable with this name in this scope.
+[line 11] Error at 'return': Can't return from top-level code.

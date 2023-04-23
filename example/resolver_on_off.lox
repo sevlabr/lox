@@ -1,0 +1,61 @@
+var a = "outer";
+{
+    var a = "inner";
+    print a;
+}
+
+var a = "outer";
+{
+    print a;
+    var a = "inner";
+}
+
+print "Without change";
+
+var a = "global";
+fun showGlobA() {
+    print a;
+}
+{
+    fun showA() {
+        print a;
+    }
+
+    showA();
+    var a = "block";
+    showA();
+
+    {
+        var a = "inner";
+        showA();
+        showGlobA();
+    }
+}
+
+print "With change";
+
+var a = "global";
+fun showGlobA() {
+    print a;
+}
+{
+    fun showA() {
+        print a;
+    }
+
+    showA();
+    a = "changed";
+    var a = "block";
+    showA();
+
+    {
+        var a = "inner";
+        showA();
+        showGlobA();
+        a = "inside";
+        showA();
+        showGlobA();
+    }
+    showA();
+}
+showGlobA();

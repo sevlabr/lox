@@ -2,12 +2,14 @@ pub mod ast;
 pub mod evaluator;
 pub mod lexer;
 pub mod parser;
+pub mod resolver;
 
 use ast::AstPrinter;
 use evaluator::{Evaluator, RuntimeError};
 use lexer::scanner::Scanner;
 use lexer::token::{Token, TokenType};
 use parser::Parser;
+use resolver::Resolver;
 use std::fs;
 use std::io::{self, Write};
 use std::process;
@@ -73,6 +75,16 @@ impl Lox {
         let statements = parser.parse();
 
         // Stop if there was a syntax error.
+        if self.had_error {
+            return;
+        }
+
+        let mut resolver = Resolver::new(self);
+        resolver.resolve_optional_stmts(statements.clone());
+        let locals = resolver.locals();
+        self.evaluator.set_locals(locals);
+
+        // Stop if there was a resolution error.
         if self.had_error {
             return;
         }

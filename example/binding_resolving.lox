@@ -21,19 +21,26 @@ var a = "global";
     showA();
 }
 
-var a = "outer";
-{
-    var a = a;
-    print a;
-}
+// var a = "outer";
+// {
+//     var a = a; // SErr: [line 26] Error at 'a': Can't read local variable in its own initializer.
+//     print a; // (ok in Rust, will be "outer")
+// }
 
-fun bad() {
-    var a = "first";
-    print a;
-    var a = "second";
-    print a;
-}
+// fun bad() {
+//     var a = "first";
+//     print a;
+//     var a = "second"; // SErr: [line 33] Error at 'a': Already a variable with this name in this scope.
+//     print a;
+// }
 
-bad();
+// bad();
 
-// return "at top level"; // RErr: Return value, not an error.
+// return "at top level"; // SErr: [line 39] Error at 'return': Can't return from top-level code.
+
+// fun scope(a) {
+//     var a = "local"; // SErr: [line 42] Error at 'a': Already a variable with this name in this scope.
+//     print a;
+// }
+
+// scope("str"); // (local in Rust)

@@ -39,9 +39,14 @@ impl Function {
         evaluator: &mut Evaluator,
         arguments: Vec<Object>,
     ) -> Result<Object, RuntimeError> {
+        // Without recovery
         // let env = Environment::new(Some(Box::new(evaluator.environment.clone())));
 
         let (mut env, depth) = recover_env(evaluator.environment.clone(), self.closure.clone());
+
+        // Debug
+        // println!("{depth}");
+        // println!("{:#?}", evaluator.locals);
 
         for i in 0..self.parameters.len() {
             env.define(
@@ -84,6 +89,8 @@ fn recover_env(current: Environment, closure: Environment) -> (Environment, usiz
     let mut curr = current.clone();
     let mut curr_vals = curr.values();
     let mut inner_envs: Vec<Environment> = Vec::new();
+    // TODO: consider case when only 'clock' (and possibly other built-ins) are in scopes
+    // (they are considered the same, but they can be just temporarily empty)
     'over_closures: loop {
         for (name, _) in clos.values().iter() {
             if !curr_vals.contains_key(name) {

@@ -1,4 +1,4 @@
-use crate::lexer::token::{Literal, Token, TokenType, KEYWORDS};
+use crate::lexer::token::{Literal, Num, Token, TokenType, KEYWORDS};
 use crate::Lox;
 
 pub struct Scanner<'a> {
@@ -216,7 +216,7 @@ impl Scanner<'_> {
             .take(self.current - self.start)
             .collect();
         let number: f64 = number.trim().parse().expect("Failed parsing number!");
-        self.add_token_literal(TokenType::Number, Literal::Number(number))
+        self.add_token_literal(TokenType::Number, Literal::Number(Num::new(number)))
     }
 
     fn identifier(&mut self) {

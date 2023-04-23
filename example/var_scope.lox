@@ -105,12 +105,12 @@ print b = "beer";
 // noSuchVar = 10; // RErr: Undefined variable 'noSuchVar' (now it does not stop execution, change later)
 
 // Interesting case
-var a = 1;
-{
-  var a = a + 2;
-  print a; // 3 (like in Rust)
-}
-print a; // 1 (like in Rust)
+// var a = 1;
+// {
+//   var a = a + 2; // SErr: [line 110] Error at 'a': Can't read local variable in its own initializer.
+//   print a; // (3 in Rust)
+// }
+// print a; // (1 in Rust)
 
 {
   var var1 = 42;

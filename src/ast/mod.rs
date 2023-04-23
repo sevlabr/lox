@@ -166,7 +166,7 @@ impl AstPrinter {
 #[cfg(test)]
 mod tests {
     use crate::ast::Expr;
-    use crate::lexer::token::{Literal, Token, TokenType};
+    use crate::lexer::token::{Literal, Num, Token, TokenType};
 
     use super::{AstPrinter, Visitor};
 
@@ -176,11 +176,11 @@ mod tests {
         let expression = Expr::Binary(
             Box::new(Expr::Unary(
                 Token::new(TokenType::Minus, "-", Literal::None, 1),
-                Box::new(Expr::LiteralExpr(Literal::Number(123.0))),
+                Box::new(Expr::LiteralExpr(Literal::Number(Num::new(123.0)))),
             )),
             Token::new(TokenType::Star, "*", Literal::None, 1),
             Box::new(Expr::Grouping(Box::new(Expr::LiteralExpr(
-                Literal::Number(45.67),
+                Literal::Number(Num::new(45.67)),
             )))),
         );
         let ref_result = "(* (- 123) (group 45.67))";
