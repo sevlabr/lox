@@ -1,7 +1,8 @@
 #!/bin/bash
 
 cargo run -- example/binding_resolving.lox > example/binding_resolving.out
-# cargo run -- example/class.lox > example/class.out
+# cargo run -- example/class.lox > example/class_fix.out
+cargo run -- example/class.lox &> example/class.out
 cargo run -- example/closure.lox > example/closure.out
 cargo run -- example/control_flow.lox > example/control_flow.out
 cargo run -- example/crazy_function.lox > example/crazy_function.out

@@ -187,9 +187,10 @@ impl Visitor<Result<Object, RuntimeError>, Result<(), RuntimeError>> for Evaluat
                     _ => Err(RuntimeError::new(name, "Only instances have fields.")),
                 }
             }
-            Expr::This(keyword) => {
+            _exp @ Expr::This(keyword) => {
                 // Should be handled the same as Expr::Variable
                 self.environment.get(keyword.clone())
+                // self._lookup_var(keyword.clone(), _exp.clone())
             }
             Expr::Grouping(exp) => self.evaluate(exp),
             Expr::Unary(op, right) => {
@@ -286,7 +287,18 @@ impl Visitor<Result<Object, RuntimeError>, Result<(), RuntimeError>> for Evaluat
                     return Err(RuntimeError::new(tok, &message));
                 }
 
-                Ok(callee.call(self, arguments)?)
+                // Fixes problems with `this` overwrites but breaks closures.
+                // See results in class_fix.out for class.lox.
+                // Performance increased in case of simple functions (test on fib).
+                // Very slow in case of closure inside a method (see Thing class in class.lox).
+
+                // self.environment = Environment::new(Some(Box::new(self.environment.clone())));
+                // let call_result = callee.call(self, arguments);
+                // let previous = self.environment.enclosing();
+                // self.environment = Environment::from_inner(previous);
+                // call_result
+
+                callee.call(self, arguments)
             }
 
             Expr::Assign(name, value) => {

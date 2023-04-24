@@ -153,3 +153,30 @@ impl Environment {
         unreachable!("Can't find given object!");
     }
 }
+
+pub fn _print_envs(mut env: Environment) {
+    let mut i = 0;
+    loop {
+        println!(
+            "{} Begin environment {} {}\n",
+            "-".repeat(10),
+            i,
+            "-".repeat(10)
+        );
+        println!("{:#?}", env);
+        println!(
+            "\n{} End environment {} {}\n",
+            "-".repeat(10),
+            i,
+            "-".repeat(10)
+        );
+
+        i += 1;
+
+        if let Some(boxed_env) = env.enclosing {
+            env = *boxed_env;
+        } else {
+            break;
+        }
+    }
+}

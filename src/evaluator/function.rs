@@ -42,6 +42,7 @@ impl Function {
             self.parameters.clone(),
             self.body.clone(),
         );
+        // println!("\n\n\n\n\n\n\n\n\n{:#?}\n\n\n\n\n\n\n\n\n", environment);
         Function::new(&self.name, declaration, environment)
     }
 
@@ -58,6 +59,7 @@ impl Function {
         // Debug
         // println!("{depth}");
         // println!("{:#?}", evaluator.locals);
+        // crate::evaluator::environment::_print_envs(env.clone());
 
         for i in 0..self.parameters.len() {
             env.define(

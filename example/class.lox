@@ -99,6 +99,7 @@ method(); // ?
 
 var bill = Person();
 bill.name = "Bill";
+bill.sayName();
 
 bill.sayName = jane.sayName;
 bill.sayName(); // ?
@@ -112,7 +113,7 @@ class Egotist {
 
 var method = Egotist().speak;
 method();
-print this;
+// print this; // Error
 
 
 class Cake {
@@ -129,8 +130,9 @@ cake.taste(); // Prints "The German chocolate cake is delicious!".
 
 class Thing {
     getCallback() {
+        var _this = this; // A stupid hack that makes it work
         fun localFunction() {
-            print this;
+            print _this;
         }
 
         return localFunction;
@@ -139,3 +141,9 @@ class Thing {
 
 var callback = Thing().getCallback();
 callback();
+
+// Works without hack and without fix.
+// {   
+//     var callback = Thing().getCallback();
+//     callback();
+// }

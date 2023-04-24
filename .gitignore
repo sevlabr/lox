@@ -2,5 +2,5 @@
 
 /target
 
-/example/debug.lox
+/example/debug.*
 TODO.md

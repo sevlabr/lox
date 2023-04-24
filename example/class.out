@@ -1,3 +1,5 @@
+    Finished dev [unoptimized + debuginfo] target(s) in 0.01s
+     Running `target/debug/lox example/class.lox`
 DevonshireCream
 Bagel instance
 str value
@@ -13,3 +15,17 @@ called function with argument
 Breakfast: an omelette with a cheese and a sausage
 Breakfast: an omelette with a cheese and a sausage
 Breakfast: an omelette with a cheese and a sausage
+Undefined property 'name'.
+[line 90]
+Runtime error!
+Undefined property 'name'.
+[line 90]
+Runtime error!
+Undefined property 'name'.
+[line 90]
+Runtime error!
+Bacon instance
+Undefined property 'flavor'.
+[line 122]
+Runtime error!
+Bacon instance
