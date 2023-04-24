@@ -132,4 +132,24 @@ impl Environment {
         }
         &mut env.values
     }
+
+    pub fn _ref_mut_obj(&mut self, obj: Object) -> &mut Object {
+        let mut env = self;
+        let mut enclosing = &mut env.enclosing;
+        loop {
+            for item in env.values.values_mut() {
+                if *item == obj {
+                    return item;
+                }
+            }
+
+            if let Some(box_encl) = enclosing {
+                env = box_encl.as_mut();
+                enclosing = &mut env.enclosing;
+            } else {
+                break;
+            }
+        }
+        unreachable!("Can't find given object!");
+    }
 }

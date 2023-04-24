@@ -4,6 +4,7 @@ use crate::lexer::token::Token;
 #[derive(Clone, Debug, PartialEq)]
 pub enum Stmt {
     Block(Vec<Stmt>),
+    Class(Token, Option<Expr>, Vec<Stmt>),
     Expression(Expr),
     Function(Token, Vec<Token>, Vec<Stmt>),
     If(Expr, Box<Stmt>, Option<Box<Stmt>>),

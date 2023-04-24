@@ -37,10 +37,30 @@ impl Visitor<String, String> for AstPrinter {
                 self.parenthesize_with_transform("call", &parts)
             }
             Expr::Grouping(ge) => self.parenthesize("group", vec![ge]),
+            Expr::Get(object, name) => {
+                let parts = vec![
+                    PrintObj::Exp(*object.clone()),
+                    PrintObj::Exp(Expr::LiteralExpr(Literal::String(
+                        name.get_lexeme().to_string(),
+                    ))),
+                ];
+                self.parenthesize_with_transform(".", &parts)
+            }
             Expr::LiteralExpr(l) => format!("{l}"),
             Expr::Logical(l, op, r) => self.parenthesize(op.get_lexeme(), vec![l, r]),
             Expr::Unary(op, r) => self.parenthesize(op.get_lexeme(), vec![r]),
             Expr::Variable(t) => t.get_lexeme().to_string(),
+            Expr::Set(object, name, value) => {
+                let parts = vec![
+                    PrintObj::Exp(*object.clone()),
+                    PrintObj::Exp(Expr::LiteralExpr(Literal::String(
+                        name.get_lexeme().to_string(),
+                    ))),
+                    PrintObj::Exp(*value.clone()),
+                ];
+                self.parenthesize_with_transform("=", &parts)
+            }
+            Expr::This(_) => "this".to_string(),
         }
     }
 
@@ -71,6 +91,24 @@ impl Visitor<String, String> for AstPrinter {
 
                 for stmt in stmts {
                     pretty_str.push_str(&self.visit_stmt(stmt));
+                }
+
+                pretty_str.push(')');
+                pretty_str
+            }
+            Stmt::Class(name, superclass, methods) => {
+                let mut pretty_str = String::new();
+                pretty_str.push_str("(class ");
+                pretty_str.push_str(name.get_lexeme());
+
+                if let Some(sup) = superclass {
+                    pretty_str.push_str(" < ");
+                    pretty_str.push_str(&self.visit_expr(sup));
+                }
+
+                for method in methods {
+                    pretty_str.push(' ');
+                    pretty_str.push_str(&self.visit_stmt(method));
                 }
 
                 pretty_str.push(')');

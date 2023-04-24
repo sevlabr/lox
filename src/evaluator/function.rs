@@ -1,4 +1,4 @@
-use crate::evaluator::{environment::Environment, Evaluator, Object, RuntimeError};
+use crate::evaluator::{Environment, Evaluator, Instance, Object, RuntimeError};
 use crate::{ast::stmt::Stmt, Token};
 use std::fmt;
 
@@ -32,6 +32,17 @@ impl Function {
 
     pub fn arity(&self) -> usize {
         self.parameters.len()
+    }
+
+    pub fn bind(&self, instance: &Instance) -> Result<Function, RuntimeError> {
+        let mut environment = Environment::new(Some(Box::new(self.closure.clone())));
+        environment.define("this".to_string(), Object::Instance(instance.clone()));
+        let declaration = Stmt::Function(
+            self.name.clone(),
+            self.parameters.clone(),
+            self.body.clone(),
+        );
+        Function::new(&self.name, declaration, environment)
     }
 
     pub fn call(

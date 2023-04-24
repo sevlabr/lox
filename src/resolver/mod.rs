@@ -7,6 +7,7 @@ use std::collections::HashMap;
 enum FunctionType {
     None,
     Func,
+    Method,
 }
 
 pub struct Resolver<'a> {
@@ -141,6 +142,7 @@ impl Visitor<(), ()> for Resolver<'_> {
                     self.resolve_expr(argument.clone());
                 }
             }
+            Expr::Get(object, _) => self.resolve_expr(*object.clone()),
             Expr::Grouping(exp) => self.resolve_expr(*exp.clone()),
             Expr::LiteralExpr(_) => (),
             Expr::Logical(l, _, r) => {
@@ -148,6 +150,11 @@ impl Visitor<(), ()> for Resolver<'_> {
                 self.resolve_expr(*r.clone());
             }
             Expr::Unary(_, r) => self.resolve_expr(*r.clone()),
+            Expr::Set(object, _, value) => {
+                self.resolve_expr(*value.clone());
+                self.resolve_expr(*object.clone());
+            }
+            exp @ Expr::This(keyword) => self.resolve_local(exp, keyword),
         }
     }
 
@@ -156,6 +163,22 @@ impl Visitor<(), ()> for Resolver<'_> {
             Stmt::Block(statements) => {
                 self.begin_scope();
                 self.resolve_stmts(statements.clone());
+                self.end_scope();
+            }
+            Stmt::Class(name, _superclass, methods) => {
+                self.declare(name.clone());
+                self.define(name.clone());
+
+                self.begin_scope();
+                self.scopes
+                    .last_mut()
+                    .unwrap()
+                    .insert("this".to_string(), true);
+
+                for method in methods {
+                    self.resovle_function(method, FunctionType::Method);
+                }
+
                 self.end_scope();
             }
             Stmt::Var(name, initializer) => {

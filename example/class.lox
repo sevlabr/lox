@@ -1,0 +1,141 @@
+class DevonshireCream {
+    serveOn() {
+        return "Scones";
+    }
+}
+
+print DevonshireCream; // Prints "DevonshireCream".
+
+class Bagel {}
+var bagel = Bagel();
+print bagel; // Prints "Bagel instance".
+
+class SomeClass {}
+var someObject = SomeClass();
+someObject.someStrProperty = "str value";
+{
+    someObject.someNumProperty = 1 - 2 * 3;
+}
+print someObject.someStrProperty;
+print someObject.someNumProperty;
+{
+    {
+        {
+            print someObject.otherProperty = "other" + " " + "property";
+        }
+    }
+}
+print someObject.otherProperty;
+{
+    print SomeClass;
+    print someObject;
+}
+
+{   
+    var blockObject = SomeClass();
+    {
+        blockObject.property = "str";
+    }
+    print blockObject.property;
+}
+
+class Bacon {
+    eat() {
+        print "Crunch crunch crunch!";
+    }
+
+    printFood(food) {
+        print "The food is: " + food;
+    }
+}
+
+Bacon().eat(); // Prints "Crunch crunch crunch!".
+
+var baconObj = Bacon();
+var printFoodMethod = baconObj.printFood;
+printFoodMethod("bacon");
+
+class Box {}
+
+fun notMethod(argument) {
+    print "called function with " + argument;
+}
+
+var box = Box();
+box.function = notMethod;
+box.function("argument");
+
+
+fun breakfast(food, meat) {
+    print "Breakfast: " + food + " and a " + meat;
+}
+
+class Omelette {
+    filledWith(filler) {
+        return "an omelette with a " + filler;
+    }
+}
+
+var omelette = Omelette();
+var sausage = "sausage";
+var cheese = "cheese";
+breakfast(omelette.filledWith(cheese), sausage);
+var eggs = omelette.filledWith(cheese);
+breakfast(eggs, sausage);
+breakfast(Omelette().filledWith("cheese"), "sausage");
+
+
+class Person {
+    sayName() {
+        print this.name;
+    }
+}
+
+var jane = Person();
+jane.name = "Jane";
+
+var method = jane.sayName;
+method(); // ?
+
+var bill = Person();
+bill.name = "Bill";
+
+bill.sayName = jane.sayName;
+bill.sayName(); // ?
+
+
+class Egotist {
+    speak() {
+        print this;
+    }
+}
+
+var method = Egotist().speak;
+method();
+print this;
+
+
+class Cake {
+    taste() {
+        var adjective = "delicious";
+        print "The " + this.flavor + " cake is " + adjective + "!";
+    }
+}
+
+var cake = Cake();
+cake.flavor = "German chocolate";
+cake.taste(); // Prints "The German chocolate cake is delicious!".
+
+
+class Thing {
+    getCallback() {
+        fun localFunction() {
+            print this;
+        }
+
+        return localFunction;
+    }
+}
+
+var callback = Thing().getCallback();
+callback();

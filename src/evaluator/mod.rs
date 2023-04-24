@@ -1,13 +1,17 @@
+pub mod class;
 pub mod environment;
 pub mod function;
+pub mod instance;
 pub mod native;
 
 use crate::ast::expr::Expr;
 use crate::ast::stmt::Stmt;
 use crate::lexer::token::{Literal, Token, TokenType};
 use crate::Visitor;
+use class::Class;
 use environment::Environment;
 use function::Function;
+use instance::Instance;
 use native::Clock;
 use std::collections::HashMap;
 use std::error::Error;
@@ -68,7 +72,9 @@ impl RuntimeError {
 #[derive(Clone, Debug, PartialEq)]
 pub enum Object {
     Bool(bool),
+    Cls(Class),
     Fun(Function),
+    Instance(Instance),
     Time(Clock),
     Number(f64),
     String(String),
@@ -79,7 +85,9 @@ impl Display for Object {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Object::Bool(b) => write!(f, "{b}"),
+            Object::Cls(c) => write!(f, "{c}"),
             Object::Fun(fun) => write!(f, "Function: {}.", fun),
+            Object::Instance(instance) => write!(f, "{instance}"),
             Object::Time(c) => write!(f, "Function: {}.", c),
             Object::Number(n) => {
                 if n.fract() == 0.0 {
@@ -96,6 +104,7 @@ impl Display for Object {
 impl Object {
     fn is_callable(&self, tok: &Token) -> Result<(), RuntimeError> {
         match self {
+            Object::Cls(_) => Ok(()),
             Object::Fun(_) => Ok(()),
             Object::Time(_) => Ok(()),
             _ => Err(RuntimeError::new(
@@ -107,9 +116,10 @@ impl Object {
 
     fn arity(&self) -> usize {
         match self {
+            Object::Cls(c) => c.arity(),
             Object::Fun(f) => f.arity(),
             Object::Time(c) => c.arity(),
-            _ => panic!("arity() is defined only for Function and clock()."),
+            _ => panic!("arity() is defined only for Function, Class and clock()."),
         }
     }
 
@@ -119,9 +129,10 @@ impl Object {
         arguments: Vec<Object>,
     ) -> Result<Object, RuntimeError> {
         match self {
+            Object::Cls(c) => c.call(evaluator, arguments),
             Object::Fun(f) => f.call(evaluator, arguments),
             Object::Time(c) => c.call(evaluator, arguments),
-            _ => panic!("call() is defined only for Function and clock()."),
+            _ => panic!("call() is defined only for Function, Class and clock()."),
         }
     }
 }
@@ -153,6 +164,32 @@ impl Visitor<Result<Object, RuntimeError>, Result<(), RuntimeError>> for Evaluat
                 }
 
                 Ok(self.evaluate(right)?)
+            }
+            Expr::Get(object, name) => {
+                let obj = self.evaluate(object)?;
+                match obj {
+                    Object::Instance(instance) => Ok(instance.get(name)?),
+                    _ => Err(RuntimeError::new(name, "Only instances have properties.")),
+                }
+            }
+            Expr::Set(object, name, value) => {
+                let obj = self.evaluate(object)?;
+                match obj {
+                    inst_obj @ Object::Instance(_) => {
+                        let val = self.evaluate(value)?;
+                        let obj_ref = self.environment._ref_mut_obj(inst_obj);
+                        match obj_ref {
+                            Object::Instance(instance) => instance.set(name, val.clone()),
+                            _ => unreachable!("Expected Object::Instance!"),
+                        }
+                        Ok(val)
+                    }
+                    _ => Err(RuntimeError::new(name, "Only instances have fields.")),
+                }
+            }
+            Expr::This(keyword) => {
+                // Should be handled the same as Expr::Variable
+                self.environment.get(keyword.clone())
             }
             Expr::Grouping(exp) => self.evaluate(exp),
             Expr::Unary(op, right) => {
@@ -292,6 +329,25 @@ impl Visitor<Result<Object, RuntimeError>, Result<(), RuntimeError>> for Evaluat
                 let function = Function::new(name, fun.clone(), self.environment.clone())?;
                 self.environment
                     .define(name.get_lexeme().to_string(), Object::Fun(function));
+                Ok(())
+            }
+            Stmt::Class(name, _superclass, methods_stmts) => {
+                self.environment
+                    .define(name.get_lexeme().to_string(), Object::None);
+
+                let mut methods: HashMap<String, Function> = HashMap::new();
+                for method in methods_stmts {
+                    if let fun @ Stmt::Function(method_name, _, _) = method {
+                        let function =
+                            Function::new(method_name, fun.clone(), self.environment.clone())?;
+                        methods.insert(method_name.get_lexeme().to_string(), function);
+                    } else {
+                        unreachable!("A method statement must be a Stmt::Function!");
+                    }
+                }
+
+                let class = Class::new(name.get_lexeme().to_string(), methods);
+                self.environment.assign(name, Object::Cls(class))?;
                 Ok(())
             }
             Stmt::If(condition, then_branch, else_branch) => {
