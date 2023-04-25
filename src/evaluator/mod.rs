@@ -187,6 +187,23 @@ impl Visitor<Result<Object, RuntimeError>, Result<(), RuntimeError>> for Evaluat
                     _ => Err(RuntimeError::new(name, "Only instances have fields.")),
                 }
             }
+            _exp @ Expr::Super(_, method) => {
+                let distance = self._locals.get(_exp).unwrap();
+                let superclass = self.environment._get_at(*distance, "super")?;
+                let object = self.environment._get_at(distance - 1, "this")?;
+                if let Object::Cls(sup_cls) = superclass {
+                    let opt_method = sup_cls.find_method(method.get_lexeme());
+                    if opt_method.is_none() {
+                        let msg = format!("Undefined property '{}'.", method.get_lexeme());
+                        return Err(RuntimeError::new(method, &msg));
+                    }
+                    if let Object::Instance(obj) = object {
+                        let some_method = opt_method.unwrap().bind(&obj)?;
+                        return Ok(Object::Fun(some_method));
+                    }
+                }
+                unreachable!("Fail during interpreting 'super'.");
+            }
             _exp @ Expr::This(keyword) => {
                 // Should be handled the same as Expr::Variable
                 self.environment.get(keyword.clone())
@@ -343,23 +360,53 @@ impl Visitor<Result<Object, RuntimeError>, Result<(), RuntimeError>> for Evaluat
                     .define(name.get_lexeme().to_string(), Object::Fun(function));
                 Ok(())
             }
-            Stmt::Class(name, _superclass, methods_stmts) => {
+            Stmt::Class(name, superclass, methods_stmts) => {
+                let mut super_class = None;
+                if let Some(sup_cls) = superclass {
+                    super_class = Some(self.evaluate(sup_cls)?);
+                    match super_class {
+                        Some(Object::Cls(_)) => (),
+                        _ => {
+                            if let Expr::Variable(sup_cls_name) = sup_cls {
+                                return Err(RuntimeError::new(
+                                    sup_cls_name,
+                                    "Superclass must be a class.",
+                                ));
+                            }
+                        }
+                    }
+                }
+
                 self.environment
                     .define(name.get_lexeme().to_string(), Object::None);
+
+                if superclass.is_some() {
+                    let old_env = self.environment.clone();
+                    self.environment = Environment::new(Some(Box::new(old_env)));
+                    self.environment
+                        .define("super".to_string(), super_class.clone().unwrap());
+                }
 
                 let mut methods: HashMap<String, Function> = HashMap::new();
                 for method in methods_stmts {
                     if let fun @ Stmt::Function(method_name, _, _) = method {
                         let is_initializer = method_name.get_lexeme() == "init";
-                        let function =
-                            Function::new(method_name, fun.clone(), self.environment.clone(), is_initializer)?;
+                        let function = Function::new(
+                            method_name,
+                            fun.clone(),
+                            self.environment.clone(),
+                            is_initializer,
+                        )?;
                         methods.insert(method_name.get_lexeme().to_string(), function);
                     } else {
                         unreachable!("A method statement must be a Stmt::Function!");
                     }
                 }
 
-                let class = Class::new(name.get_lexeme().to_string(), methods);
+                let class = Class::new(name.get_lexeme().to_string(), super_class, methods);
+                if superclass.is_some() {
+                    self.environment = *self.environment.enclosing().unwrap();
+                }
                 self.environment.assign(name, Object::Cls(class))?;
                 Ok(())
             }

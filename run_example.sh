@@ -6,6 +6,7 @@ cargo run -- example/binding_resolving.lox > example/binding_resolving.out
 # cargo run -- example/class_init.lox &> example/class_fix_init.out # ran without silly fix (in .lox)
 # cargo run -- example/class.lox > example/class_fix.out
 cargo run -- example/class_init.lox > example/class_init.out # ran with silly fix (in .lox)
+cargo run -- example/class_super.lox > example/class_super.out # ran with silly fix (in .lox)
 cargo run -- example/class.lox &> example/class.out
 cargo run -- example/closure.lox > example/closure.out
 cargo run -- example/control_flow.lox > example/control_flow.out

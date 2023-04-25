@@ -77,16 +77,23 @@ impl Function {
             Ok(_) => {
                 if self.is_initializer {
                     // return self.closure._get_at(0, "this");
-                    return self.closure.get(Token::new(TokenType::This, "this", Literal::None, 0));
+                    return self
+                        .closure
+                        .get(Token::new(TokenType::This, "this", Literal::None, 0));
                 }
                 Ok(Object::None)
-            },
+            }
             Err(err) => {
                 if err.is_return() {
                     // The result is actually the same, if this `if` block is removed.
                     if self.is_initializer {
                         // return self.closure._get_at(0, "this");
-                        return self.closure.get(Token::new(TokenType::This, "this", Literal::None, 0));
+                        return self.closure.get(Token::new(
+                            TokenType::This,
+                            "this",
+                            Literal::None,
+                            0,
+                        ));
                     }
                     return Ok(err.get_value());
                 }

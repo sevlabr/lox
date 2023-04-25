@@ -15,6 +15,7 @@ enum FunctionType {
 enum ClassType {
     None,
     Class,
+    Subclass,
 }
 
 pub struct Resolver<'a> {
@@ -163,9 +164,21 @@ impl Visitor<(), ()> for Resolver<'_> {
                 self.resolve_expr(*value.clone());
                 self.resolve_expr(*object.clone());
             }
+            exp @ Expr::Super(keyword, _) => {
+                if self.current_class == ClassType::None {
+                    self.interpreter
+                        .error(keyword, "Can't use 'super' outside of a class.");
+                } else if self.current_class != ClassType::Subclass {
+                    self.interpreter
+                        .error(keyword, "Can't use 'super' in a class with no superclass.");
+                }
+
+                self.resolve_local(exp, keyword)
+            }
             exp @ Expr::This(keyword) => {
                 if self.current_class == ClassType::None {
-                    self.interpreter.error(keyword, "Can't use 'this' outside of a class.");
+                    self.interpreter
+                        .error(keyword, "Can't use 'this' outside of a class.");
                 }
 
                 self.resolve_local(exp, keyword)
@@ -180,12 +193,31 @@ impl Visitor<(), ()> for Resolver<'_> {
                 self.resolve_stmts(statements.clone());
                 self.end_scope();
             }
-            Stmt::Class(name, _superclass, methods) => {
+            Stmt::Class(name, superclass, methods) => {
                 let enclosing_class = self.current_class;
                 self.current_class = ClassType::Class;
 
                 self.declare(name.clone());
                 self.define(name.clone());
+
+                if let Some(sup_cls) = superclass {
+                    if let Expr::Variable(sup_cls_name) = sup_cls {
+                        if name.get_lexeme() == sup_cls_name.get_lexeme() {
+                            self.interpreter
+                                .error(sup_cls_name, "A class can't inherit from itself.");
+                        }
+                    }
+                    self.current_class = ClassType::Subclass;
+                    self.resolve_expr(sup_cls.clone());
+                }
+
+                if superclass.is_some() {
+                    self.begin_scope();
+                    self.scopes
+                        .last_mut()
+                        .unwrap()
+                        .insert("super".to_string(), true);
+                }
 
                 self.begin_scope();
                 self.scopes
@@ -204,6 +236,9 @@ impl Visitor<(), ()> for Resolver<'_> {
                 }
 
                 self.end_scope();
+                if superclass.is_some() {
+                    self.end_scope();
+                }
                 self.current_class = enclosing_class;
             }
             Stmt::Var(name, initializer) => {

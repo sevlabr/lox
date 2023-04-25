@@ -60,6 +60,9 @@ impl Visitor<String, String> for AstPrinter {
                 ];
                 self.parenthesize_with_transform("=", &parts)
             }
+            Expr::Super(_, method) => {
+                self.parenthesize_with_transform("super", &vec![PrintObj::Tok(method.clone())])
+            }
             Expr::This(_) => "this".to_string(),
         }
     }

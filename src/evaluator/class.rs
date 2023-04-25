@@ -5,12 +5,21 @@ use std::fmt::Display;
 #[derive(Clone, Debug, PartialEq)]
 pub struct Class {
     name: String,
+    superclass: Box<Option<Object>>,
     methods: HashMap<String, Function>,
 }
 
 impl Class {
-    pub fn new(name: String, methods: HashMap<String, Function>) -> Self {
-        Class { name, methods }
+    pub fn new(
+        name: String,
+        superclass: Option<Object>,
+        methods: HashMap<String, Function>,
+    ) -> Self {
+        Class {
+            name,
+            superclass: Box::new(superclass),
+            methods,
+        }
     }
 
     pub fn arity(&self) -> usize {
@@ -21,7 +30,11 @@ impl Class {
         0
     }
 
-    pub fn call(&self, evaluator: &mut Evaluator, arguments: Vec<Object>) -> Result<Object, RuntimeError> {
+    pub fn call(
+        &self,
+        evaluator: &mut Evaluator,
+        arguments: Vec<Object>,
+    ) -> Result<Object, RuntimeError> {
         let instance = Instance::new(self.clone());
         let initializer = self.find_method("init");
         if let Some(init) = initializer {
@@ -32,7 +45,15 @@ impl Class {
     }
 
     pub fn find_method(&self, name: &str) -> Option<Function> {
-        self.methods.get(name).cloned()
+        if self.methods.contains_key(name) {
+            return self.methods.get(name).cloned();
+        }
+
+        if let Some(Object::Cls(cls)) = &*self.superclass {
+            return cls.find_method(name);
+        }
+
+        None
     }
 
     fn stringify(&self) -> String {

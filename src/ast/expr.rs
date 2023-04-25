@@ -11,6 +11,7 @@ pub enum Expr {
     Logical(Box<Expr>, Token, Box<Expr>),
     Unary(Token, Box<Expr>),
     Set(Box<Expr>, Token, Box<Expr>),
+    Super(Token, Token),
     This(Token),
     Variable(Token),
 }

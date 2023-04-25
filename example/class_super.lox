@@ -1,0 +1,86 @@
+class Doughnut {
+    // General doughnut stuff...
+    cook() {
+        print "Fry until golden brown.";
+    }
+}
+
+class BostonCream < Doughnut {
+    // Boston Cream-specific stuff...
+}
+
+// class Cls < 123 {} // ParseError: [line 12] Error at '123': Expect superclass name.
+// class Oops < Oops {} // Semantic Error: [line 13] Error at 'Oops': A class can't inherit from itself.
+
+// var NotAClass = "I am totally not a class";
+// class Subclass < NotAClass {} // RuntimeError: [line 16] Superclass must be a class.
+
+{
+    BostonCream().cook(); // Prints: "Fry until golden brown."
+}
+
+class DoughnutSup {
+    cook() {
+        print "Fry until golden brown.";
+    }
+}
+
+class BostonCreamSub < DoughnutSup {
+    cook() {
+        super.cook();
+        print "Pipe full of custard and coat with chocolate.";
+    }
+}
+
+{
+    BostonCreamSub().cook();
+}
+
+// print super; // Syntax error. [line 39] Error at ';': Expect '.' after 'super'.
+
+class BostonCreamSubVar < DoughnutSup {
+    cook() {
+        var method = super.cook;
+        method();
+        print "Pipe full of custard and coat with chocolate.";
+    }
+}
+
+{
+    BostonCreamSubVar().cook();
+}
+
+class A {
+    method() {
+        print "A method";
+    }
+}
+
+class B < A {
+    method() {
+        print "B method";
+    }
+
+    test() {
+        super.method();
+    }
+}
+
+class C < B {}
+
+{
+    C().test();
+    B().method();
+}
+
+class Eclair {
+    cook() {
+        // super.cook(); // Static (Semantic) Error: [line 78] Error at 'super': Can't use 'super' in a class with no superclass.
+        print "Pipe full of creme patissiere.";
+    }
+}
+
+{
+    Eclair().cook();
+    // super.notEvenInAClass(); // Static (Semantic) Error: [line 85] Error at 'super': Can't use 'super' outside of a class.
+}
