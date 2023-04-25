@@ -338,7 +338,7 @@ impl Visitor<Result<Object, RuntimeError>, Result<(), RuntimeError>> for Evaluat
                 Ok(())
             }
             fun @ Stmt::Function(name, _, _) => {
-                let function = Function::new(name, fun.clone(), self.environment.clone())?;
+                let function = Function::new(name, fun.clone(), self.environment.clone(), false)?;
                 self.environment
                     .define(name.get_lexeme().to_string(), Object::Fun(function));
                 Ok(())
@@ -350,8 +350,9 @@ impl Visitor<Result<Object, RuntimeError>, Result<(), RuntimeError>> for Evaluat
                 let mut methods: HashMap<String, Function> = HashMap::new();
                 for method in methods_stmts {
                     if let fun @ Stmt::Function(method_name, _, _) = method {
+                        let is_initializer = method_name.get_lexeme() == "init";
                         let function =
-                            Function::new(method_name, fun.clone(), self.environment.clone())?;
+                            Function::new(method_name, fun.clone(), self.environment.clone(), is_initializer)?;
                         methods.insert(method_name.get_lexeme().to_string(), function);
                     } else {
                         unreachable!("A method statement must be a Stmt::Function!");

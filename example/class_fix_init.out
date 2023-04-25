@@ -1,0 +1,24 @@
+    Finished dev [unoptimized + debuginfo] target(s) in 0.01s
+     Running `target/debug/lox example/class_init.lox`
+
+Add some older examples to check if they don't break anything
+
+Crunch crunch crunch!
+The food is: bacon
+The German chocolate cake is delicious!
+
+End older exampels
+
+Start initialization.
+Initialized.
+Undefined property 'str'.
+[line 62]
+Runtime error!
+Undefined variable 'num'.
+[line 74]
+Runtime error!
+FooThis instance
+FooThis instance
+FooThis instance
+FooEarly
+FooEarly instance

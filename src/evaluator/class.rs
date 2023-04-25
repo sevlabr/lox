@@ -14,11 +14,21 @@ impl Class {
     }
 
     pub fn arity(&self) -> usize {
+        let initializer = self.find_method("init");
+        if let Some(init) = initializer {
+            return init.arity();
+        }
         0
     }
 
-    pub fn call(&self, _: &mut Evaluator, _: Vec<Object>) -> Result<Object, RuntimeError> {
-        Ok(Object::Instance(Instance::new(self.clone())))
+    pub fn call(&self, evaluator: &mut Evaluator, arguments: Vec<Object>) -> Result<Object, RuntimeError> {
+        let instance = Instance::new(self.clone());
+        let initializer = self.find_method("init");
+        if let Some(init) = initializer {
+            (init.bind(&instance)?).call(evaluator, arguments)?;
+        }
+
+        Ok(Object::Instance(instance))
     }
 
     pub fn find_method(&self, name: &str) -> Option<Function> {

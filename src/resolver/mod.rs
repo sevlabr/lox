@@ -7,13 +7,21 @@ use std::collections::HashMap;
 enum FunctionType {
     None,
     Func,
+    Initializer,
     Method,
+}
+
+#[derive(Clone, Copy, PartialEq)]
+enum ClassType {
+    None,
+    Class,
 }
 
 pub struct Resolver<'a> {
     scopes: Vec<HashMap<String, bool>>,
     locals: HashMap<Expr, usize>,
     current_function: FunctionType,
+    current_class: ClassType,
 
     interpreter: &'a mut Lox,
 }
@@ -25,6 +33,7 @@ impl Resolver<'_> {
             locals: HashMap::new(),
             interpreter,
             current_function: FunctionType::None,
+            current_class: ClassType::None,
         }
     }
 
@@ -154,7 +163,13 @@ impl Visitor<(), ()> for Resolver<'_> {
                 self.resolve_expr(*value.clone());
                 self.resolve_expr(*object.clone());
             }
-            exp @ Expr::This(keyword) => self.resolve_local(exp, keyword),
+            exp @ Expr::This(keyword) => {
+                if self.current_class == ClassType::None {
+                    self.interpreter.error(keyword, "Can't use 'this' outside of a class.");
+                }
+
+                self.resolve_local(exp, keyword)
+            }
         }
     }
 
@@ -166,6 +181,9 @@ impl Visitor<(), ()> for Resolver<'_> {
                 self.end_scope();
             }
             Stmt::Class(name, _superclass, methods) => {
+                let enclosing_class = self.current_class;
+                self.current_class = ClassType::Class;
+
                 self.declare(name.clone());
                 self.define(name.clone());
 
@@ -176,10 +194,17 @@ impl Visitor<(), ()> for Resolver<'_> {
                     .insert("this".to_string(), true);
 
                 for method in methods {
-                    self.resovle_function(method, FunctionType::Method);
+                    let mut declaration = FunctionType::Method;
+                    if let Stmt::Function(name, _, _) = method {
+                        if name.get_lexeme() == "init" {
+                            declaration = FunctionType::Initializer;
+                        }
+                    }
+                    self.resovle_function(method, declaration);
                 }
 
                 self.end_scope();
+                self.current_class = enclosing_class;
             }
             Stmt::Var(name, initializer) => {
                 self.declare(name.clone());
@@ -210,6 +235,11 @@ impl Visitor<(), ()> for Resolver<'_> {
                 }
 
                 if *value != Expr::LiteralExpr(Literal::None) {
+                    if self.current_function == FunctionType::Initializer {
+                        self.interpreter
+                            .error(keyword, "Can't return a value from an initializer.");
+                    }
+
                     self.resolve_expr(value.clone());
                 }
             }

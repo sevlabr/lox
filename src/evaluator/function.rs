@@ -1,5 +1,5 @@
-use crate::evaluator::{Environment, Evaluator, Instance, Object, RuntimeError};
-use crate::{ast::stmt::Stmt, Token};
+use crate::evaluator::{Environment, Evaluator, Instance, Literal, Object, RuntimeError};
+use crate::{ast::stmt::Stmt, Token, TokenType};
 use std::fmt;
 
 #[derive(Clone, Debug, PartialEq)]
@@ -8,6 +8,7 @@ pub struct Function {
     parameters: Vec<Token>,
     body: Vec<Stmt>,
     closure: Environment,
+    is_initializer: bool,
 }
 
 impl Function {
@@ -15,6 +16,7 @@ impl Function {
         tok: &Token,
         declaration: Stmt,
         closure: Environment,
+        is_initializer: bool,
     ) -> Result<Function, RuntimeError> {
         match declaration {
             Stmt::Function(name, parameters, body) => Ok(Function {
@@ -22,6 +24,7 @@ impl Function {
                 parameters,
                 body,
                 closure,
+                is_initializer,
             }),
             _ => Err(RuntimeError::new(
                 tok,
@@ -43,7 +46,7 @@ impl Function {
             self.body.clone(),
         );
         // println!("\n\n\n\n\n\n\n\n\n{:#?}\n\n\n\n\n\n\n\n\n", environment);
-        Function::new(&self.name, declaration, environment)
+        Function::new(&self.name, declaration, environment, self.is_initializer)
     }
 
     pub fn call(
@@ -71,9 +74,20 @@ impl Function {
         let (eval_res, closure) = evaluator.execute_block_fun(&self.body, env, depth);
         self.closure = closure;
         match eval_res {
-            Ok(_) => Ok(Object::None),
+            Ok(_) => {
+                if self.is_initializer {
+                    // return self.closure._get_at(0, "this");
+                    return self.closure.get(Token::new(TokenType::This, "this", Literal::None, 0));
+                }
+                Ok(Object::None)
+            },
             Err(err) => {
                 if err.is_return() {
+                    // The result is actually the same, if this `if` block is removed.
+                    if self.is_initializer {
+                        // return self.closure._get_at(0, "this");
+                        return self.closure.get(Token::new(TokenType::This, "this", Literal::None, 0));
+                    }
                     return Ok(err.get_value());
                 }
                 Err(err)

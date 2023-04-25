@@ -1,0 +1,106 @@
+print "";
+print "Add some older examples to check if they don't break anything";
+print "";
+
+class Bacon {
+    eat() {
+        print "Crunch crunch crunch!";
+    }
+
+    printFood(food) {
+        print "The food is: " + food;
+    }
+}
+
+// Bacon().eat(); // Prints "Crunch crunch crunch!".
+
+var baconObj = Bacon();
+var printFoodMethod = baconObj.printFood;
+// printFoodMethod("bacon");
+
+// Silly fix
+{   
+    Bacon().eat();
+    printFoodMethod("bacon");
+}
+
+class Cake {
+    taste() {
+        var adjective = "delicious";
+        print "The " + this.flavor + " cake is " + adjective + "!";
+    }
+}
+
+var cake = Cake();
+cake.flavor = "German chocolate";
+// cake.taste(); // Runtime Error: Undefined property 'flavor'. [line 24]
+// Silly fix.
+{
+    cake.taste(); // Prints "The German chocolate cake is delicious!".
+}
+
+print "";
+print "End older exampels";
+print "";
+
+class Foo {
+    init(bar) {
+        print "Start initialization.";
+
+        this.bar = bar;
+        this.num = 3.14;
+        this.str = "string";
+        
+        print "Initialized.";
+    }
+
+    hello(name) {
+        var msg = "Hello, " + name + "!";
+        msg = msg + " I'm Foo and I have a ";
+        msg = msg + this.str + "!";
+        print msg;
+        print "I also have:";
+        print this.bar;
+        print this.num;
+        print "And I return my num!";
+        return this.num;
+    }
+}
+
+var foo = Foo("bar str");
+var num = foo.hello("Author");
+print num;
+
+
+class FooThis {
+    init() {
+        print this;
+    }
+}
+
+var fooThis = FooThis();
+print fooThis.init();
+
+
+// class FooWrong {
+//     init() {
+//         return "something else"; // Static error: [line 193] Error at 'return': Can't return a value from an initializer.
+//     }
+// }
+
+// print FooWrong();
+
+
+class FooEarly {
+    init() {
+        return;
+    }
+}
+
+print FooEarly;
+print FooEarly();
+
+
+// fun notAMethod() {
+//     print this; // Static Error: [line 211] Error at 'this': Can't use 'this' outside of a class.
+// }

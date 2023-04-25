@@ -95,7 +95,7 @@ impl Environment {
         if let Some(obj) = env.values().get(name) {
             return Ok(obj.clone());
         }
-        let msg = format!("Did not find {name} in ancestor environment!");
+        let msg = format!("Did not find '{name}' in ancestor environment!");
         unreachable!("{msg}");
     }
 
