@@ -2,5 +2,11 @@
 
 /target
 
+# executables
+benchmark/fib-?*
+# Haskell files
+benchmark/fib.hi
+benchmark/fib.o
+
 /example/debug.*
 TODO.md
