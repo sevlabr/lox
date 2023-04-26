@@ -1,0 +1,46 @@
+fib(40): 102334155
+Took 634.814000 milliseconds to execute
+fib(40): 102334155
+Took 307.226000 milliseconds to execute
+fib(40): 102334155
+Took 327.490000 milliseconds to execute
+Result: 102334155
+Elapsed: 635 milliseconds
+Result: 102334155
+Elapsed: 295 milliseconds
+Result: 102334155
+Elapsed: 338 milliseconds
+2023/04/26 22:46:44 fib(40) is 102334155 and took 490.419332ms
+[1 of 1] Compiling Main             ( fib.hs, fib.o ) [Optimisation flags changed]
+Linking fib-hs-unopt ...
+Start
+Result: 102334155
+End
+
+real	0m9,135s
+user	0m9,115s
+sys	0m0,020s
+[1 of 1] Compiling Main             ( fib.hs, fib.o ) [Optimisation flags changed]
+Linking fib-hs-O2 ...
+Start
+Result: 102334155
+End
+
+real	0m0,554s
+user	0m0,554s
+sys	0m0,000s
+Time:
+  471.578 ms (0 allocations: 0 bytes)
+Result: 102334155
+Time:
+  471.755 ms (0 allocations: 0 bytes)
+Result: 102334155
+Time:
+  531.437 ms (0 allocations: 0 bytes)
+Result: 102334155
+Result: 102334155, number of function calls: 331160281
+Time elapsed for this closure function:
+  8.289 s (317810 allocations: 4.85 MiB)
+fib(40): 102334155, time: 14.714937448501587 seconds
+Time elapsed in fib(40) is: 1.05063063s, result is: 102334155
+Time elapsed in fib(40) is: 326.477725ms, result is: 102334155
