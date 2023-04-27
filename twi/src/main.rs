@@ -1,5 +1,5 @@
-use lox::evaluator::{environment::Environment, Evaluator};
-use lox::Lox;
+use twi::evaluator::{environment::Environment, Evaluator};
+use twi::Lox;
 use std::env;
 use std::process;
 

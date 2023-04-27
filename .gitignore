@@ -1,6 +1,7 @@
 .vscode
 
 /target
+twi/target
 
 # executables
 benchmark/fib-?*
@@ -8,5 +9,5 @@ benchmark/fib-?*
 benchmark/fib.hi
 benchmark/fib.o
 
-/example/debug.*
+twi/example/debug/debug.*
 TODO.md
