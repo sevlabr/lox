@@ -24,3 +24,7 @@ Also I learnt some *Java*. At least reading it.
 
 `twi` and `bvm` are implemented as self-consistent and completely independent *Rust* crates.
 `benchmark` is a set of independent scripts on various languages.
+
+# Current status of the project
+
+Unfinished. I plan to do more things.

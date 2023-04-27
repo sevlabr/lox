@@ -21,6 +21,11 @@ with environments if I have time. Overall, lexer, parser and resolver seem to wo
 
 # Examples
 
+All basic and human-readable examples are in `/example` folder
+(`debug` subfolder contains some tests for edge cases and thus the code here is probably quite hard to understand).
+Currently, there are 3 examples: classes, closures and basic functions. *.lox* files are the source code
+and *.out* files contain outputs.
+
 TODO
 
 # AST visualization
