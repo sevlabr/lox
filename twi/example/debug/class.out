@@ -1,5 +1,5 @@
     Finished dev [unoptimized + debuginfo] target(s) in 0.01s
-     Running `target/debug/lox example/class.lox`
+     Running `/home/vova/rust-learning/lox/target/debug/twi example/debug/class.lox`
 DevonshireCream
 Bagel instance
 str value

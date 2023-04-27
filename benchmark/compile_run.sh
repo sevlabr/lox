@@ -29,6 +29,10 @@ julia -O3 fib.jl
 julia -O3 --handle-signals=no --min-optlevel=3 -g0 --inline=yes --check-bounds=no --math-mode=fast --compile=all fib.jl
 julia -O3 fib_count.jl
 
+# Lox
+# cargo run -p twi -- ./../twi/example/fib.lox
+# cargo run --release -p twi -- ./../twi/example/fib.lox
+
 # Python
 python fib.py
 

@@ -21,4 +21,8 @@ with environments if I have time. Overall, lexer, parser and resolver seem to wo
 
 # Examples
 
+TODO
+
 # AST visualization
+
+TODO

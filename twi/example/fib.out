@@ -1,0 +1,41 @@
+First 15 Fibonacci numbers:
+0
+1
+1
+2
+3
+5
+8
+13
+21
+34
+55
+89
+144
+233
+377
+
+Time test for fib(n), where n:
+15
+Result:
+610
+(this is the (n+1)th Fibonacci number.
+Time elapsed (seconds):
+0
+
+Time test for fib(n), where n:
+20
+Result:
+6765
+(this is the (n+1)th Fibonacci number.
+Time elapsed (seconds):
+6
+
+Time test for fib(n), where n:
+23
+Result:
+28657
+(this is the (n+1)th Fibonacci number.
+Time elapsed (seconds):
+27
+

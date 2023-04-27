@@ -1,0 +1,31 @@
+fun someFunc() {
+    print "I'm 'someFunc' and I do something important.";
+}
+
+fun genCounter(threshold) {
+    var count = 0;
+
+    fun counter(func) {
+        func();
+        count = count + 1;
+
+        print "Was called:";
+        print count;
+        print "times.";
+        print "";
+
+        if (count >= threshold) {
+            print "Threshold reached.";
+            print "";
+        }
+    }
+
+    return counter;
+}
+
+var counterFunc = genCounter(3);
+
+counterFunc(someFunc);
+counterFunc(someFunc);
+counterFunc(someFunc);
+counterFunc(someFunc);

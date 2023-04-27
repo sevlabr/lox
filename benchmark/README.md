@@ -33,5 +33,7 @@ real evaluation, but on estimation (see details in ...).
 | Go | 0.5 | - |
 | Haskell | 9 | 0.5 |
 | Julia | 0.5 | 0.5 |
+| Lox (bvm) | - | - |
+| Lox (twi) | \\( \sim 10^5 \\) | \\( \sim 10^4 \\) |
 | Python | 15 | - |
 | Rust | 1 | 0.3 |

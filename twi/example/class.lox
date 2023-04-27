@@ -1,0 +1,83 @@
+class Worker {
+    work() {
+        print "Trying to understand the task...";
+    }
+}
+
+class Programmer < Worker {
+    work() {
+        print "Writing program...";
+    }
+
+    makeProgram() {
+        super.work();
+        this.work();
+        print "Made a program!";
+    }
+}
+
+var programmer = Programmer();
+programmer.makeProgram();
+print "";
+
+class Animal {
+    init(eatDaily, foodType) {
+        this.eatDaily = eatDaily;
+        this.foodType = foodType;
+    }
+
+    eat(eatDaily, foodType) {
+        if (foodType != this.foodType) {
+            print "I can't eat this!";
+            return;
+        }
+        if (eatDaily < this.eatDaily) {
+            print "Not enough food!";
+            return;
+        }
+        print "Nice meal!";
+    }
+}
+
+class Lion < Animal {
+    roar() {
+        print "Roar!";
+    }
+
+    walk() {
+        print "Searching for food...";
+    }
+
+    hunt(eatDaily, foodType) {
+        this.walk();
+        this.eat(eatDaily, foodType);
+    }
+}
+
+class Cow < Animal {
+    moo() {
+        print "Moo!";
+    }
+}
+
+var lion = Lion(10, "meat");
+
+lion.roar();
+lion.eat(1.5, "plant");
+lion.eat(12, "plant");
+lion.eat(9.5, "meat");
+lion.eat(20, "meat");
+lion.roar();
+lion.hunt(30, "meat");
+lion.roar();
+print "";
+
+var cow = Cow(12, "plant");
+
+cow.moo();
+cow.eat(20, "plant");
+cow.eat(13.45, "meat");
+cow.eat(12.1, "plant");
+cow.eat(2, "plant");
+cow.eat(2, "meat");
+cow.moo();
