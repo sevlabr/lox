@@ -1,0 +1,354 @@
+digraph Program {
+subgraph stmt0 {
+	fontname="Helvetica,Arial,sans-serif"
+	node [
+		style=filled
+		shape=rect
+		fontname="Helvetica,Arial,sans-serif"
+	]
+	edge [
+		fontname="Helvetica,Arial,sans-serif"
+	]
+	N1 [
+		color="#93c47d"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Stmt</b></td> </tr>
+			<tr> <td align="center"><i>Function</i></td> </tr>
+			<tr> <td align="center">fun</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N2 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">fib</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N3 [
+		color="#eee5de"
+		label="Parameters"
+	]
+	N4 [
+		color="#6ca1a2"
+		label="Function body"
+	]
+	N1 -> {N2, N3, N4}
+	N5 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">n</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N3 -> N5
+	N6 [
+		color="#93c47d"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Stmt</b></td> </tr>
+			<tr> <td align="center"><i>If</i></td> </tr>
+			<tr> <td align="center">if</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N7 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Binary</i></td> </tr>
+			<tr> <td align="center">&lt;</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N8 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Variable</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N9 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">n</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N8 -> N9
+	N10 [
+		color="#ffcc60"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Literal</b></td> </tr>
+			<tr> <td align="center"><i>Number</i></td> </tr>
+			<tr> <td align="center">2</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N7 -> {N8, N10}
+	N11 [
+		color="#93c47d"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Stmt</b></td> </tr>
+			<tr> <td align="center"><i>Block</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N12 [
+		color="#93c47d"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Stmt</b></td> </tr>
+			<tr> <td align="center"><i>Return</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N13 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Variable</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N14 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">n</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N13 -> N14
+	N12 -> N13
+	N11 -> N12
+	N6 -> {N7, N11}
+	N15 [
+		color="#93c47d"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Stmt</b></td> </tr>
+			<tr> <td align="center"><i>Return</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N16 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Binary</i></td> </tr>
+			<tr> <td align="center">+</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N17 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Call</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N18 [
+		color="#a88f85"
+		label="Arguments"
+	]
+	N19 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Variable</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N20 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">fib</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N19 -> N20
+	N17 -> {N18, N19}
+	N21 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Binary</i></td> </tr>
+			<tr> <td align="center">-</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N22 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Variable</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N23 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">n</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N22 -> N23
+	N24 [
+		color="#ffcc60"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Literal</b></td> </tr>
+			<tr> <td align="center"><i>Number</i></td> </tr>
+			<tr> <td align="center">2</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N21 -> {N22, N24}
+	N18 -> N21
+	N25 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Call</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N26 [
+		color="#a88f85"
+		label="Arguments"
+	]
+	N27 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Variable</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N28 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">fib</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N27 -> N28
+	N25 -> {N26, N27}
+	N29 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Binary</i></td> </tr>
+			<tr> <td align="center">-</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N30 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Variable</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N31 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">n</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N30 -> N31
+	N32 [
+		color="#ffcc60"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Literal</b></td> </tr>
+			<tr> <td align="center"><i>Number</i></td> </tr>
+			<tr> <td align="center">1</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N29 -> {N30, N32}
+	N26 -> N29
+	N16 -> {N17, N25}
+	N15 -> N16
+	N4 -> N6
+	N4 -> N15
+}
+subgraph stmt1 {
+	fontname="Helvetica,Arial,sans-serif"
+	node [
+		style=filled
+		shape=rect
+		fontname="Helvetica,Arial,sans-serif"
+	]
+	edge [
+		fontname="Helvetica,Arial,sans-serif"
+	]
+	N33 [
+		color="#93c47d"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Stmt</b></td> </tr>
+			<tr> <td align="center"><i>Print</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N34 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Call</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N35 [
+		color="#a88f85"
+		label="Arguments"
+	]
+	N36 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Variable</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N37 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">fib</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N36 -> N37
+	N34 -> {N35, N36}
+	N38 [
+		color="#ffcc60"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Literal</b></td> </tr>
+			<tr> <td align="center"><i>Number</i></td> </tr>
+			<tr> <td align="center">15</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N35 -> N38
+	N33 -> N34
+}
+}
+

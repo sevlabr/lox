@@ -1,3 +1,5 @@
+![An Abstract Syntax Tree (AST) for a definition of a function that calculates Fibonacci numbers using naive recursive approach and a call to this function with argument *15* result of which is then passed to a *Print* statement.](twi/gallery/readme/main.svg)
+
 # What is it?
 
 *Rust* implementations of *Lox* language as it is described in a
@@ -20,6 +22,7 @@ Also I learnt some *Java*. At least reading it.
 
 - `benchmark` — very simple benchmark for *Lox* implementations and comparison with some other languages
 - `twi` — code for *Tree-Walk Interpreter*, as it is described in Part II of the [book](https://craftinginterpreters.com/)
+   and also code for custom AST visualizer that outputs nice pictures such as the one above.
 - `bvm` — *Bytecode Virtual Machine*, as it is described in Part III of the [book](https://craftinginterpreters.com/)
 
 `twi` and `bvm` are implemented as self-consistent and completely independent *Rust* crates.
