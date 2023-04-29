@@ -4,7 +4,7 @@ pub mod lexer;
 pub mod parser;
 pub mod resolver;
 
-use ast::AstPrinter;
+use ast::{graphviz::AstVis, AstPrinter};
 use evaluator::{Evaluator, RuntimeError};
 use lexer::scanner::Scanner;
 use lexer::token::{Token, TokenType};
@@ -104,8 +104,9 @@ impl Lox {
         }
     }
 
-    fn _run_ast_print(&mut self, source: String) {
-        let mut scanner = Scanner::new(self, &source);
+    pub fn run_ast_print(&mut self, path: &str, is_graphviz: bool) {
+        let contents = fs::read_to_string(path).expect("Couldn't read the given file!");
+        let mut scanner = Scanner::new(self, &contents);
         scanner.scan_tokens();
 
         let tokens = scanner.tokens().clone();
@@ -114,6 +115,12 @@ impl Lox {
 
         // Stop if there was a syntax error.
         if self.had_error {
+            return;
+        }
+
+        if is_graphviz {
+            let mut graphviz_printer = AstVis::new();
+            graphviz_printer.print(statements);
             return;
         }
 

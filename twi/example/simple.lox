@@ -1,0 +1,42 @@
+var start = clock();
+var someVar = 1 + 2 - 3 * (5 - 6) + 13.4 / 2;
+print someVar;
+
+fun someFunc(value, threshold) {
+    if (value < threshold and value >= 0) {
+        print value;
+    }
+
+    if (value >= 2 * threshold or value > 5 and value < 8) {
+        print 2 * value;
+    } else {
+        print "Value is bad";
+    }
+
+    return value / 3;
+}
+
+var otherVar;
+for (var i = -10; i < 40; i = i + 10) {
+    for (var j = -10; j <= 10; j = j + 1) {
+
+        otherVar = someFunc(j, i);
+
+        if (otherVar > -2 and otherVar < 5) {
+            print "otherVar";
+        }
+
+    }
+}
+
+print "Time (seconds):";
+print clock() - start;
+
+start = clock();
+print "Expensive loop...";
+print "(1 million iterations)";
+var i = 0;
+while (i < 1000000) {
+    i = i + 1;
+}
+print clock() - start;

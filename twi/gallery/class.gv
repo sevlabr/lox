@@ -1,0 +1,2889 @@
+digraph Program {
+subgraph stmt0 {
+	fontname="Helvetica,Arial,sans-serif"
+	node [
+		style=filled
+		shape=rect
+		fontname="Helvetica,Arial,sans-serif"
+	]
+	edge [
+		fontname="Helvetica,Arial,sans-serif"
+	]
+	N1 [
+		color="#93c47d"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Stmt</b></td> </tr>
+			<tr> <td align="center"><i>Class</i></td> </tr>
+			<tr> <td align="center">class</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N2 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">Worker</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N3 [
+		color="#ffcde0"
+		label="Methods"
+	]
+	N1 -> {N2, N3}
+	N4 [
+		color="#93c47d"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Stmt</b></td> </tr>
+			<tr> <td align="center"><i>Function</i></td> </tr>
+			<tr> <td align="center">fun</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N5 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">work</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N6 [
+		color="#eee5de"
+		label="Parameters"
+	]
+	N7 [
+		color="#6ca1a2"
+		label="Function body"
+	]
+	N4 -> {N5, N6, N7}
+	N8 [
+		color="#93c47d"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Stmt</b></td> </tr>
+			<tr> <td align="center"><i>Print</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N9 [
+		color="#ffcc60"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Literal</b></td> </tr>
+			<tr> <td align="center"><i>String</i></td> </tr>
+			<tr> <td align="center">Trying to un</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N8 -> N9
+	N7 -> N8
+	N3 -> N4
+}
+subgraph stmt1 {
+	fontname="Helvetica,Arial,sans-serif"
+	node [
+		style=filled
+		shape=rect
+		fontname="Helvetica,Arial,sans-serif"
+	]
+	edge [
+		fontname="Helvetica,Arial,sans-serif"
+	]
+	N10 [
+		color="#93c47d"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Stmt</b></td> </tr>
+			<tr> <td align="center"><i>Class</i></td> </tr>
+			<tr> <td align="center">class</td> </tr>
+			<tr> <td align="center">&lt;</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N11 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">Programmer</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N12 [
+		color="#ffcde0"
+		label="Methods"
+	]
+	N13 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Variable</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N14 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">Worker</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N13 -> N14
+	N10 -> {N11, N12, N13}
+	N15 [
+		color="#93c47d"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Stmt</b></td> </tr>
+			<tr> <td align="center"><i>Function</i></td> </tr>
+			<tr> <td align="center">fun</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N16 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">work</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N17 [
+		color="#eee5de"
+		label="Parameters"
+	]
+	N18 [
+		color="#6ca1a2"
+		label="Function body"
+	]
+	N15 -> {N16, N17, N18}
+	N19 [
+		color="#93c47d"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Stmt</b></td> </tr>
+			<tr> <td align="center"><i>Print</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N20 [
+		color="#ffcc60"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Literal</b></td> </tr>
+			<tr> <td align="center"><i>String</i></td> </tr>
+			<tr> <td align="center">Writing prog</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N19 -> N20
+	N18 -> N19
+	N21 [
+		color="#93c47d"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Stmt</b></td> </tr>
+			<tr> <td align="center"><i>Function</i></td> </tr>
+			<tr> <td align="center">fun</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N22 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">makeProgram</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N23 [
+		color="#eee5de"
+		label="Parameters"
+	]
+	N24 [
+		color="#6ca1a2"
+		label="Function body"
+	]
+	N21 -> {N22, N23, N24}
+	N25 [
+		color="#93c47d"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Stmt</b></td> </tr>
+			<tr> <td align="center"><i>Expression</i></td> </tr>
+			<tr> <td align="center">;</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N26 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Call</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N27 [
+		color="#a88f85"
+		label="Arguments"
+	]
+	N28 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Super</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N29 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">work</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N28 -> N29
+	N26 -> {N27, N28}
+	N25 -> N26
+	N30 [
+		color="#93c47d"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Stmt</b></td> </tr>
+			<tr> <td align="center"><i>Expression</i></td> </tr>
+			<tr> <td align="center">;</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N31 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Call</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N32 [
+		color="#a88f85"
+		label="Arguments"
+	]
+	N33 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Get</i></td> </tr>
+			<tr> <td align="center">.</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N34 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">work</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N33 -> N34
+	N35 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>This</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N33 -> N35
+	N31 -> {N32, N33}
+	N30 -> N31
+	N36 [
+		color="#93c47d"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Stmt</b></td> </tr>
+			<tr> <td align="center"><i>Print</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N37 [
+		color="#ffcc60"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Literal</b></td> </tr>
+			<tr> <td align="center"><i>String</i></td> </tr>
+			<tr> <td align="center">Made a progr</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N36 -> N37
+	N24 -> N25
+	N24 -> N30
+	N24 -> N36
+	N12 -> N15
+	N12 -> N21
+}
+subgraph stmt2 {
+	fontname="Helvetica,Arial,sans-serif"
+	node [
+		style=filled
+		shape=rect
+		fontname="Helvetica,Arial,sans-serif"
+	]
+	edge [
+		fontname="Helvetica,Arial,sans-serif"
+	]
+	N38 [
+		color="#93c47d"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Stmt</b></td> </tr>
+			<tr> <td align="center"><i>Var</i></td> </tr>
+			<tr> <td align="center">var</td> </tr>
+			<tr> <td align="center">=</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N39 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">programmer</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N40 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Call</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N41 [
+		color="#a88f85"
+		label="Arguments"
+	]
+	N42 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Variable</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N43 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">Programmer</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N42 -> N43
+	N40 -> {N41, N42}
+	N38 -> {N39, N40}
+}
+subgraph stmt3 {
+	fontname="Helvetica,Arial,sans-serif"
+	node [
+		style=filled
+		shape=rect
+		fontname="Helvetica,Arial,sans-serif"
+	]
+	edge [
+		fontname="Helvetica,Arial,sans-serif"
+	]
+	N44 [
+		color="#93c47d"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Stmt</b></td> </tr>
+			<tr> <td align="center"><i>Expression</i></td> </tr>
+			<tr> <td align="center">;</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N45 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Call</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N46 [
+		color="#a88f85"
+		label="Arguments"
+	]
+	N47 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Get</i></td> </tr>
+			<tr> <td align="center">.</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N48 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">makeProgram</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N47 -> N48
+	N49 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Variable</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N50 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">programmer</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N49 -> N50
+	N47 -> N49
+	N45 -> {N46, N47}
+	N44 -> N45
+}
+subgraph stmt4 {
+	fontname="Helvetica,Arial,sans-serif"
+	node [
+		style=filled
+		shape=rect
+		fontname="Helvetica,Arial,sans-serif"
+	]
+	edge [
+		fontname="Helvetica,Arial,sans-serif"
+	]
+	N51 [
+		color="#93c47d"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Stmt</b></td> </tr>
+			<tr> <td align="center"><i>Print</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N52 [
+		color="#ffcc60"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Literal</b></td> </tr>
+			<tr> <td align="center"><i>String</i></td> </tr>
+			<tr> <td align="center"></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N51 -> N52
+}
+subgraph stmt5 {
+	fontname="Helvetica,Arial,sans-serif"
+	node [
+		style=filled
+		shape=rect
+		fontname="Helvetica,Arial,sans-serif"
+	]
+	edge [
+		fontname="Helvetica,Arial,sans-serif"
+	]
+	N53 [
+		color="#93c47d"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Stmt</b></td> </tr>
+			<tr> <td align="center"><i>Class</i></td> </tr>
+			<tr> <td align="center">class</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N54 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">Animal</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N55 [
+		color="#ffcde0"
+		label="Methods"
+	]
+	N53 -> {N54, N55}
+	N56 [
+		color="#93c47d"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Stmt</b></td> </tr>
+			<tr> <td align="center"><i>Function</i></td> </tr>
+			<tr> <td align="center">fun</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N57 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">init</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N58 [
+		color="#eee5de"
+		label="Parameters"
+	]
+	N59 [
+		color="#6ca1a2"
+		label="Function body"
+	]
+	N56 -> {N57, N58, N59}
+	N60 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">eatDaily</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N61 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">foodType</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N58 -> N60
+	N58 -> N61
+	N62 [
+		color="#93c47d"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Stmt</b></td> </tr>
+			<tr> <td align="center"><i>Expression</i></td> </tr>
+			<tr> <td align="center">;</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N63 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Set</i></td> </tr>
+			<tr> <td align="center">=</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N64 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">eatDaily</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N63 -> N64
+	N65 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>This</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N63 -> N65
+	N66 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Variable</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N67 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">eatDaily</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N66 -> N67
+	N63 -> N66
+	N62 -> N63
+	N68 [
+		color="#93c47d"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Stmt</b></td> </tr>
+			<tr> <td align="center"><i>Expression</i></td> </tr>
+			<tr> <td align="center">;</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N69 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Set</i></td> </tr>
+			<tr> <td align="center">=</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N70 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">foodType</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N69 -> N70
+	N71 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>This</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N69 -> N71
+	N72 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Variable</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N73 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">foodType</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N72 -> N73
+	N69 -> N72
+	N68 -> N69
+	N59 -> N62
+	N59 -> N68
+	N74 [
+		color="#93c47d"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Stmt</b></td> </tr>
+			<tr> <td align="center"><i>Function</i></td> </tr>
+			<tr> <td align="center">fun</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N75 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">eat</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N76 [
+		color="#eee5de"
+		label="Parameters"
+	]
+	N77 [
+		color="#6ca1a2"
+		label="Function body"
+	]
+	N74 -> {N75, N76, N77}
+	N78 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">eatDaily</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N79 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">foodType</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N76 -> N78
+	N76 -> N79
+	N80 [
+		color="#93c47d"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Stmt</b></td> </tr>
+			<tr> <td align="center"><i>If</i></td> </tr>
+			<tr> <td align="center">if</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N81 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Binary</i></td> </tr>
+			<tr> <td align="center">!=</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N82 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Variable</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N83 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">foodType</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N82 -> N83
+	N84 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Get</i></td> </tr>
+			<tr> <td align="center">.</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N85 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">foodType</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N84 -> N85
+	N86 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>This</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N84 -> N86
+	N81 -> {N82, N84}
+	N87 [
+		color="#93c47d"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Stmt</b></td> </tr>
+			<tr> <td align="center"><i>Block</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N88 [
+		color="#93c47d"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Stmt</b></td> </tr>
+			<tr> <td align="center"><i>Print</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N89 [
+		color="#ffcc60"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Literal</b></td> </tr>
+			<tr> <td align="center"><i>String</i></td> </tr>
+			<tr> <td align="center">I can't eat </td> </tr>
+		</table>>
+		shape=plain
+	]
+	N88 -> N89
+	N90 [
+		color="#93c47d"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Stmt</b></td> </tr>
+			<tr> <td align="center"><i>Return</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N91 [
+		color="#ffcc60"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Literal</b></td> </tr>
+			<tr> <td align="center"><i>None</i></td> </tr>
+			<tr> <td align="center">nil</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N90 -> N91
+	N87 -> N88
+	N87 -> N90
+	N80 -> {N81, N87}
+	N92 [
+		color="#93c47d"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Stmt</b></td> </tr>
+			<tr> <td align="center"><i>If</i></td> </tr>
+			<tr> <td align="center">if</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N93 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Binary</i></td> </tr>
+			<tr> <td align="center">&lt;</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N94 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Variable</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N95 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">eatDaily</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N94 -> N95
+	N96 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Get</i></td> </tr>
+			<tr> <td align="center">.</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N97 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">eatDaily</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N96 -> N97
+	N98 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>This</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N96 -> N98
+	N93 -> {N94, N96}
+	N99 [
+		color="#93c47d"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Stmt</b></td> </tr>
+			<tr> <td align="center"><i>Block</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N100 [
+		color="#93c47d"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Stmt</b></td> </tr>
+			<tr> <td align="center"><i>Print</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N101 [
+		color="#ffcc60"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Literal</b></td> </tr>
+			<tr> <td align="center"><i>String</i></td> </tr>
+			<tr> <td align="center">Not enough f</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N100 -> N101
+	N102 [
+		color="#93c47d"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Stmt</b></td> </tr>
+			<tr> <td align="center"><i>Return</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N103 [
+		color="#ffcc60"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Literal</b></td> </tr>
+			<tr> <td align="center"><i>None</i></td> </tr>
+			<tr> <td align="center">nil</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N102 -> N103
+	N99 -> N100
+	N99 -> N102
+	N92 -> {N93, N99}
+	N104 [
+		color="#93c47d"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Stmt</b></td> </tr>
+			<tr> <td align="center"><i>Print</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N105 [
+		color="#ffcc60"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Literal</b></td> </tr>
+			<tr> <td align="center"><i>String</i></td> </tr>
+			<tr> <td align="center">Nice meal!</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N104 -> N105
+	N77 -> N80
+	N77 -> N92
+	N77 -> N104
+	N55 -> N56
+	N55 -> N74
+}
+subgraph stmt6 {
+	fontname="Helvetica,Arial,sans-serif"
+	node [
+		style=filled
+		shape=rect
+		fontname="Helvetica,Arial,sans-serif"
+	]
+	edge [
+		fontname="Helvetica,Arial,sans-serif"
+	]
+	N106 [
+		color="#93c47d"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Stmt</b></td> </tr>
+			<tr> <td align="center"><i>Class</i></td> </tr>
+			<tr> <td align="center">class</td> </tr>
+			<tr> <td align="center">&lt;</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N107 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">Lion</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N108 [
+		color="#ffcde0"
+		label="Methods"
+	]
+	N109 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Variable</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N110 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">Animal</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N109 -> N110
+	N106 -> {N107, N108, N109}
+	N111 [
+		color="#93c47d"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Stmt</b></td> </tr>
+			<tr> <td align="center"><i>Function</i></td> </tr>
+			<tr> <td align="center">fun</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N112 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">roar</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N113 [
+		color="#eee5de"
+		label="Parameters"
+	]
+	N114 [
+		color="#6ca1a2"
+		label="Function body"
+	]
+	N111 -> {N112, N113, N114}
+	N115 [
+		color="#93c47d"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Stmt</b></td> </tr>
+			<tr> <td align="center"><i>Print</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N116 [
+		color="#ffcc60"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Literal</b></td> </tr>
+			<tr> <td align="center"><i>String</i></td> </tr>
+			<tr> <td align="center">Roar!</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N115 -> N116
+	N114 -> N115
+	N117 [
+		color="#93c47d"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Stmt</b></td> </tr>
+			<tr> <td align="center"><i>Function</i></td> </tr>
+			<tr> <td align="center">fun</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N118 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">walk</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N119 [
+		color="#eee5de"
+		label="Parameters"
+	]
+	N120 [
+		color="#6ca1a2"
+		label="Function body"
+	]
+	N117 -> {N118, N119, N120}
+	N121 [
+		color="#93c47d"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Stmt</b></td> </tr>
+			<tr> <td align="center"><i>Print</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N122 [
+		color="#ffcc60"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Literal</b></td> </tr>
+			<tr> <td align="center"><i>String</i></td> </tr>
+			<tr> <td align="center">Searching fo</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N121 -> N122
+	N120 -> N121
+	N123 [
+		color="#93c47d"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Stmt</b></td> </tr>
+			<tr> <td align="center"><i>Function</i></td> </tr>
+			<tr> <td align="center">fun</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N124 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">hunt</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N125 [
+		color="#eee5de"
+		label="Parameters"
+	]
+	N126 [
+		color="#6ca1a2"
+		label="Function body"
+	]
+	N123 -> {N124, N125, N126}
+	N127 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">eatDaily</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N128 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">foodType</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N125 -> N127
+	N125 -> N128
+	N129 [
+		color="#93c47d"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Stmt</b></td> </tr>
+			<tr> <td align="center"><i>Expression</i></td> </tr>
+			<tr> <td align="center">;</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N130 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Call</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N131 [
+		color="#a88f85"
+		label="Arguments"
+	]
+	N132 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Get</i></td> </tr>
+			<tr> <td align="center">.</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N133 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">walk</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N132 -> N133
+	N134 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>This</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N132 -> N134
+	N130 -> {N131, N132}
+	N129 -> N130
+	N135 [
+		color="#93c47d"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Stmt</b></td> </tr>
+			<tr> <td align="center"><i>Expression</i></td> </tr>
+			<tr> <td align="center">;</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N136 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Call</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N137 [
+		color="#a88f85"
+		label="Arguments"
+	]
+	N138 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Get</i></td> </tr>
+			<tr> <td align="center">.</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N139 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">eat</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N138 -> N139
+	N140 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>This</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N138 -> N140
+	N136 -> {N137, N138}
+	N141 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Variable</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N142 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">eatDaily</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N141 -> N142
+	N143 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Variable</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N144 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">foodType</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N143 -> N144
+	N137 -> N141
+	N137 -> N143
+	N135 -> N136
+	N126 -> N129
+	N126 -> N135
+	N108 -> N111
+	N108 -> N117
+	N108 -> N123
+}
+subgraph stmt7 {
+	fontname="Helvetica,Arial,sans-serif"
+	node [
+		style=filled
+		shape=rect
+		fontname="Helvetica,Arial,sans-serif"
+	]
+	edge [
+		fontname="Helvetica,Arial,sans-serif"
+	]
+	N145 [
+		color="#93c47d"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Stmt</b></td> </tr>
+			<tr> <td align="center"><i>Class</i></td> </tr>
+			<tr> <td align="center">class</td> </tr>
+			<tr> <td align="center">&lt;</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N146 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">Cow</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N147 [
+		color="#ffcde0"
+		label="Methods"
+	]
+	N148 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Variable</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N149 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">Animal</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N148 -> N149
+	N145 -> {N146, N147, N148}
+	N150 [
+		color="#93c47d"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Stmt</b></td> </tr>
+			<tr> <td align="center"><i>Function</i></td> </tr>
+			<tr> <td align="center">fun</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N151 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">moo</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N152 [
+		color="#eee5de"
+		label="Parameters"
+	]
+	N153 [
+		color="#6ca1a2"
+		label="Function body"
+	]
+	N150 -> {N151, N152, N153}
+	N154 [
+		color="#93c47d"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Stmt</b></td> </tr>
+			<tr> <td align="center"><i>Print</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N155 [
+		color="#ffcc60"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Literal</b></td> </tr>
+			<tr> <td align="center"><i>String</i></td> </tr>
+			<tr> <td align="center">Moo!</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N154 -> N155
+	N153 -> N154
+	N147 -> N150
+}
+subgraph stmt8 {
+	fontname="Helvetica,Arial,sans-serif"
+	node [
+		style=filled
+		shape=rect
+		fontname="Helvetica,Arial,sans-serif"
+	]
+	edge [
+		fontname="Helvetica,Arial,sans-serif"
+	]
+	N156 [
+		color="#93c47d"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Stmt</b></td> </tr>
+			<tr> <td align="center"><i>Var</i></td> </tr>
+			<tr> <td align="center">var</td> </tr>
+			<tr> <td align="center">=</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N157 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">lion</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N158 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Call</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N159 [
+		color="#a88f85"
+		label="Arguments"
+	]
+	N160 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Variable</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N161 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">Lion</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N160 -> N161
+	N158 -> {N159, N160}
+	N162 [
+		color="#ffcc60"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Literal</b></td> </tr>
+			<tr> <td align="center"><i>Number</i></td> </tr>
+			<tr> <td align="center">10</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N163 [
+		color="#ffcc60"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Literal</b></td> </tr>
+			<tr> <td align="center"><i>String</i></td> </tr>
+			<tr> <td align="center">meat</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N159 -> N162
+	N159 -> N163
+	N156 -> {N157, N158}
+}
+subgraph stmt9 {
+	fontname="Helvetica,Arial,sans-serif"
+	node [
+		style=filled
+		shape=rect
+		fontname="Helvetica,Arial,sans-serif"
+	]
+	edge [
+		fontname="Helvetica,Arial,sans-serif"
+	]
+	N164 [
+		color="#93c47d"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Stmt</b></td> </tr>
+			<tr> <td align="center"><i>Expression</i></td> </tr>
+			<tr> <td align="center">;</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N165 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Call</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N166 [
+		color="#a88f85"
+		label="Arguments"
+	]
+	N167 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Get</i></td> </tr>
+			<tr> <td align="center">.</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N168 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">roar</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N167 -> N168
+	N169 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Variable</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N170 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">lion</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N169 -> N170
+	N167 -> N169
+	N165 -> {N166, N167}
+	N164 -> N165
+}
+subgraph stmt10 {
+	fontname="Helvetica,Arial,sans-serif"
+	node [
+		style=filled
+		shape=rect
+		fontname="Helvetica,Arial,sans-serif"
+	]
+	edge [
+		fontname="Helvetica,Arial,sans-serif"
+	]
+	N171 [
+		color="#93c47d"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Stmt</b></td> </tr>
+			<tr> <td align="center"><i>Expression</i></td> </tr>
+			<tr> <td align="center">;</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N172 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Call</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N173 [
+		color="#a88f85"
+		label="Arguments"
+	]
+	N174 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Get</i></td> </tr>
+			<tr> <td align="center">.</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N175 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">eat</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N174 -> N175
+	N176 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Variable</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N177 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">lion</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N176 -> N177
+	N174 -> N176
+	N172 -> {N173, N174}
+	N178 [
+		color="#ffcc60"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Literal</b></td> </tr>
+			<tr> <td align="center"><i>Number</i></td> </tr>
+			<tr> <td align="center">1.5</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N179 [
+		color="#ffcc60"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Literal</b></td> </tr>
+			<tr> <td align="center"><i>String</i></td> </tr>
+			<tr> <td align="center">plant</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N173 -> N178
+	N173 -> N179
+	N171 -> N172
+}
+subgraph stmt11 {
+	fontname="Helvetica,Arial,sans-serif"
+	node [
+		style=filled
+		shape=rect
+		fontname="Helvetica,Arial,sans-serif"
+	]
+	edge [
+		fontname="Helvetica,Arial,sans-serif"
+	]
+	N180 [
+		color="#93c47d"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Stmt</b></td> </tr>
+			<tr> <td align="center"><i>Expression</i></td> </tr>
+			<tr> <td align="center">;</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N181 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Call</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N182 [
+		color="#a88f85"
+		label="Arguments"
+	]
+	N183 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Get</i></td> </tr>
+			<tr> <td align="center">.</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N184 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">eat</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N183 -> N184
+	N185 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Variable</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N186 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">lion</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N185 -> N186
+	N183 -> N185
+	N181 -> {N182, N183}
+	N187 [
+		color="#ffcc60"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Literal</b></td> </tr>
+			<tr> <td align="center"><i>Number</i></td> </tr>
+			<tr> <td align="center">12</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N188 [
+		color="#ffcc60"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Literal</b></td> </tr>
+			<tr> <td align="center"><i>String</i></td> </tr>
+			<tr> <td align="center">plant</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N182 -> N187
+	N182 -> N188
+	N180 -> N181
+}
+subgraph stmt12 {
+	fontname="Helvetica,Arial,sans-serif"
+	node [
+		style=filled
+		shape=rect
+		fontname="Helvetica,Arial,sans-serif"
+	]
+	edge [
+		fontname="Helvetica,Arial,sans-serif"
+	]
+	N189 [
+		color="#93c47d"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Stmt</b></td> </tr>
+			<tr> <td align="center"><i>Expression</i></td> </tr>
+			<tr> <td align="center">;</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N190 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Call</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N191 [
+		color="#a88f85"
+		label="Arguments"
+	]
+	N192 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Get</i></td> </tr>
+			<tr> <td align="center">.</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N193 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">eat</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N192 -> N193
+	N194 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Variable</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N195 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">lion</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N194 -> N195
+	N192 -> N194
+	N190 -> {N191, N192}
+	N196 [
+		color="#ffcc60"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Literal</b></td> </tr>
+			<tr> <td align="center"><i>Number</i></td> </tr>
+			<tr> <td align="center">9.5</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N197 [
+		color="#ffcc60"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Literal</b></td> </tr>
+			<tr> <td align="center"><i>String</i></td> </tr>
+			<tr> <td align="center">meat</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N191 -> N196
+	N191 -> N197
+	N189 -> N190
+}
+subgraph stmt13 {
+	fontname="Helvetica,Arial,sans-serif"
+	node [
+		style=filled
+		shape=rect
+		fontname="Helvetica,Arial,sans-serif"
+	]
+	edge [
+		fontname="Helvetica,Arial,sans-serif"
+	]
+	N198 [
+		color="#93c47d"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Stmt</b></td> </tr>
+			<tr> <td align="center"><i>Expression</i></td> </tr>
+			<tr> <td align="center">;</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N199 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Call</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N200 [
+		color="#a88f85"
+		label="Arguments"
+	]
+	N201 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Get</i></td> </tr>
+			<tr> <td align="center">.</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N202 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">eat</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N201 -> N202
+	N203 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Variable</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N204 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">lion</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N203 -> N204
+	N201 -> N203
+	N199 -> {N200, N201}
+	N205 [
+		color="#ffcc60"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Literal</b></td> </tr>
+			<tr> <td align="center"><i>Number</i></td> </tr>
+			<tr> <td align="center">20</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N206 [
+		color="#ffcc60"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Literal</b></td> </tr>
+			<tr> <td align="center"><i>String</i></td> </tr>
+			<tr> <td align="center">meat</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N200 -> N205
+	N200 -> N206
+	N198 -> N199
+}
+subgraph stmt14 {
+	fontname="Helvetica,Arial,sans-serif"
+	node [
+		style=filled
+		shape=rect
+		fontname="Helvetica,Arial,sans-serif"
+	]
+	edge [
+		fontname="Helvetica,Arial,sans-serif"
+	]
+	N207 [
+		color="#93c47d"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Stmt</b></td> </tr>
+			<tr> <td align="center"><i>Expression</i></td> </tr>
+			<tr> <td align="center">;</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N208 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Call</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N209 [
+		color="#a88f85"
+		label="Arguments"
+	]
+	N210 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Get</i></td> </tr>
+			<tr> <td align="center">.</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N211 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">roar</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N210 -> N211
+	N212 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Variable</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N213 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">lion</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N212 -> N213
+	N210 -> N212
+	N208 -> {N209, N210}
+	N207 -> N208
+}
+subgraph stmt15 {
+	fontname="Helvetica,Arial,sans-serif"
+	node [
+		style=filled
+		shape=rect
+		fontname="Helvetica,Arial,sans-serif"
+	]
+	edge [
+		fontname="Helvetica,Arial,sans-serif"
+	]
+	N214 [
+		color="#93c47d"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Stmt</b></td> </tr>
+			<tr> <td align="center"><i>Expression</i></td> </tr>
+			<tr> <td align="center">;</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N215 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Call</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N216 [
+		color="#a88f85"
+		label="Arguments"
+	]
+	N217 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Get</i></td> </tr>
+			<tr> <td align="center">.</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N218 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">hunt</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N217 -> N218
+	N219 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Variable</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N220 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">lion</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N219 -> N220
+	N217 -> N219
+	N215 -> {N216, N217}
+	N221 [
+		color="#ffcc60"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Literal</b></td> </tr>
+			<tr> <td align="center"><i>Number</i></td> </tr>
+			<tr> <td align="center">30</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N222 [
+		color="#ffcc60"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Literal</b></td> </tr>
+			<tr> <td align="center"><i>String</i></td> </tr>
+			<tr> <td align="center">meat</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N216 -> N221
+	N216 -> N222
+	N214 -> N215
+}
+subgraph stmt16 {
+	fontname="Helvetica,Arial,sans-serif"
+	node [
+		style=filled
+		shape=rect
+		fontname="Helvetica,Arial,sans-serif"
+	]
+	edge [
+		fontname="Helvetica,Arial,sans-serif"
+	]
+	N223 [
+		color="#93c47d"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Stmt</b></td> </tr>
+			<tr> <td align="center"><i>Expression</i></td> </tr>
+			<tr> <td align="center">;</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N224 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Call</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N225 [
+		color="#a88f85"
+		label="Arguments"
+	]
+	N226 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Get</i></td> </tr>
+			<tr> <td align="center">.</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N227 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">roar</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N226 -> N227
+	N228 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Variable</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N229 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">lion</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N228 -> N229
+	N226 -> N228
+	N224 -> {N225, N226}
+	N223 -> N224
+}
+subgraph stmt17 {
+	fontname="Helvetica,Arial,sans-serif"
+	node [
+		style=filled
+		shape=rect
+		fontname="Helvetica,Arial,sans-serif"
+	]
+	edge [
+		fontname="Helvetica,Arial,sans-serif"
+	]
+	N230 [
+		color="#93c47d"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Stmt</b></td> </tr>
+			<tr> <td align="center"><i>Print</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N231 [
+		color="#ffcc60"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Literal</b></td> </tr>
+			<tr> <td align="center"><i>String</i></td> </tr>
+			<tr> <td align="center"></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N230 -> N231
+}
+subgraph stmt18 {
+	fontname="Helvetica,Arial,sans-serif"
+	node [
+		style=filled
+		shape=rect
+		fontname="Helvetica,Arial,sans-serif"
+	]
+	edge [
+		fontname="Helvetica,Arial,sans-serif"
+	]
+	N232 [
+		color="#93c47d"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Stmt</b></td> </tr>
+			<tr> <td align="center"><i>Var</i></td> </tr>
+			<tr> <td align="center">var</td> </tr>
+			<tr> <td align="center">=</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N233 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">cow</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N234 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Call</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N235 [
+		color="#a88f85"
+		label="Arguments"
+	]
+	N236 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Variable</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N237 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">Cow</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N236 -> N237
+	N234 -> {N235, N236}
+	N238 [
+		color="#ffcc60"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Literal</b></td> </tr>
+			<tr> <td align="center"><i>Number</i></td> </tr>
+			<tr> <td align="center">12</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N239 [
+		color="#ffcc60"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Literal</b></td> </tr>
+			<tr> <td align="center"><i>String</i></td> </tr>
+			<tr> <td align="center">plant</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N235 -> N238
+	N235 -> N239
+	N232 -> {N233, N234}
+}
+subgraph stmt19 {
+	fontname="Helvetica,Arial,sans-serif"
+	node [
+		style=filled
+		shape=rect
+		fontname="Helvetica,Arial,sans-serif"
+	]
+	edge [
+		fontname="Helvetica,Arial,sans-serif"
+	]
+	N240 [
+		color="#93c47d"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Stmt</b></td> </tr>
+			<tr> <td align="center"><i>Expression</i></td> </tr>
+			<tr> <td align="center">;</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N241 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Call</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N242 [
+		color="#a88f85"
+		label="Arguments"
+	]
+	N243 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Get</i></td> </tr>
+			<tr> <td align="center">.</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N244 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">moo</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N243 -> N244
+	N245 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Variable</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N246 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">cow</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N245 -> N246
+	N243 -> N245
+	N241 -> {N242, N243}
+	N240 -> N241
+}
+subgraph stmt20 {
+	fontname="Helvetica,Arial,sans-serif"
+	node [
+		style=filled
+		shape=rect
+		fontname="Helvetica,Arial,sans-serif"
+	]
+	edge [
+		fontname="Helvetica,Arial,sans-serif"
+	]
+	N247 [
+		color="#93c47d"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Stmt</b></td> </tr>
+			<tr> <td align="center"><i>Expression</i></td> </tr>
+			<tr> <td align="center">;</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N248 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Call</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N249 [
+		color="#a88f85"
+		label="Arguments"
+	]
+	N250 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Get</i></td> </tr>
+			<tr> <td align="center">.</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N251 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">eat</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N250 -> N251
+	N252 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Variable</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N253 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">cow</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N252 -> N253
+	N250 -> N252
+	N248 -> {N249, N250}
+	N254 [
+		color="#ffcc60"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Literal</b></td> </tr>
+			<tr> <td align="center"><i>Number</i></td> </tr>
+			<tr> <td align="center">20</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N255 [
+		color="#ffcc60"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Literal</b></td> </tr>
+			<tr> <td align="center"><i>String</i></td> </tr>
+			<tr> <td align="center">plant</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N249 -> N254
+	N249 -> N255
+	N247 -> N248
+}
+subgraph stmt21 {
+	fontname="Helvetica,Arial,sans-serif"
+	node [
+		style=filled
+		shape=rect
+		fontname="Helvetica,Arial,sans-serif"
+	]
+	edge [
+		fontname="Helvetica,Arial,sans-serif"
+	]
+	N256 [
+		color="#93c47d"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Stmt</b></td> </tr>
+			<tr> <td align="center"><i>Expression</i></td> </tr>
+			<tr> <td align="center">;</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N257 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Call</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N258 [
+		color="#a88f85"
+		label="Arguments"
+	]
+	N259 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Get</i></td> </tr>
+			<tr> <td align="center">.</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N260 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">eat</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N259 -> N260
+	N261 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Variable</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N262 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">cow</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N261 -> N262
+	N259 -> N261
+	N257 -> {N258, N259}
+	N263 [
+		color="#ffcc60"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Literal</b></td> </tr>
+			<tr> <td align="center"><i>Number</i></td> </tr>
+			<tr> <td align="center">13.45</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N264 [
+		color="#ffcc60"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Literal</b></td> </tr>
+			<tr> <td align="center"><i>String</i></td> </tr>
+			<tr> <td align="center">meat</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N258 -> N263
+	N258 -> N264
+	N256 -> N257
+}
+subgraph stmt22 {
+	fontname="Helvetica,Arial,sans-serif"
+	node [
+		style=filled
+		shape=rect
+		fontname="Helvetica,Arial,sans-serif"
+	]
+	edge [
+		fontname="Helvetica,Arial,sans-serif"
+	]
+	N265 [
+		color="#93c47d"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Stmt</b></td> </tr>
+			<tr> <td align="center"><i>Expression</i></td> </tr>
+			<tr> <td align="center">;</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N266 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Call</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N267 [
+		color="#a88f85"
+		label="Arguments"
+	]
+	N268 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Get</i></td> </tr>
+			<tr> <td align="center">.</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N269 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">eat</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N268 -> N269
+	N270 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Variable</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N271 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">cow</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N270 -> N271
+	N268 -> N270
+	N266 -> {N267, N268}
+	N272 [
+		color="#ffcc60"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Literal</b></td> </tr>
+			<tr> <td align="center"><i>Number</i></td> </tr>
+			<tr> <td align="center">12.1</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N273 [
+		color="#ffcc60"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Literal</b></td> </tr>
+			<tr> <td align="center"><i>String</i></td> </tr>
+			<tr> <td align="center">plant</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N267 -> N272
+	N267 -> N273
+	N265 -> N266
+}
+subgraph stmt23 {
+	fontname="Helvetica,Arial,sans-serif"
+	node [
+		style=filled
+		shape=rect
+		fontname="Helvetica,Arial,sans-serif"
+	]
+	edge [
+		fontname="Helvetica,Arial,sans-serif"
+	]
+	N274 [
+		color="#93c47d"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Stmt</b></td> </tr>
+			<tr> <td align="center"><i>Expression</i></td> </tr>
+			<tr> <td align="center">;</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N275 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Call</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N276 [
+		color="#a88f85"
+		label="Arguments"
+	]
+	N277 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Get</i></td> </tr>
+			<tr> <td align="center">.</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N278 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">eat</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N277 -> N278
+	N279 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Variable</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N280 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">cow</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N279 -> N280
+	N277 -> N279
+	N275 -> {N276, N277}
+	N281 [
+		color="#ffcc60"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Literal</b></td> </tr>
+			<tr> <td align="center"><i>Number</i></td> </tr>
+			<tr> <td align="center">2</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N282 [
+		color="#ffcc60"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Literal</b></td> </tr>
+			<tr> <td align="center"><i>String</i></td> </tr>
+			<tr> <td align="center">plant</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N276 -> N281
+	N276 -> N282
+	N274 -> N275
+}
+subgraph stmt24 {
+	fontname="Helvetica,Arial,sans-serif"
+	node [
+		style=filled
+		shape=rect
+		fontname="Helvetica,Arial,sans-serif"
+	]
+	edge [
+		fontname="Helvetica,Arial,sans-serif"
+	]
+	N283 [
+		color="#93c47d"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Stmt</b></td> </tr>
+			<tr> <td align="center"><i>Expression</i></td> </tr>
+			<tr> <td align="center">;</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N284 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Call</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N285 [
+		color="#a88f85"
+		label="Arguments"
+	]
+	N286 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Get</i></td> </tr>
+			<tr> <td align="center">.</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N287 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">eat</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N286 -> N287
+	N288 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Variable</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N289 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">cow</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N288 -> N289
+	N286 -> N288
+	N284 -> {N285, N286}
+	N290 [
+		color="#ffcc60"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Literal</b></td> </tr>
+			<tr> <td align="center"><i>Number</i></td> </tr>
+			<tr> <td align="center">2</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N291 [
+		color="#ffcc60"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Literal</b></td> </tr>
+			<tr> <td align="center"><i>String</i></td> </tr>
+			<tr> <td align="center">meat</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N285 -> N290
+	N285 -> N291
+	N283 -> N284
+}
+subgraph stmt25 {
+	fontname="Helvetica,Arial,sans-serif"
+	node [
+		style=filled
+		shape=rect
+		fontname="Helvetica,Arial,sans-serif"
+	]
+	edge [
+		fontname="Helvetica,Arial,sans-serif"
+	]
+	N292 [
+		color="#93c47d"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Stmt</b></td> </tr>
+			<tr> <td align="center"><i>Expression</i></td> </tr>
+			<tr> <td align="center">;</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N293 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Call</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N294 [
+		color="#a88f85"
+		label="Arguments"
+	]
+	N295 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Get</i></td> </tr>
+			<tr> <td align="center">.</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N296 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">moo</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N295 -> N296
+	N297 [
+		color="#9fc5e8"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Expr</b></td> </tr>
+			<tr> <td align="center"><i>Variable</i></td> </tr>
+		</table>>
+		shape=plain
+	]
+	N298 [
+		color="#c27ba0"
+		label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+			<tr> <td align="center"><b>Token</b></td> </tr>
+			<tr> <td align="center"><i>Identifier</i></td> </tr>
+			<tr> <td align="center">cow</td> </tr>
+		</table>>
+		shape=plain
+	]
+	N297 -> N298
+	N295 -> N297
+	N293 -> {N294, N295}
+	N292 -> N293
+}
+}
+

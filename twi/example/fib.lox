@@ -21,7 +21,7 @@ fun fibTest(n) {
     var end = clock() - start;
     print "Result:";
     print res;
-    print "(this is the (n+1)th Fibonacci number.";
+    print "(this is the (n+1)th Fibonacci number.)";
     print "Time elapsed (seconds):";
     print end;
     print "";

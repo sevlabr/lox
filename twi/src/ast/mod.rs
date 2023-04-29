@@ -1,4 +1,5 @@
 pub mod expr;
+pub mod graphviz;
 pub mod stmt;
 
 use crate::lexer::token::{Literal, Token};
