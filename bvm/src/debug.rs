@@ -5,15 +5,16 @@ pub fn disassemble_chunk(chunk: &Chunk, name: &str) {
 
     let mut offset: usize = 0;
     while offset < chunk.code.len() {
-        let instruction = chunk
-            .code
-            .get(offset)
-            .expect("Instruction index out of bounds (in chunk.code).");
-        offset = disassemble_instruction(OpCode::try_from(*instruction).unwrap(), chunk, offset);
+        offset = disassemble_instruction(chunk, offset);
     }
 }
 
-fn disassemble_instruction(instruction: OpCode, chunk: &Chunk, offset: usize) -> usize {
+pub fn disassemble_instruction(chunk: &Chunk, offset: usize) -> usize {
+    let instruction = chunk
+        .code
+        .get(offset)
+        .expect("Instruction index out of bounds (in chunk.code).");
+
     print!("{:04} ", offset);
     if offset > 0 && chunk.lines[offset] == chunk.lines[offset - 1] {
         print!("   | ");
@@ -21,13 +22,18 @@ fn disassemble_instruction(instruction: OpCode, chunk: &Chunk, offset: usize) ->
         print!("{:4} ", chunk.lines[offset]);
     }
 
-    match instruction {
-        OpCode::OpReturn => simple_instruction("OP_RETURN", offset),
-        OpCode::OpConstant => constant_instruction("OP_CONSTANT", chunk, offset),
+    match OpCode::try_from(*instruction).unwrap() {
+        OpCode::Constant => constant_instruction("OP_CONSTANT", chunk, offset),
+        OpCode::Add => simple_instruction("OP_ADD", offset),
+        OpCode::Subtract => simple_instruction("OP_SUBTRACT", offset),
+        OpCode::Multiply => simple_instruction("OP_MULTIPLY", offset),
+        OpCode::Divide => simple_instruction("OP_DIVIDE", offset),
+        OpCode::Negate => simple_instruction("OP_NEGATE", offset),
+        OpCode::Return => simple_instruction("OP_RETURN", offset),
 
         #[allow(unreachable_patterns)]
         _ => {
-            println!("Unknown opcode {:?}", instruction);
+            eprintln!("Unknown opcode {:?}", instruction);
             offset + 1
         }
     }
