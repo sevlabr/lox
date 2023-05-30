@@ -1,6 +1,6 @@
 ![An Abstract Syntax Tree (AST) for a definition of a function that calculates Fibonacci numbers using naive recursive approach and a call to this function with argument *15* result of which is then passed to a *Print* statement.](twi/gallery/readme/main.svg)
 
-'''
+```
 fun fib(n) {
     if (n < 2) {
         return n;
@@ -9,7 +9,7 @@ fun fib(n) {
 }
 
 print fib(15);
-'''
+```
 
 # What is it?
 
