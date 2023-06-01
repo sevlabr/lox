@@ -1,4 +1,5 @@
 use crate::chunk::{Chunk, OpCode};
+use crate::compiler::compile;
 use crate::debug::disassemble_instruction;
 use crate::DEBUG_TRACE_EXECUTION;
 
@@ -54,10 +55,12 @@ impl VM {
         self.chunk = chunk;
     }
 
-    pub fn interpret(&mut self, chunk: Chunk) -> InterpretResult {
-        self.set_chunk(chunk);
-        self.ip = 0;
-        self.run()
+    pub fn interpret(&mut self, source: String) -> InterpretResult {
+        compile(source);
+        InterpretResult::Ok
+        // self.set_chunk(chunk);
+        // self.ip = 0;
+        // self.run()
     }
 
     fn run(&mut self) -> InterpretResult {
