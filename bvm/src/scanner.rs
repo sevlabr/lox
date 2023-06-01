@@ -11,7 +11,7 @@ impl Error for ScanError {}
 
 impl fmt::Display for ScanError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}: {:?}", self.message, self.token)
+        write!(f, "{} ScanError at: '{:?}'.", self.message, self.token)
     }
 }
 
@@ -23,6 +23,10 @@ impl ScanError {
     pub fn token(&self) -> Token {
         self.token
     }
+
+    pub fn message(&self) -> String {
+        self.message.to_string()
+    }
 }
 
 pub struct Scanner {
@@ -30,6 +34,36 @@ pub struct Scanner {
     start: usize,
     current: usize,
     line: isize,
+}
+
+pub fn print_tokens(source: String) {
+    let mut scanner = Scanner::new(source);
+    let mut line: isize = -1;
+    loop {
+        let (token, message) = match scanner.scan_token() {
+            Ok(token) => (token, scanner.lexeme(token.start, token.length)),
+            Err(err) => (err.token(), format!("{err}")),
+        };
+
+        if token.line != line {
+            print!("{:4} ", token.line);
+            line = token.line;
+        } else {
+            print!("   | ");
+        }
+        let token_kind = format!("{}", token.kind);
+        println!("{:>12} '{}'", token_kind, message);
+
+        if token.kind == TokenType::EoF {
+            break;
+        }
+    }
+}
+
+impl Default for Scanner {
+    fn default() -> Self {
+        Self::new(String::new())
+    }
 }
 
 impl Scanner {

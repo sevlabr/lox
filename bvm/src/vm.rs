@@ -1,12 +1,13 @@
 use crate::chunk::{Chunk, OpCode};
-use crate::compiler::compile;
+use crate::compiler::Parser;
 use crate::debug::disassemble_instruction;
 use crate::DEBUG_TRACE_EXECUTION;
+use std::{cell::RefCell, rc::Rc};
 
 const STACK_MAX: usize = 256;
 
 pub struct VM {
-    chunk: Chunk,
+    chunk: Rc<RefCell<Chunk>>,
     ip: usize,
     stack: [f64; STACK_MAX],
     stack_top: usize,
@@ -15,7 +16,7 @@ pub struct VM {
 impl Default for VM {
     fn default() -> Self {
         VM {
-            chunk: Chunk::default(),
+            chunk: Rc::new(RefCell::new(Chunk::default())),
             ip: 0,
             stack: [0f64; STACK_MAX],
             stack_top: 0,
@@ -26,7 +27,7 @@ impl Default for VM {
 impl VM {
     pub fn new(chunk: Chunk, ip: usize, stack: [f64; STACK_MAX], stack_top: usize) -> Self {
         VM {
-            chunk,
+            chunk: Rc::new(RefCell::new(chunk)),
             ip,
             stack,
             stack_top,
@@ -51,16 +52,24 @@ impl VM {
         self.stack[self.stack_top]
     }
 
-    pub fn set_chunk(&mut self, chunk: Chunk) {
+    pub fn set_chunk(&mut self, chunk: Rc<RefCell<Chunk>>) {
         self.chunk = chunk;
     }
 
     pub fn interpret(&mut self, source: String) -> InterpretResult {
-        compile(source);
-        InterpretResult::Ok
-        // self.set_chunk(chunk);
-        // self.ip = 0;
-        // self.run()
+        let chunk = Rc::new(RefCell::new(Chunk::new()));
+        let mut parser = Parser::new();
+        match parser.compile(source, Rc::clone(&chunk)) {
+            Ok(_) => {
+                self.set_chunk(chunk);
+                self.ip = 0;
+                self.run()
+            }
+            Err(_err) => {
+                // eprintln!("{_err}");
+                InterpretResult::CompileError
+            }
+        }
     }
 
     fn run(&mut self) -> InterpretResult {
@@ -76,7 +85,7 @@ impl VM {
                 }
                 println!();
 
-                disassemble_instruction(&self.chunk, self.ip);
+                disassemble_instruction(&self.chunk.borrow(), self.ip);
             }
 
             let raw_instruction = self.read_byte();
@@ -110,8 +119,8 @@ impl VM {
     }
 
     fn read_byte(&mut self) -> u8 {
-        let raw_instruction = self
-            .chunk
+        let chunk = self.chunk.borrow();
+        let raw_instruction = chunk
             .code
             .get(self.ip)
             .expect("instruction pointer is out of chunk.code bounds.");
@@ -123,6 +132,7 @@ impl VM {
         let index = self.read_byte() as usize;
         *self
             .chunk
+            .borrow()
             .constants
             .get(index)
             .expect("Index of a constant value is out of bounds.")

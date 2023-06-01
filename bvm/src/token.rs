@@ -19,6 +19,12 @@ impl Token {
     }
 }
 
+impl Default for Token {
+    fn default() -> Self {
+        Self::new(TokenType::Error, 0, 0, -1)
+    }
+}
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum TokenType {
     // Single-character tokens.

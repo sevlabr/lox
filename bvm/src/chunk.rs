@@ -1,6 +1,6 @@
 pub struct Chunk {
     pub code: Vec<u8>,
-    pub lines: Vec<usize>,
+    pub lines: Vec<isize>,
     pub constants: Vec<f64>,
 }
 
@@ -19,12 +19,12 @@ impl Chunk {
         }
     }
 
-    pub fn write_instruction(&mut self, code: OpCode, line: usize) {
+    pub fn write_instruction(&mut self, code: OpCode, line: isize) {
         self.code.push(code as u8);
         self.lines.push(line);
     }
 
-    pub fn write_raw_instruction(&mut self, code: u8, line: usize) {
+    pub fn write_raw_instruction(&mut self, code: u8, line: isize) {
         self.code.push(code);
         self.lines.push(line);
     }
