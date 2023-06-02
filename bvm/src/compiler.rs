@@ -2,6 +2,7 @@ use crate::chunk::{Chunk, OpCode};
 use crate::debug::disassemble_chunk;
 use crate::scanner::Scanner;
 use crate::token::{Token, TokenType};
+use crate::value::Value;
 use crate::Config;
 use std::{cell::RefCell, error::Error, fmt, rc::Rc};
 
@@ -369,16 +370,16 @@ impl Parser {
         self.emit_universal(byte2);
     }
 
-    fn emit_constant(&mut self, value: f64) {
+    fn emit_constant(&mut self, value: Value) {
         let index = Byte::Raw(self.make_constant(value));
         self.emit_instructions(Byte::Code(OpCode::Constant), index);
     }
 
-    fn write_value(&self, value: f64) -> usize {
+    fn write_value(&self, value: Value) -> usize {
         self.current_chunk().borrow_mut().write_value(value)
     }
 
-    fn make_constant(&mut self, value: f64) -> u8 {
+    fn make_constant(&mut self, value: Value) -> u8 {
         let constant = self.write_value(value);
         if constant > u8::MAX.into() {
             self.error("Too many constants in one chunk.".to_string());
@@ -429,7 +430,7 @@ impl Parser {
             .scanner
             .lexeme(self.previous.start, self.previous.length);
         match lexeme.trim().parse::<f64>() {
-            Ok(num) => self.emit_constant(num),
+            Ok(num) => self.emit_constant(Value::Num(num)),
             Err(_) => self.error("Failed parsing float number.".to_string()),
         }
     }

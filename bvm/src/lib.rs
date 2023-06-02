@@ -6,6 +6,7 @@ pub mod compiler;
 pub mod debug;
 pub mod scanner;
 pub mod token;
+pub mod value;
 pub mod vm;
 
 #[derive(Clone, Copy)]

@@ -1,7 +1,9 @@
+use crate::value::Value;
+
 pub struct Chunk {
     pub code: Vec<u8>,
     pub lines: Vec<isize>,
-    pub constants: Vec<f64>,
+    pub constants: Vec<Value>,
 }
 
 impl Default for Chunk {
@@ -29,7 +31,7 @@ impl Chunk {
         self.lines.push(line);
     }
 
-    pub fn write_value(&mut self, value: f64) -> usize {
+    pub fn write_value(&mut self, value: Value) -> usize {
         self.constants.push(value);
         self.constants.len() - 1
     }

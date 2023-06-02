@@ -2,6 +2,7 @@ use crate::chunk::{Chunk, OpCode};
 use crate::compiler::Parser;
 use crate::debug::{disassemble_chunk, disassemble_instruction};
 use crate::scanner::print_tokens;
+use crate::value::Value;
 use crate::Config;
 use std::{cell::RefCell, rc::Rc};
 
@@ -11,7 +12,7 @@ pub struct VM {
     config: Config,
     chunk: Rc<RefCell<Chunk>>,
     ip: usize,
-    stack: [f64; STACK_MAX],
+    stack: [Value; STACK_MAX],
     stack_top: usize,
 }
 
@@ -21,7 +22,7 @@ impl Default for VM {
             config: Config::default(),
             chunk: Rc::new(RefCell::new(Chunk::default())),
             ip: 0,
-            stack: [0f64; STACK_MAX],
+            stack: [Value::Nil; STACK_MAX],
             stack_top: 0,
         }
     }
@@ -32,7 +33,7 @@ impl VM {
         config: Config,
         chunk: Chunk,
         ip: usize,
-        stack: [f64; STACK_MAX],
+        stack: [Value; STACK_MAX],
         stack_top: usize,
     ) -> Self {
         VM {
@@ -56,12 +57,12 @@ impl VM {
         self.stack_top = 0;
     }
 
-    fn push(&mut self, value: f64) {
+    fn push(&mut self, value: Value) {
         self.stack[self.stack_top] = value;
         self.stack_top += 1;
     }
 
-    fn pop(&mut self) -> f64 {
+    fn pop(&mut self) -> Value {
         self.stack_top -= 1;
         self.stack[self.stack_top]
     }
@@ -85,7 +86,10 @@ impl VM {
                         InterpretResult::Ok
                     } else {
                         self.ip = 0;
-                        self.run()
+                        match self.run() {
+                            Ok(result) => result,
+                            Err(result) => result,
+                        }
                     }
                 }
                 Err(_err) => {
@@ -96,7 +100,7 @@ impl VM {
         }
     }
 
-    fn run(&mut self) -> InterpretResult {
+    fn run(&mut self) -> Result<InterpretResult, InterpretResult> {
         loop {
             if self.config.trace {
                 print!("          ");
@@ -120,23 +124,28 @@ impl VM {
                     let constant = self.read_constant();
                     self.push(constant);
                 }
-                OpCode::Add => self.binary_op("+"),
-                OpCode::Subtract => self.binary_op("-"),
-                OpCode::Multiply => self.binary_op("*"),
-                OpCode::Divide => self.binary_op("/"),
+                OpCode::Add => self.binary_op("+")?,
+                OpCode::Subtract => self.binary_op("-")?,
+                OpCode::Multiply => self.binary_op("*")?,
+                OpCode::Divide => self.binary_op("/")?,
                 OpCode::Negate => {
+                    if !self.peek(0).is_num() {
+                        self.runtime_error("Operand must be a number.".to_string());
+                        return Err(InterpretResult::RuntimeError);
+                    }
                     let val = self.pop();
-                    self.push(-val);
+                    let val_f64 = unsafe { val.as_num() };
+                    self.push(Value::Num(-val_f64));
                 }
                 OpCode::Return => {
                     println!("{}", self.pop());
-                    return InterpretResult::Ok;
+                    return Ok(InterpretResult::Ok);
                 }
 
                 #[allow(unreachable_patterns)]
                 _ => {
                     eprintln!("Unknown opcode {:?}", instruction);
-                    return InterpretResult::RuntimeError;
+                    return Err(InterpretResult::RuntimeError);
                 }
             }
         }
@@ -152,7 +161,7 @@ impl VM {
         *raw_instruction
     }
 
-    fn read_constant(&mut self) -> f64 {
+    fn read_constant(&mut self) -> Value {
         let index = self.read_byte() as usize;
         *self
             .chunk
@@ -162,18 +171,35 @@ impl VM {
             .expect("Index of a constant value is out of bounds.")
     }
 
-    fn binary_op(&mut self, op: &str) {
-        let b = self.pop();
-        let a = self.pop();
+    fn binary_op(&mut self, op: &str) -> Result<(), InterpretResult> {
+        if !self.peek(0).is_num() || !self.peek(1).is_num() {
+            self.runtime_error("Operands must be numbers.".to_string());
+            return Err(InterpretResult::RuntimeError);
+        }
+        let b = unsafe { self.pop().as_num() };
+        let a = unsafe { self.pop().as_num() };
         match op {
-            "+" => self.push(a + b),
-            "-" => self.push(a - b),
-            "*" => self.push(a * b),
-            "/" => self.push(a / b),
+            "+" => self.push(Value::Num(a + b)),
+            "-" => self.push(Value::Num(a - b)),
+            "*" => self.push(Value::Num(a * b)),
+            "/" => self.push(Value::Num(a / b)),
             _ => {
                 panic!("Unknown binary operation: {}", op);
             }
         }
+        Ok(())
+    }
+
+    fn peek(&self, distance: usize) -> Value {
+        self.stack[self.stack_top - 1 - distance]
+    }
+
+    fn runtime_error(&mut self, message: String) {
+        eprintln!("{message}");
+        let instruction = self.ip - 1;
+        let line = self.chunk.borrow().lines[instruction];
+        eprintln!("[line {}] in script", line);
+        self.reset_stack();
     }
 }
 
