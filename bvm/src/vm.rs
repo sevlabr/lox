@@ -1,12 +1,14 @@
+use crate::Config;
 use crate::chunk::{Chunk, OpCode};
 use crate::compiler::Parser;
-use crate::debug::disassemble_instruction;
-use crate::DEBUG_TRACE_EXECUTION;
+use crate::debug::{disassemble_chunk, disassemble_instruction};
+use crate::scanner::print_tokens;
 use std::{cell::RefCell, rc::Rc};
 
 const STACK_MAX: usize = 256;
 
 pub struct VM {
+    config: Config,
     chunk: Rc<RefCell<Chunk>>,
     ip: usize,
     stack: [f64; STACK_MAX],
@@ -16,6 +18,7 @@ pub struct VM {
 impl Default for VM {
     fn default() -> Self {
         VM {
+            config: Config::default(),
             chunk: Rc::new(RefCell::new(Chunk::default())),
             ip: 0,
             stack: [0f64; STACK_MAX],
@@ -25,13 +28,18 @@ impl Default for VM {
 }
 
 impl VM {
-    pub fn new(chunk: Chunk, ip: usize, stack: [f64; STACK_MAX], stack_top: usize) -> Self {
+    pub fn new(config: Config, chunk: Chunk, ip: usize, stack: [f64; STACK_MAX], stack_top: usize) -> Self {
         VM {
+            config,
             chunk: Rc::new(RefCell::new(chunk)),
             ip,
             stack,
             stack_top,
         }
+    }
+
+    pub fn set_config(&mut self, config: Config) {
+        self.config = config;
     }
 
     pub fn init(&mut self) {
@@ -57,24 +65,39 @@ impl VM {
     }
 
     pub fn interpret(&mut self, source: String) -> InterpretResult {
-        let chunk = Rc::new(RefCell::new(Chunk::new()));
-        let mut parser = Parser::new();
-        match parser.compile(source, Rc::clone(&chunk)) {
-            Ok(_) => {
-                self.set_chunk(chunk);
-                self.ip = 0;
-                self.run()
+
+        if self.config.scanner {
+
+            print_tokens(source);
+            InterpretResult::Ok
+
+        } else {
+
+            let chunk = Rc::new(RefCell::new(Chunk::new()));
+            let mut parser = Parser::new(self.config);
+            match parser.compile(source, Rc::clone(&chunk)) {
+                Ok(_) => {
+                    self.set_chunk(chunk);
+                    if self.config.bytecode {
+                        disassemble_chunk(&self.chunk.borrow(), "code");
+                        InterpretResult::Ok
+                    } else {
+                        self.ip = 0;
+                        self.run()
+                    }
+                }
+                Err(_err) => {
+                    // eprintln!("{_err}");
+                    InterpretResult::CompileError
+                }
             }
-            Err(_err) => {
-                // eprintln!("{_err}");
-                InterpretResult::CompileError
-            }
+
         }
     }
 
     fn run(&mut self) -> InterpretResult {
         loop {
-            if DEBUG_TRACE_EXECUTION {
+            if self.config.trace {
                 print!("          ");
                 for (i, val) in self.stack.iter().enumerate() {
                     if i < self.stack_top {

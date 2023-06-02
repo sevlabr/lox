@@ -8,10 +8,34 @@ pub mod scanner;
 pub mod token;
 pub mod vm;
 
-const DEBUG_PRINT_CODE: bool = true;
-const DEBUG_TRACE_EXECUTION: bool = true;
+#[derive(Clone, Copy)]
+pub struct Config {
+    pub bytecode: bool,
+    pub debug: bool,
+    pub scanner: bool,
+    pub trace: bool,
+}
 
-pub fn repl(mut vm: VM) {
+impl Default for Config {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl Config {
+    pub fn new() -> Self {
+        Config { bytecode: false, debug: false, scanner: false, trace: false }
+    }
+}
+
+const WELCOME_REPL: &'static str =
+"Lox language (Crafting Interpreters book: https://craftinginterpreters.com/)
+Interactive REPL for Bytecode Virtual Machine
+Written in Rust by sevlabr";
+
+pub fn repl(config: Config, mut vm: VM) {
+    vm.set_config(config);
+    println!("{}", WELCOME_REPL);
     loop {
         print!("> ");
 
@@ -37,15 +61,16 @@ pub fn repl(mut vm: VM) {
     }
 }
 
-pub fn run_file(mut vm: VM, path: String) {
-    match fs::read_to_string(path) {
+pub fn run_file(config: Config, mut vm: VM, path: String) {
+    vm.set_config(config);
+    match fs::read_to_string(path.clone()) {
         Ok(contents) => match vm.interpret(contents) {
             InterpretResult::CompileError => process::exit(65),
             InterpretResult::RuntimeError => process::exit(70),
             _ => (),
         },
         Err(e) => {
-            eprintln!("Error during reading file: {e}");
+            eprintln!("Error during reading file: {e}.\nGiven [PATH]: {}", path);
             process::exit(74);
         }
     }

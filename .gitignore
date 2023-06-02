@@ -9,5 +9,6 @@ benchmark/fib-?*
 benchmark/fib.hi
 benchmark/fib.o
 
+bvm/test.lox
 twi/example/debug/debug.*
 TODO.md

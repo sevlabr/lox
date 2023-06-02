@@ -1,7 +1,8 @@
+use crate::Config;
 use crate::chunk::{Chunk, OpCode};
 use crate::scanner::Scanner;
 use crate::token::{Token, TokenType};
-use crate::{debug::disassemble_chunk, DEBUG_PRINT_CODE};
+use crate::{debug::disassemble_chunk};
 use std::{cell::RefCell, error::Error, fmt, rc::Rc};
 
 #[derive(Debug)]
@@ -57,6 +58,7 @@ struct ParseRule {
 }
 
 pub struct Parser {
+    config: Config,
     chunk: Rc<RefCell<Chunk>>,
     scanner: Scanner,
     current: Token,
@@ -67,13 +69,14 @@ pub struct Parser {
 
 impl Default for Parser {
     fn default() -> Self {
-        Self::new()
+        Self::new(Config::default())
     }
 }
 
 impl Parser {
-    pub fn new() -> Self {
+    pub fn new(config: Config) -> Self {
         Self {
+            config,
             chunk: Rc::new(RefCell::new(Chunk::new())),
             scanner: Scanner::default(),
             current: Token::default(),
@@ -488,7 +491,7 @@ impl Parser {
 
     fn end_compiler(&self) {
         self.emit_return();
-        if DEBUG_PRINT_CODE && self.had_error {
+        if self.config.debug && self.had_error {
             disassemble_chunk(&self.chunk.borrow(), "code")
         }
     }
