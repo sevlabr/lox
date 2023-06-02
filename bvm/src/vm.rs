@@ -124,10 +124,24 @@ impl VM {
                     let constant = self.read_constant();
                     self.push(constant);
                 }
+                OpCode::Nil => self.push(Value::Nil),
+                OpCode::True => self.push(Value::Bool(true)),
+                OpCode::False => self.push(Value::Bool(false)),
+                OpCode::Equal => {
+                    let b = self.pop();
+                    let a = self.pop();
+                    self.push(Value::Bool(a.equal(b)));
+                }
+                OpCode::Greater => self.binary_op(">")?,
+                OpCode::Less => self.binary_op("<")?,
                 OpCode::Add => self.binary_op("+")?,
                 OpCode::Subtract => self.binary_op("-")?,
                 OpCode::Multiply => self.binary_op("*")?,
                 OpCode::Divide => self.binary_op("/")?,
+                OpCode::Not => {
+                    let new_val = self.pop().is_falsey();
+                    self.push(Value::Bool(new_val))
+                }
                 OpCode::Negate => {
                     if !self.peek(0).is_num() {
                         self.runtime_error("Operand must be a number.".to_string());
@@ -179,6 +193,8 @@ impl VM {
         let b = unsafe { self.pop().as_num() };
         let a = unsafe { self.pop().as_num() };
         match op {
+            ">" => self.push(Value::Bool(a > b)),
+            "<" => self.push(Value::Bool(a < b)),
             "+" => self.push(Value::Num(a + b)),
             "-" => self.push(Value::Num(a - b)),
             "*" => self.push(Value::Num(a * b)),

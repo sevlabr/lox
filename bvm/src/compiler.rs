@@ -199,14 +199,14 @@ impl Parser {
                 precedence: Precedence::Factor,
             },
             TokenType::Bang => ParseRule {
-                prefix: None,
+                prefix: Some(Parser::unary),
                 infix: None,
                 precedence: Precedence::None,
             },
             TokenType::BangEqual => ParseRule {
                 prefix: None,
-                infix: None,
-                precedence: Precedence::None,
+                infix: Some(Parser::binary),
+                precedence: Precedence::Equality,
             },
             TokenType::Equal => ParseRule {
                 prefix: None,
@@ -215,28 +215,28 @@ impl Parser {
             },
             TokenType::EqualEqual => ParseRule {
                 prefix: None,
-                infix: None,
-                precedence: Precedence::None,
+                infix: Some(Parser::binary),
+                precedence: Precedence::Equality,
             },
             TokenType::Greater => ParseRule {
                 prefix: None,
-                infix: None,
-                precedence: Precedence::None,
+                infix: Some(Parser::binary),
+                precedence: Precedence::Comparison,
             },
             TokenType::GreaterEqual => ParseRule {
                 prefix: None,
-                infix: None,
-                precedence: Precedence::None,
+                infix: Some(Parser::binary),
+                precedence: Precedence::Comparison,
             },
             TokenType::Less => ParseRule {
                 prefix: None,
-                infix: None,
-                precedence: Precedence::None,
+                infix: Some(Parser::binary),
+                precedence: Precedence::Comparison,
             },
             TokenType::LessEqual => ParseRule {
                 prefix: None,
-                infix: None,
-                precedence: Precedence::None,
+                infix: Some(Parser::binary),
+                precedence: Precedence::Comparison,
             },
             TokenType::Identifier => ParseRule {
                 prefix: None,
@@ -269,7 +269,7 @@ impl Parser {
                 precedence: Precedence::None,
             },
             TokenType::False => ParseRule {
-                prefix: None,
+                prefix: Some(Parser::literal),
                 infix: None,
                 precedence: Precedence::None,
             },
@@ -289,7 +289,7 @@ impl Parser {
                 precedence: Precedence::None,
             },
             TokenType::Nil => ParseRule {
-                prefix: None,
+                prefix: Some(Parser::literal),
                 infix: None,
                 precedence: Precedence::None,
             },
@@ -319,7 +319,7 @@ impl Parser {
                 precedence: Precedence::None,
             },
             TokenType::True => ParseRule {
-                prefix: None,
+                prefix: Some(Parser::literal),
                 infix: None,
                 precedence: Precedence::None,
             },
@@ -405,8 +405,9 @@ impl Parser {
 
         // Emit the operator instruction.
         match op_type {
+            TokenType::Bang => self.emit_instruction(OpCode::Not),
             TokenType::Minus => self.emit_instruction(OpCode::Negate),
-            _ => unreachable!("Unary can be only '-' for now."),
+            _ => unreachable!("Unary can be only one of: '-', '!'."),
         }
     }
 
@@ -417,11 +418,34 @@ impl Parser {
         self.parse_precedence(precedence);
 
         match op_type {
+            TokenType::BangEqual => {
+                self.emit_instructions(Byte::Code(OpCode::Equal), Byte::Code(OpCode::Not))
+            }
+            TokenType::EqualEqual => self.emit_instruction(OpCode::Equal),
+            TokenType::Greater => self.emit_instruction(OpCode::Greater),
+            TokenType::GreaterEqual => {
+                self.emit_instructions(Byte::Code(OpCode::Less), Byte::Code(OpCode::Not))
+            }
+            TokenType::Less => self.emit_instruction(OpCode::Less),
+            TokenType::LessEqual => {
+                self.emit_instructions(Byte::Code(OpCode::Greater), Byte::Code(OpCode::Not))
+            }
             TokenType::Plus => self.emit_instruction(OpCode::Add),
             TokenType::Minus => self.emit_instruction(OpCode::Subtract),
             TokenType::Star => self.emit_instruction(OpCode::Multiply),
             TokenType::Slash => self.emit_instruction(OpCode::Divide),
-            _ => unreachable!("Binary can be one of: '+', '-', '*', '/'."),
+            _ => unreachable!(
+                "Binary can be one of: '+', '-', '*', '/', '!=', '==', '>', '>=', '<', '<='."
+            ),
+        }
+    }
+
+    fn literal(&mut self) {
+        match self.previous.kind {
+            TokenType::False => self.emit_instruction(OpCode::False),
+            TokenType::Nil => self.emit_instruction(OpCode::Nil),
+            TokenType::True => self.emit_instruction(OpCode::True),
+            _ => unreachable!("Expected one of: 'false', 'true', 'nil'."),
         }
     }
 
