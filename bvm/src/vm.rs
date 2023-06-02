@@ -1,8 +1,8 @@
-use crate::Config;
 use crate::chunk::{Chunk, OpCode};
 use crate::compiler::Parser;
 use crate::debug::{disassemble_chunk, disassemble_instruction};
 use crate::scanner::print_tokens;
+use crate::Config;
 use std::{cell::RefCell, rc::Rc};
 
 const STACK_MAX: usize = 256;
@@ -28,7 +28,13 @@ impl Default for VM {
 }
 
 impl VM {
-    pub fn new(config: Config, chunk: Chunk, ip: usize, stack: [f64; STACK_MAX], stack_top: usize) -> Self {
+    pub fn new(
+        config: Config,
+        chunk: Chunk,
+        ip: usize,
+        stack: [f64; STACK_MAX],
+        stack_top: usize,
+    ) -> Self {
         VM {
             config,
             chunk: Rc::new(RefCell::new(chunk)),
@@ -65,14 +71,10 @@ impl VM {
     }
 
     pub fn interpret(&mut self, source: String) -> InterpretResult {
-
         if self.config.scanner {
-
             print_tokens(source);
             InterpretResult::Ok
-
         } else {
-
             let chunk = Rc::new(RefCell::new(Chunk::new()));
             let mut parser = Parser::new(self.config);
             match parser.compile(source, Rc::clone(&chunk)) {
@@ -91,7 +93,6 @@ impl VM {
                     InterpretResult::CompileError
                 }
             }
-
         }
     }
 

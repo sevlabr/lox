@@ -1,8 +1,8 @@
-use crate::Config;
 use crate::chunk::{Chunk, OpCode};
+use crate::debug::disassemble_chunk;
 use crate::scanner::Scanner;
 use crate::token::{Token, TokenType};
-use crate::{debug::disassemble_chunk};
+use crate::Config;
 use std::{cell::RefCell, error::Error, fmt, rc::Rc};
 
 #[derive(Debug)]

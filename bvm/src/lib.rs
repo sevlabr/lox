@@ -24,12 +24,17 @@ impl Default for Config {
 
 impl Config {
     pub fn new() -> Self {
-        Config { bytecode: false, debug: false, scanner: false, trace: false }
+        Config {
+            bytecode: false,
+            debug: false,
+            scanner: false,
+            trace: false,
+        }
     }
 }
 
-const WELCOME_REPL: &'static str =
-"Lox language (Crafting Interpreters book: https://craftinginterpreters.com/)
+const WELCOME_REPL: &str =
+    "Lox language (Crafting Interpreters book: https://craftinginterpreters.com/)
 Interactive REPL for Bytecode Virtual Machine
 Written in Rust by sevlabr";
 
