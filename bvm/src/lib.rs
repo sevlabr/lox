@@ -1,9 +1,12 @@
+#![feature(linked_list_remove)]
+
 use std::{fs, io::Write, process};
 use vm::{InterpretResult, VM};
 
 pub mod chunk;
 pub mod compiler;
 pub mod debug;
+pub mod memory;
 pub mod object;
 pub mod scanner;
 pub mod token;

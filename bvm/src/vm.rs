@@ -6,8 +6,15 @@ use crate::scanner::print_tokens;
 use crate::value::Value;
 use crate::Config;
 use std::{cell::RefCell, rc::Rc};
+use std::collections::LinkedList;
 
 const STACK_MAX: usize = 256;
+
+pub enum InterpretResult {
+    Ok,
+    CompileError,
+    RuntimeError,
+}
 
 pub struct VM {
     config: Config,
@@ -15,6 +22,9 @@ pub struct VM {
     ip: usize,
     stack: Vec<Value>,
     stack_top: usize,
+    
+    // maybe use Rc::try_unwrap
+    objects: LinkedList<*mut Obj>,
 }
 
 impl Default for VM {
@@ -25,6 +35,7 @@ impl Default for VM {
             ip: 0,
             stack: vec![Value::Nil; STACK_MAX],
             stack_top: 0,
+            objects: LinkedList::new()
         }
     }
 }
@@ -36,6 +47,7 @@ impl VM {
         ip: usize,
         stack: Vec<Value>,
         stack_top: usize,
+        objects: LinkedList<*mut Obj>,
     ) -> Self {
         VM {
             config,
@@ -43,6 +55,7 @@ impl VM {
             ip,
             stack,
             stack_top,
+            objects,
         }
     }
 
@@ -214,7 +227,8 @@ impl VM {
             // Concatenation
             let b = unsafe { self.pop().as_obj().as_string() };
             let a = unsafe { self.pop().as_obj().as_string() };
-            self.push(Value::Obj(Obj::Str(a + &b)));
+            let res = self.allocate_obj(Obj::Str(a + &b));
+            self.push(Value::Obj(res));
         } else if self.peek(0).is_num() && self.peek(1).is_num() {
             let b = unsafe { self.pop().as_num() };
             let a = unsafe { self.pop().as_num() };
@@ -237,10 +251,46 @@ impl VM {
         eprintln!("[line {}] in script", line);
         self.reset_stack();
     }
-}
 
-pub enum InterpretResult {
-    Ok,
-    CompileError,
-    RuntimeError,
+    // Start tracking created object to be able to deallocate it with GC later.
+    fn allocate_obj(&mut self, mut obj: Obj) -> Obj {
+        self.objects.push_front(&mut obj as *mut _);
+        obj
+    }
+
+    // Example function for deallocation. May change later.
+    // Supposed to be used for GC.
+    // This variant is less safe than the other.
+    fn _deallocate_obj(&mut self, index: usize) {
+        use std::alloc::{dealloc, Layout};
+
+        let loc = self.objects.remove(index) as *mut u8;
+        if !loc.is_null() {
+            unsafe {
+                dealloc(loc, Layout::new::<Obj>())
+            }
+        } else {
+            panic!("Detected attempt to dereference a null-pointer.");
+        }
+    }
+
+    // Example function for deallocation. May change later.
+    // Supposed to be used for GC.
+    // This variant is more safe than the other.
+    // (Also check Zeroize crate if needed).
+    fn _free_obj(&mut self, index: usize) {
+        let loc = self.objects.remove(index);
+        if !loc.is_null() {
+            unsafe {
+                match *loc {
+                    Obj::Str(ref mut s) => {
+                        s.clear() // This does not do the job.
+                        // s.zeroize();
+                    }
+                }
+            }
+        } else {
+            panic!("Detected attempt to dereference a null-pointer.");
+        }
+    }
 }
