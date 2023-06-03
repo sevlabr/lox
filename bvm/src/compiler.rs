@@ -1,5 +1,6 @@
 use crate::chunk::{Chunk, OpCode};
 use crate::debug::disassemble_chunk;
+use crate::object::Obj;
 use crate::scanner::Scanner;
 use crate::token::{Token, TokenType};
 use crate::value::Value;
@@ -244,7 +245,7 @@ impl Parser {
                 precedence: Precedence::None,
             },
             TokenType::String => ParseRule {
-                prefix: None,
+                prefix: Some(Parser::string),
                 infix: None,
                 precedence: Precedence::None,
             },
@@ -457,6 +458,13 @@ impl Parser {
             Ok(num) => self.emit_constant(Value::Num(num)),
             Err(_) => self.error("Failed parsing float number.".to_string()),
         }
+    }
+
+    fn string(&mut self) {
+        let str = self
+            .scanner
+            .lexeme(self.previous.start + 1, self.previous.length - 2);
+        self.emit_constant(Value::Obj(Obj::Str(str)));
     }
 
     fn advance(&mut self) {

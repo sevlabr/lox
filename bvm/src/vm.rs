@@ -1,6 +1,7 @@
 use crate::chunk::{Chunk, OpCode};
 use crate::compiler::Parser;
 use crate::debug::{disassemble_chunk, disassemble_instruction};
+use crate::object::Obj;
 use crate::scanner::print_tokens;
 use crate::value::Value;
 use crate::Config;
@@ -12,7 +13,7 @@ pub struct VM {
     config: Config,
     chunk: Rc<RefCell<Chunk>>,
     ip: usize,
-    stack: [Value; STACK_MAX],
+    stack: Vec<Value>,
     stack_top: usize,
 }
 
@@ -22,7 +23,7 @@ impl Default for VM {
             config: Config::default(),
             chunk: Rc::new(RefCell::new(Chunk::default())),
             ip: 0,
-            stack: [Value::Nil; STACK_MAX],
+            stack: vec![Value::Nil; STACK_MAX],
             stack_top: 0,
         }
     }
@@ -33,7 +34,7 @@ impl VM {
         config: Config,
         chunk: Chunk,
         ip: usize,
-        stack: [Value; STACK_MAX],
+        stack: Vec<Value>,
         stack_top: usize,
     ) -> Self {
         VM {
@@ -64,7 +65,7 @@ impl VM {
 
     fn pop(&mut self) -> Value {
         self.stack_top -= 1;
-        self.stack[self.stack_top]
+        self.stack[self.stack_top].clone()
     }
 
     pub fn set_chunk(&mut self, chunk: Rc<RefCell<Chunk>>) {
@@ -177,15 +178,18 @@ impl VM {
 
     fn read_constant(&mut self) -> Value {
         let index = self.read_byte() as usize;
-        *self
-            .chunk
+        self.chunk
             .borrow()
             .constants
             .get(index)
             .expect("Index of a constant value is out of bounds.")
+            .clone()
     }
 
     fn binary_op(&mut self, op: &str) -> Result<(), InterpretResult> {
+        if op == "+" {
+            return self.binary_plus();
+        }
         if !self.peek(0).is_num() || !self.peek(1).is_num() {
             self.runtime_error("Operands must be numbers.".to_string());
             return Err(InterpretResult::RuntimeError);
@@ -195,7 +199,6 @@ impl VM {
         match op {
             ">" => self.push(Value::Bool(a > b)),
             "<" => self.push(Value::Bool(a < b)),
-            "+" => self.push(Value::Num(a + b)),
             "-" => self.push(Value::Num(a - b)),
             "*" => self.push(Value::Num(a * b)),
             "/" => self.push(Value::Num(a / b)),
@@ -206,8 +209,25 @@ impl VM {
         Ok(())
     }
 
+    fn binary_plus(&mut self) -> Result<(), InterpretResult> {
+        if self.peek(0).is_obj_type("String") && self.peek(1).is_obj_type("String") {
+            // Concatenation
+            let b = unsafe { self.pop().as_obj().as_string() };
+            let a = unsafe { self.pop().as_obj().as_string() };
+            self.push(Value::Obj(Obj::Str(a + &b)));
+        } else if self.peek(0).is_num() && self.peek(1).is_num() {
+            let b = unsafe { self.pop().as_num() };
+            let a = unsafe { self.pop().as_num() };
+            self.push(Value::Num(a + b));
+        } else {
+            self.runtime_error("Operands must be two numbers or two strings.".to_string());
+            return Err(InterpretResult::RuntimeError);
+        }
+        Ok(())
+    }
+
     fn peek(&self, distance: usize) -> Value {
-        self.stack[self.stack_top - 1 - distance]
+        self.stack[self.stack_top - 1 - distance].clone()
     }
 
     fn runtime_error(&mut self, message: String) {
