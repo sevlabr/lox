@@ -17,7 +17,7 @@ impl Chunk {
         Chunk {
             code: Vec::new(),
             lines: Vec::new(),
-            constants: Vec::new(),
+            constants: Vec::with_capacity(u8::MAX.into()),
         }
     }
 
@@ -79,6 +79,7 @@ pub enum OpCode {
     Method,
 }
 
+/// `num_enum` crate is better solution here.
 impl TryFrom<u8> for OpCode {
     type Error = &'static str;
 
