@@ -5,8 +5,8 @@ use crate::object::Obj;
 use crate::scanner::print_tokens;
 use crate::value::Value;
 use crate::Config;
+use std::collections::{HashMap, LinkedList};
 use std::{cell::RefCell, rc::Rc};
-use std::collections::LinkedList;
 
 const STACK_MAX: usize = 256;
 
@@ -22,9 +22,11 @@ pub struct VM {
     ip: usize,
     stack: Vec<Value>,
     stack_top: usize,
-    
+
     // maybe use Rc::try_unwrap
     objects: LinkedList<*mut Obj>,
+
+    globals: HashMap<String, Value>,
 }
 
 impl Default for VM {
@@ -35,7 +37,8 @@ impl Default for VM {
             ip: 0,
             stack: vec![Value::Nil; STACK_MAX],
             stack_top: 0,
-            objects: LinkedList::new()
+            objects: LinkedList::new(),
+            globals: HashMap::new(),
         }
     }
 }
@@ -48,6 +51,7 @@ impl VM {
         stack: Vec<Value>,
         stack_top: usize,
         objects: LinkedList<*mut Obj>,
+        globals: HashMap<String, Value>,
     ) -> Self {
         VM {
             config,
@@ -56,6 +60,7 @@ impl VM {
             stack,
             stack_top,
             objects,
+            globals,
         }
     }
 
@@ -71,6 +76,8 @@ impl VM {
         self.stack_top = 0;
     }
 
+    // Maybe add check of a value type here to add it to `self.objects`,
+    // so that GC can delete it later.
     fn push(&mut self, value: Value) {
         self.stack[self.stack_top] = value;
         self.stack_top += 1;
@@ -141,6 +148,38 @@ impl VM {
                 OpCode::Nil => self.push(Value::Nil),
                 OpCode::True => self.push(Value::Bool(true)),
                 OpCode::False => self.push(Value::Bool(false)),
+                OpCode::Pop => {
+                    self.pop();
+                }
+                OpCode::GetGlobal => {
+                    // Safe to not check if it is a string,
+                    // because compiler never emits an instruction
+                    // that refers to a non-string constant.
+                    let name = unsafe { self.read_constant().as_obj().as_string() };
+                    let value = self.globals.get(&name);
+                    match value {
+                        Some(val) => self.push(val.clone()),
+                        None => {
+                            self.runtime_error(format!("Undefined variable '{}'.", name));
+                            return Err(InterpretResult::RuntimeError);
+                        }
+                    }
+                }
+                OpCode::DefineGlobal => {
+                    // See comment for GetGlobal.
+                    let name = unsafe { self.read_constant().as_obj().as_string() };
+                    self.globals.insert(name, self.peek(0));
+                    self.pop();
+                }
+                OpCode::SetGlobal => {
+                    // See comment for GetGlobal.
+                    let name = unsafe { self.read_constant().as_obj().as_string() };
+                    if self.globals.insert(name.clone(), self.peek(0)).is_none() {
+                        self.globals.remove(&name);
+                        self.runtime_error(format!("Undefined variable '{}'.", name));
+                        return Err(InterpretResult::RuntimeError);
+                    }
+                }
                 OpCode::Equal => {
                     let b = self.pop();
                     let a = self.pop();
@@ -165,8 +204,10 @@ impl VM {
                     let val_f64 = unsafe { val.as_num() };
                     self.push(Value::Num(-val_f64));
                 }
-                OpCode::Return => {
+                OpCode::Print => {
                     println!("{}", self.pop());
+                }
+                OpCode::Return => {
                     return Ok(InterpretResult::Ok);
                 }
 
@@ -266,9 +307,7 @@ impl VM {
 
         let loc = self.objects.remove(index) as *mut u8;
         if !loc.is_null() {
-            unsafe {
-                dealloc(loc, Layout::new::<Obj>())
-            }
+            unsafe { dealloc(loc, Layout::new::<Obj>()) }
         } else {
             panic!("Detected attempt to dereference a null-pointer.");
         }
@@ -285,7 +324,7 @@ impl VM {
                 match *loc {
                     Obj::Str(ref mut s) => {
                         s.clear() // This does not do the job.
-                        // s.zeroize();
+                                  // s.zeroize();
                     }
                 }
             }

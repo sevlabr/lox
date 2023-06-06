@@ -191,7 +191,8 @@ impl Scanner {
     }
 
     fn is_digit(&self, c: char) -> bool {
-        ('0'..='9').contains(&c)
+        // ('0'..='9').contains(&c)
+        c.is_ascii_digit()
     }
 
     fn number(&mut self) -> Token {

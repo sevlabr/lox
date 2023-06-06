@@ -54,7 +54,7 @@ impl Precedence {
 }
 
 struct ParseRule {
-    prefix: Option<fn(&mut Parser) -> ()>,
+    prefix: Option<fn(&mut Parser, bool) -> ()>,
     infix: Option<fn(&mut Parser) -> ()>,
     precedence: Precedence,
 }
@@ -108,8 +108,11 @@ impl Parser {
         self.set_chunk(chunk);
         self.set_scanner(source);
         self.advance();
-        self.expression();
-        self.consume(TokenType::EoF, "Expect end of expression.");
+
+        while !self.fit(TokenType::EoF) {
+            self.declaration();
+        }
+
         self.end_compiler();
 
         if self.had_error {
@@ -121,8 +124,9 @@ impl Parser {
     fn parse_precedence(&mut self, precedence: Precedence) {
         self.advance();
         let prefix_rule = self.get_rule(self.previous.kind).prefix;
+        let can_assign = precedence <= Precedence::Assignment;
         match prefix_rule {
-            Some(func) => func(self),
+            Some(func) => func(self, can_assign),
             None => {
                 self.error("Expect expression.".to_string());
                 return;
@@ -139,6 +143,10 @@ impl Parser {
                     return;
                 }
             }
+        }
+
+        if can_assign && self.fit(TokenType::Equal) {
+            self.error("Invalid assignment target.".to_string());
         }
     }
 
@@ -240,7 +248,7 @@ impl Parser {
                 precedence: Precedence::Comparison,
             },
             TokenType::Identifier => ParseRule {
-                prefix: None,
+                prefix: Some(Parser::variable),
                 infix: None,
                 precedence: Precedence::None,
             },
@@ -389,16 +397,64 @@ impl Parser {
         constant as u8
     }
 
+    fn declaration(&mut self) {
+        if self.fit(TokenType::Var) {
+            self.var_declaration();
+        } else {
+            self.statement();
+        }
+
+        if self.panic_mode {
+            self.synchronize();
+        }
+    }
+
+    fn var_declaration(&mut self) {
+        let global = self.parse_variable("Expect variable name.");
+
+        if self.fit(TokenType::Equal) {
+            self.expression();
+        } else {
+            self.emit_instruction(OpCode::Nil);
+        }
+        self.consume(
+            TokenType::Semicolon,
+            "Expect ';' after variable declaration.",
+        );
+
+        self.define_variable(global);
+    }
+
+    fn statement(&mut self) {
+        if self.fit(TokenType::Print) {
+            self.print_stmt();
+        } else {
+            self.expression_stmt();
+        }
+    }
+
+    fn print_stmt(&mut self) {
+        self.expression();
+        self.consume(TokenType::Semicolon, "Expect ';' after value.");
+        self.emit_instruction(OpCode::Print);
+    }
+
+    fn expression_stmt(&mut self) {
+        self.expression();
+        self.consume(TokenType::Semicolon, "Expect ';' after expression.");
+        self.emit_instruction(OpCode::Pop);
+    }
+
     fn expression(&mut self) {
         self.parse_precedence(Precedence::Assignment);
     }
 
-    fn grouping(&mut self) {
+    fn grouping(&mut self, _: bool) {
         self.expression();
         self.consume(TokenType::RightParen, "Expect ')' after expression.");
     }
 
-    fn unary(&mut self) {
+    fn unary(&mut self, _: bool) {
         let op_type = self.previous.kind;
 
         // Compile the operand.
@@ -441,7 +497,7 @@ impl Parser {
         }
     }
 
-    fn literal(&mut self) {
+    fn literal(&mut self, _: bool) {
         match self.previous.kind {
             TokenType::False => self.emit_instruction(OpCode::False),
             TokenType::Nil => self.emit_instruction(OpCode::Nil),
@@ -450,7 +506,7 @@ impl Parser {
         }
     }
 
-    fn number(&mut self) {
+    fn number(&mut self, _: bool) {
         let lexeme = self
             .scanner
             .lexeme(self.previous.start, self.previous.length);
@@ -460,11 +516,40 @@ impl Parser {
         }
     }
 
-    fn string(&mut self) {
+    fn string(&mut self, _: bool) {
         let str = self
             .scanner
             .lexeme(self.previous.start + 1, self.previous.length - 2);
         self.emit_constant(Value::Obj(Obj::Str(str)));
+    }
+
+    fn named_variable(&mut self, name: Token, can_assign: bool) {
+        let arg = self.identifier_constant(name);
+
+        if can_assign && self.fit(TokenType::Equal) {
+            self.expression();
+            self.emit_instructions(Byte::Code(OpCode::SetGlobal), Byte::Raw(arg));
+        } else {
+            self.emit_instructions(Byte::Code(OpCode::GetGlobal), Byte::Raw(arg));
+        }
+    }
+
+    fn variable(&mut self, can_assign: bool) {
+        self.named_variable(self.previous, can_assign);
+    }
+
+    fn identifier_constant(&mut self, token: Token) -> u8 {
+        let name = self.scanner.lexeme(token.start, token.length);
+        self.make_constant(Value::Obj(Obj::Str(name)))
+    }
+
+    fn parse_variable(&mut self, message: &'static str) -> u8 {
+        self.consume(TokenType::Identifier, message);
+        self.identifier_constant(self.previous)
+    }
+
+    fn define_variable(&self, var: u8) {
+        self.emit_instructions(Byte::Code(OpCode::DefineGlobal), Byte::Raw(var));
     }
 
     fn advance(&mut self) {
@@ -492,6 +577,18 @@ impl Parser {
         }
 
         self.error_at_current(message.to_string());
+    }
+
+    fn check(&self, kind: TokenType) -> bool {
+        self.current.kind == kind
+    }
+
+    fn fit(&mut self, kind: TokenType) -> bool {
+        if !self.check(kind) {
+            return false;
+        }
+        self.advance();
+        true
     }
 
     fn error_at_current(&mut self, message: String) {
@@ -522,6 +619,27 @@ impl Parser {
         self.had_error = true;
     }
 
+    fn synchronize(&mut self) {
+        self.panic_mode = false;
+
+        while self.current.kind != TokenType::EoF {
+            if self.previous.kind == TokenType::Semicolon {
+                return;
+            }
+            match self.current.kind {
+                TokenType::Class
+                | TokenType::Fun
+                | TokenType::Var
+                | TokenType::For
+                | TokenType::If
+                | TokenType::While
+                | TokenType::Print
+                | TokenType::Return => return,
+                _ => self.advance(),
+            }
+        }
+    }
+
     fn end_compiler(&self) {
         self.emit_return();
         if self.config.debug && self.had_error {
@@ -534,6 +652,7 @@ impl Parser {
     }
 }
 
+/// `num_enum` crate is better solution here.
 impl TryFrom<u8> for Precedence {
     type Error = &'static str;
 
