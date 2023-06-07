@@ -43,6 +43,8 @@ pub fn disassemble_instruction(chunk: &Chunk, offset: usize) -> usize {
         OpCode::Not => simple_instruction("OP_NOT", offset),
         OpCode::Negate => simple_instruction("OP_NEGATE", offset),
         OpCode::Print => simple_instruction("OP_PRINT", offset),
+        OpCode::Jump => jump_instruction("OP_JUMP", 1, chunk, offset),
+        OpCode::JumpIfFalse => jump_instruction("OP_JUMP_IF_FALSE", 1, chunk, offset),
         OpCode::Return => simple_instruction("OP_RETURN", offset),
 
         #[allow(unreachable_patterns)]
@@ -77,4 +79,20 @@ fn byte_instruction(name: &str, chunk: &Chunk, offset: usize) -> usize {
     let slot = chunk.code.get(offset + 1).expect(&msg);
     println!("{:16} {:4}", name, slot);
     offset + 2
+}
+
+fn jump_instruction(name: &str, sign: isize, chunk: &Chunk, offset: usize) -> usize {
+    let part1 = chunk
+        .code
+        .get(offset + 1)
+        .expect("Failed to get 1st part of jump value.");
+    let mut jump = (*part1 as u16) << 8;
+    let part2 = chunk
+        .code
+        .get(offset + 2)
+        .expect("Failed to get 2nd part of jump value.");
+    jump |= *part2 as u16;
+    let dest: isize = (offset as isize) + 3 + sign * (jump as isize);
+    println!("{:16} {:4} -> {}", name, offset, dest);
+    offset + 3
 }

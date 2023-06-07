@@ -434,6 +434,25 @@ impl Parser {
         self.emit_instructions(Byte::Code(OpCode::Constant), index);
     }
 
+    fn emit_jump(&self, instruction: OpCode) -> isize {
+        self.emit_instruction(instruction);
+        self.emit_raw_instruction(255);
+        self.emit_raw_instruction(255);
+        self.current_chunk().borrow().code.len() as isize - 2
+    }
+
+    fn patch_jump(&mut self, offset: isize) {
+        // -2 to adjust for the bytecode for the jump offset itself.
+        let jump = self.current_chunk().borrow().code.len() as isize - offset - 2;
+
+        if jump > u16::MAX as isize {
+            self.error("Too much code to jump over.".to_string());
+        }
+
+        self.current_chunk().borrow_mut().code[offset as usize] = ((jump >> 8) & 0xff) as u8;
+        self.current_chunk().borrow_mut().code[offset as usize + 1] = (jump & 0xff) as u8;
+    }
+
     fn write_value(&self, value: Value) -> usize {
         self.current_chunk().borrow_mut().write_value(value)
     }
@@ -478,6 +497,8 @@ impl Parser {
     fn statement(&mut self) {
         if self.fit(TokenType::Print) {
             self.print_stmt();
+        } else if self.fit(TokenType::If) {
+            self.if_stmt();
         } else if self.fit(TokenType::LeftBrace) {
             self.begin_scope();
             self.block();
@@ -497,6 +518,26 @@ impl Parser {
         self.expression();
         self.consume(TokenType::Semicolon, "Expect ';' after expression.");
         self.emit_instruction(OpCode::Pop);
+    }
+
+    fn if_stmt(&mut self) {
+        self.consume(TokenType::LeftParen, "Expect '(' after 'if'.");
+        self.expression();
+        self.consume(TokenType::RightParen, "Expect ')' after condition.");
+
+        let then_jump = self.emit_jump(OpCode::JumpIfFalse);
+        self.emit_instruction(OpCode::Pop);
+        self.statement();
+
+        let else_jump = self.emit_jump(OpCode::Jump);
+
+        self.patch_jump(then_jump);
+        self.emit_instruction(OpCode::Pop);
+
+        if self.fit(TokenType::Else) {
+            self.statement();
+        }
+        self.patch_jump(else_jump);
     }
 
     fn block(&mut self) {

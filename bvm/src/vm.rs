@@ -216,6 +216,16 @@ impl VM {
                 OpCode::Print => {
                     println!("{}", self.pop());
                 }
+                OpCode::Jump => {
+                    let offset: u16 = self.read_short();
+                    self.ip += offset as usize;
+                }
+                OpCode::JumpIfFalse => {
+                    let offset: u16 = self.read_short();
+                    if self.peek(0).is_falsey() {
+                        self.ip += offset as usize;
+                    }
+                }
                 OpCode::Return => {
                     return Ok(InterpretResult::Ok);
                 }
@@ -247,6 +257,13 @@ impl VM {
             .get(index)
             .expect("Index of a constant value is out of bounds.")
             .clone()
+    }
+
+    fn read_short(&mut self) -> u16 {
+        self.ip += 2;
+        let chunk = self.chunk.borrow();
+        let offset = chunk.code[self.ip - 2] as u16;
+        (offset << 8) | (chunk.code[self.ip - 1] as u16)
     }
 
     fn binary_op(&mut self, op: &str) -> Result<(), InterpretResult> {
