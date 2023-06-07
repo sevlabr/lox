@@ -151,6 +151,15 @@ impl VM {
                 OpCode::Pop => {
                     self.pop();
                 }
+                OpCode::GetLocal => {
+                    let slot = self.read_byte();
+                    let val = self.stack[slot as usize].clone();
+                    self.push(val);
+                }
+                OpCode::SetLocal => {
+                    let slot = self.read_byte();
+                    self.stack[slot as usize] = self.peek(0);
+                }
                 OpCode::GetGlobal => {
                     // Safe to not check if it is a string,
                     // because compiler never emits an instruction

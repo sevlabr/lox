@@ -28,6 +28,8 @@ pub fn disassemble_instruction(chunk: &Chunk, offset: usize) -> usize {
         OpCode::True => simple_instruction("OP_TRUE", offset),
         OpCode::False => simple_instruction("OP_FALSE", offset),
         OpCode::Pop => simple_instruction("OP_POP", offset),
+        OpCode::GetLocal => byte_instruction("OP_GET_LOCAL", chunk, offset),
+        OpCode::SetLocal => byte_instruction("OP_SET_LOCAL", chunk, offset),
         OpCode::GetGlobal => constant_instruction("OP_GET_GLOBAL", chunk, offset),
         OpCode::DefineGlobal => constant_instruction("OP_DEFINE_GLOBAL", chunk, offset),
         OpCode::SetGlobal => constant_instruction("OP_SET_GLOBAL", chunk, offset),
@@ -66,5 +68,13 @@ fn constant_instruction(name: &str, chunk: &Chunk, offset: usize) -> usize {
         .get(*constant as usize)
         .expect("Failed to get a value of a constant (out of bounds in chunk.constants).");
     println!("{:16} {:4} '{}'", name, constant, value);
+    offset + 2
+}
+
+fn byte_instruction(name: &str, chunk: &Chunk, offset: usize) -> usize {
+    let mut msg = "Failed to get an index of a variable (out of bounds in chunk.code).".to_string();
+    msg += " Expected local or enclosing variable or function name.";
+    let slot = chunk.code.get(offset + 1).expect(&msg);
+    println!("{:16} {:4}", name, slot);
     offset + 2
 }
