@@ -314,8 +314,8 @@ impl Parser {
             },
             TokenType::And => ParseRule {
                 prefix: None,
-                infix: None,
-                precedence: Precedence::None,
+                infix: Some(Parser::and_),
+                precedence: Precedence::And,
             },
             TokenType::Class => ParseRule {
                 prefix: None,
@@ -354,8 +354,8 @@ impl Parser {
             },
             TokenType::Or => ParseRule {
                 prefix: None,
-                infix: None,
-                precedence: Precedence::None,
+                infix: Some(Parser::or_),
+                precedence: Precedence::Or,
             },
             TokenType::Print => ParseRule {
                 prefix: None,
@@ -713,6 +713,26 @@ impl Parser {
         }
 
         self.emit_instructions(Byte::Code(OpCode::DefineGlobal), Byte::Raw(var));
+    }
+
+    fn and_(&mut self) {
+        let end_jump = self.emit_jump(OpCode::JumpIfFalse);
+
+        self.emit_instruction(OpCode::Pop);
+        self.parse_precedence(Precedence::And);
+
+        self.patch_jump(end_jump);
+    }
+
+    fn or_(&mut self) {
+        let else_jump = self.emit_jump(OpCode::JumpIfFalse);
+        let end_jump = self.emit_jump(OpCode::Jump);
+
+        self.patch_jump(else_jump);
+        self.emit_instruction(OpCode::Pop);
+
+        self.parse_precedence(Precedence::Or);
+        self.patch_jump(end_jump);
     }
 
     fn add_local(&mut self, name: Token) {
