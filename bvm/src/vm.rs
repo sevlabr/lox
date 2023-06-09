@@ -226,6 +226,10 @@ impl VM {
                         self.ip += offset as usize;
                     }
                 }
+                OpCode::Loop => {
+                    let offset: u16 = self.read_short();
+                    self.ip -= offset as usize;
+                }
                 OpCode::Return => {
                     return Ok(InterpretResult::Ok);
                 }

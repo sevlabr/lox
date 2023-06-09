@@ -35,7 +35,7 @@ pub fn disassemble_instruction(chunk: &Chunk, offset: usize) -> usize {
         OpCode::SetGlobal => constant_instruction("OP_SET_GLOBAL", chunk, offset),
         OpCode::Equal => simple_instruction("OP_EQUAL", offset),
         OpCode::Greater => simple_instruction("OP_GREATER", offset),
-        OpCode::Less => simple_instruction("OP_Less", offset),
+        OpCode::Less => simple_instruction("OP_LESS", offset),
         OpCode::Add => simple_instruction("OP_ADD", offset),
         OpCode::Subtract => simple_instruction("OP_SUBTRACT", offset),
         OpCode::Multiply => simple_instruction("OP_MULTIPLY", offset),
@@ -45,6 +45,7 @@ pub fn disassemble_instruction(chunk: &Chunk, offset: usize) -> usize {
         OpCode::Print => simple_instruction("OP_PRINT", offset),
         OpCode::Jump => jump_instruction("OP_JUMP", 1, chunk, offset),
         OpCode::JumpIfFalse => jump_instruction("OP_JUMP_IF_FALSE", 1, chunk, offset),
+        OpCode::Loop => jump_instruction("OP_LOOP", -1, chunk, offset),
         OpCode::Return => simple_instruction("OP_RETURN", offset),
 
         #[allow(unreachable_patterns)]

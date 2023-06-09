@@ -453,6 +453,18 @@ impl Parser {
         self.current_chunk().borrow_mut().code[offset as usize + 1] = (jump & 0xff) as u8;
     }
 
+    fn emit_loop(&mut self, loop_start: usize) {
+        self.emit_instruction(OpCode::Loop);
+
+        let offset = self.current_chunk().borrow().code.len() - loop_start + 2;
+        if offset > u16::MAX as usize {
+            self.error("Loop body too large.".to_string());
+        }
+
+        self.emit_raw_instruction(((offset >> 8) & 0xff) as u8);
+        self.emit_raw_instruction((offset & 0xff) as u8);
+    }
+
     fn write_value(&self, value: Value) -> usize {
         self.current_chunk().borrow_mut().write_value(value)
     }
@@ -499,6 +511,8 @@ impl Parser {
             self.print_stmt();
         } else if self.fit(TokenType::If) {
             self.if_stmt();
+        } else if self.fit(TokenType::While) {
+            self.while_stmt();
         } else if self.fit(TokenType::LeftBrace) {
             self.begin_scope();
             self.block();
@@ -538,6 +552,21 @@ impl Parser {
             self.statement();
         }
         self.patch_jump(else_jump);
+    }
+
+    fn while_stmt(&mut self) {
+        let loop_start = self.current_chunk().borrow().code.len();
+        self.consume(TokenType::LeftParen, "Expect '(' after 'while'.");
+        self.expression();
+        self.consume(TokenType::RightParen, "Expect ')' after condition.");
+
+        let exit_jump = self.emit_jump(OpCode::JumpIfFalse);
+        self.emit_instruction(OpCode::Pop);
+        self.statement();
+        self.emit_loop(loop_start);
+
+        self.patch_jump(exit_jump);
+        self.emit_instruction(OpCode::Pop);
     }
 
     fn block(&mut self) {
