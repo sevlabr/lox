@@ -509,6 +509,8 @@ impl Parser {
     fn statement(&mut self) {
         if self.fit(TokenType::Print) {
             self.print_stmt();
+        } else if self.fit(TokenType::For) {
+            self.for_stmt();
         } else if self.fit(TokenType::If) {
             self.if_stmt();
         } else if self.fit(TokenType::While) {
@@ -567,6 +569,51 @@ impl Parser {
 
         self.patch_jump(exit_jump);
         self.emit_instruction(OpCode::Pop);
+    }
+
+    fn for_stmt(&mut self) {
+        self.begin_scope();
+        self.consume(TokenType::LeftParen, "Expect '(' after 'for'.");
+        if self.fit(TokenType::Semicolon) {
+            // No initializer.
+        } else if self.fit(TokenType::Var) {
+            self.var_declaration();
+        } else {
+            self.expression_stmt();
+        }
+
+        let mut loop_start = self.current_chunk().borrow().code.len();
+        let mut exit_jump: isize = -1;
+        if !self.fit(TokenType::Semicolon) {
+            self.expression();
+            self.consume(TokenType::Semicolon, "Expect ';' after loop condition.");
+
+            // Jump out of the loop if the condition is false.
+            exit_jump = self.emit_jump(OpCode::JumpIfFalse);
+            self.emit_instruction(OpCode::Pop); // Condition.
+        }
+
+        if !self.fit(TokenType::RightParen) {
+            let body_jump = self.emit_jump(OpCode::Jump);
+            let increment_start = self.current_chunk().borrow().code.len();
+            self.expression();
+            self.emit_instruction(OpCode::Pop);
+            self.consume(TokenType::RightParen, "Expect ')' after for clauses.");
+
+            self.emit_loop(loop_start);
+            loop_start = increment_start;
+            self.patch_jump(body_jump);
+        }
+
+        self.statement();
+        self.emit_loop(loop_start);
+
+        if exit_jump != -1 {
+            self.patch_jump(exit_jump);
+            self.emit_instruction(OpCode::Pop); // Condition.
+        }
+
+        self.end_scope();
     }
 
     fn block(&mut self) {
