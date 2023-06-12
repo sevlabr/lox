@@ -1,14 +1,37 @@
-use crate::chunk::{Chunk, OpCode};
+use crate::chunk::OpCode;
 use crate::compiler::Parser;
 use crate::debug::{disassemble_chunk, disassemble_instruction};
-use crate::object::Obj;
+use crate::object::{Function, Obj};
 use crate::scanner::print_tokens;
 use crate::value::Value;
 use crate::Config;
 use std::collections::{HashMap, LinkedList};
 use std::{cell::RefCell, rc::Rc};
 
-const STACK_MAX: usize = 256;
+const FRAMES_MAX: usize = 64;
+const STACK_MAX: usize = FRAMES_MAX * 256;
+
+pub struct CallFrame {
+    function: Rc<RefCell<Function>>,
+    ip: usize,
+    slots: usize,
+}
+
+impl Default for CallFrame {
+    fn default() -> Self {
+        Self::new(Rc::new(RefCell::new(Function::default())), 0, 0)
+    }
+}
+
+impl CallFrame {
+    fn new(function: Rc<RefCell<Function>>, ip: usize, slots: usize) -> Self {
+        Self {
+            function,
+            ip,
+            slots,
+        }
+    }
+}
 
 pub enum InterpretResult {
     Ok,
@@ -17,9 +40,11 @@ pub enum InterpretResult {
 }
 
 pub struct VM {
+    frames: [CallFrame; FRAMES_MAX],
+    frame_count: isize,
+
     config: Config,
-    chunk: Rc<RefCell<Chunk>>,
-    ip: usize,
+
     stack: Vec<Value>,
     stack_top: usize,
 
@@ -32,9 +57,9 @@ pub struct VM {
 impl Default for VM {
     fn default() -> Self {
         VM {
+            frames: [(); FRAMES_MAX].map(|_| CallFrame::default()),
+            frame_count: 0,
             config: Config::default(),
-            chunk: Rc::new(RefCell::new(Chunk::default())),
-            ip: 0,
             stack: vec![Value::Nil; STACK_MAX],
             stack_top: 0,
             objects: LinkedList::new(),
@@ -45,18 +70,18 @@ impl Default for VM {
 
 impl VM {
     pub fn new(
+        frames: [CallFrame; FRAMES_MAX],
+        frame_count: isize,
         config: Config,
-        chunk: Chunk,
-        ip: usize,
         stack: Vec<Value>,
         stack_top: usize,
         objects: LinkedList<*mut Obj>,
         globals: HashMap<String, Value>,
     ) -> Self {
         VM {
+            frames,
+            frame_count,
             config,
-            chunk: Rc::new(RefCell::new(chunk)),
-            ip,
             stack,
             stack_top,
             objects,
@@ -88,25 +113,30 @@ impl VM {
         self.stack[self.stack_top].clone()
     }
 
-    pub fn set_chunk(&mut self, chunk: Rc<RefCell<Chunk>>) {
-        self.chunk = chunk;
-    }
-
     pub fn interpret(&mut self, source: String) -> InterpretResult {
         if self.config.scanner {
             print_tokens(source);
             InterpretResult::Ok
         } else {
-            let chunk = Rc::new(RefCell::new(Chunk::new()));
             let mut parser = Parser::new(self.config);
-            match parser.compile(source, Rc::clone(&chunk)) {
-                Ok(_) => {
-                    self.set_chunk(chunk);
+            match parser.compile(source) {
+                Ok(function) => {
+                    self.push(Value::Obj(Obj::Fun(function.borrow().clone())));
+                    let frame = self
+                        .frames
+                        .get_mut(self.frame_count as usize)
+                        .expect("Instruction pointer is out of vm.frames bounds.");
+                    self.frame_count += 1;
+                    frame.function = function;
+                    frame.ip = 0;
+                    frame.slots = 0;
+
                     if self.config.bytecode {
-                        disassemble_chunk(&self.chunk.borrow(), "code");
+                        let chunk = (*frame.function).borrow().chunk();
+                        let chunk = (*chunk).borrow();
+                        disassemble_chunk(&chunk, "code");
                         InterpretResult::Ok
                     } else {
-                        self.ip = 0;
                         match self.run() {
                             Ok(result) => result,
                             Err(result) => result,
@@ -134,7 +164,13 @@ impl VM {
                 }
                 println!();
 
-                disassemble_instruction(&self.chunk.borrow(), self.ip);
+                let frame = self
+                    .frames
+                    .get(self.frame_count as usize - 1)
+                    .expect("Instruction pointer is out of vm.frames bounds.");
+                let chunk = (*frame.function).borrow().chunk();
+                let chunk = (*chunk).borrow();
+                disassemble_instruction(&chunk, frame.ip);
             }
 
             let raw_instruction = self.read_byte();
@@ -153,12 +189,21 @@ impl VM {
                 }
                 OpCode::GetLocal => {
                     let slot = self.read_byte();
-                    let val = self.stack[slot as usize].clone();
+                    let frame = self
+                        .frames
+                        .get_mut(self.frame_count as usize - 1)
+                        .expect("Instruction pointer is out of vm.frames bounds.");
+                    let val = self.stack[frame.slots + slot as usize].clone();
                     self.push(val);
                 }
                 OpCode::SetLocal => {
                     let slot = self.read_byte();
-                    self.stack[slot as usize] = self.peek(0);
+                    let value = self.peek(0);
+                    let frame = self
+                        .frames
+                        .get_mut(self.frame_count as usize - 1)
+                        .expect("Instruction pointer is out of vm.frames bounds.");
+                    self.stack[frame.slots + slot as usize] = value;
                 }
                 OpCode::GetGlobal => {
                     // Safe to not check if it is a string,
@@ -218,17 +263,29 @@ impl VM {
                 }
                 OpCode::Jump => {
                     let offset: u16 = self.read_short();
-                    self.ip += offset as usize;
+                    let frame = self
+                        .frames
+                        .get_mut(self.frame_count as usize - 1)
+                        .expect("Instruction pointer is out of vm.frames bounds.");
+                    frame.ip += offset as usize;
                 }
                 OpCode::JumpIfFalse => {
                     let offset: u16 = self.read_short();
                     if self.peek(0).is_falsey() {
-                        self.ip += offset as usize;
+                        let frame = self
+                            .frames
+                            .get_mut(self.frame_count as usize - 1)
+                            .expect("Instruction pointer is out of vm.frames bounds.");
+                        frame.ip += offset as usize;
                     }
                 }
                 OpCode::Loop => {
                     let offset: u16 = self.read_short();
-                    self.ip -= offset as usize;
+                    let frame = self
+                        .frames
+                        .get_mut(self.frame_count as usize - 1)
+                        .expect("Instruction pointer is out of vm.frames bounds.");
+                    frame.ip -= offset as usize;
                 }
                 OpCode::Return => {
                     return Ok(InterpretResult::Ok);
@@ -244,19 +301,30 @@ impl VM {
     }
 
     fn read_byte(&mut self) -> u8 {
-        let chunk = self.chunk.borrow();
+        let frame = self
+            .frames
+            .get_mut(self.frame_count as usize - 1)
+            .expect("Instruction pointer is out of vm.frames bounds.");
+        let ip = &mut frame.ip;
+        let chunk = (*frame.function).borrow().chunk();
+        let chunk = (*chunk).borrow();
         let raw_instruction = chunk
             .code
-            .get(self.ip)
-            .expect("instruction pointer is out of chunk.code bounds.");
-        self.ip += 1;
+            .get(*ip)
+            .expect("Instruction pointer is out of chunk.code bounds.");
+        *ip += 1;
         *raw_instruction
     }
 
     fn read_constant(&mut self) -> Value {
         let index = self.read_byte() as usize;
-        self.chunk
-            .borrow()
+        let frame = self
+            .frames
+            .get(self.frame_count as usize - 1)
+            .expect("Instruction pointer is out of vm.frames bounds.");
+        let chunk = (*frame.function).borrow().chunk();
+        let chunk = (*chunk).borrow();
+        chunk
             .constants
             .get(index)
             .expect("Index of a constant value is out of bounds.")
@@ -264,10 +332,16 @@ impl VM {
     }
 
     fn read_short(&mut self) -> u16 {
-        self.ip += 2;
-        let chunk = self.chunk.borrow();
-        let offset = chunk.code[self.ip - 2] as u16;
-        (offset << 8) | (chunk.code[self.ip - 1] as u16)
+        let frame = self
+            .frames
+            .get_mut(self.frame_count as usize - 1)
+            .expect("Instruction pointer is out of vm.frames bounds.");
+        let ip = &mut frame.ip;
+        *ip += 2;
+        let chunk = (*frame.function).borrow().chunk();
+        let chunk = (*chunk).borrow();
+        let offset = chunk.code[*ip - 2] as u16;
+        (offset << 8) | (chunk.code[*ip - 1] as u16)
     }
 
     fn binary_op(&mut self, op: &str) -> Result<(), InterpretResult> {
@@ -316,10 +390,28 @@ impl VM {
     }
 
     fn runtime_error(&mut self, message: String) {
+        let frame = self
+            .frames
+            .get(self.frame_count as usize - 1)
+            .expect("Instruction pointer is out of vm.frames bounds.");
+        let chunk = (*frame.function).borrow().chunk();
+        let chunk = (*chunk).borrow();
+
         eprintln!("{message}");
-        let instruction = self.ip - 1;
-        let line = self.chunk.borrow().lines[instruction];
+        let instruction = frame.ip - 1;
+        let line = chunk.lines[instruction];
         eprintln!("[line {}] in script", line);
+
+        if self.config.debug {
+            let name = if frame.function.borrow().name().is_empty() {
+                "<script>".to_string()
+            } else {
+                frame.function.borrow().name()
+            };
+            println!();
+            disassemble_chunk(&chunk, &name)
+        }
+
         self.reset_stack();
     }
 
@@ -352,6 +444,9 @@ impl VM {
         if !loc.is_null() {
             unsafe {
                 match *loc {
+                    Obj::Fun(ref mut fun) => {
+                        fun.free();
+                    }
                     Obj::Str(ref mut s) => {
                         s.clear() // This does not do the job.
                                   // s.zeroize();

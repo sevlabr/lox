@@ -1,6 +1,6 @@
 use crate::chunk::{Chunk, OpCode};
 use crate::debug::disassemble_chunk;
-use crate::object::Obj;
+use crate::object::{Function, Obj};
 use crate::scanner::Scanner;
 use crate::token::{Token, TokenType};
 use crate::value::Value;
@@ -77,9 +77,18 @@ impl Local {
     }
 }
 
+enum FunType {
+    #[allow(dead_code)]
+    Function,
+    Script,
+}
+
 const UINT8_COUNT: usize = u8::MAX as usize + 1;
 
 struct Compiler {
+    function: Rc<RefCell<Function>>,
+    kind: FunType,
+
     locals: [Local; UINT8_COUNT],
     local_count: isize,
     scope_depth: isize,
@@ -87,23 +96,45 @@ struct Compiler {
 
 impl Default for Compiler {
     fn default() -> Self {
-        Self::new([Local::default(); UINT8_COUNT], -20, -30)
+        let function = Rc::new(RefCell::new(Function::new()));
+        Self::new(
+            function,
+            FunType::Script,
+            [Local::default(); UINT8_COUNT],
+            -20,
+            -30,
+        )
     }
 }
 
 impl Compiler {
-    pub fn new(locals: [Local; UINT8_COUNT], local_count: isize, scope_depth: isize) -> Self {
+    pub fn new(
+        function: Rc<RefCell<Function>>,
+        kind: FunType,
+        locals: [Local; UINT8_COUNT],
+        local_count: isize,
+        scope_depth: isize,
+    ) -> Self {
         Self {
+            function,
+            kind,
             locals,
             local_count,
             scope_depth,
         }
     }
+
+    fn current_fun(&self) -> Rc<RefCell<Function>> {
+        Rc::clone(&self.function)
+    }
+
+    fn set_fun_kind(&mut self, fun_kind: FunType) {
+        self.kind = fun_kind;
+    }
 }
 
 pub struct Parser {
     config: Config,
-    chunk: Rc<RefCell<Chunk>>,
     compiler: Compiler,
     scanner: Scanner,
     current: Token,
@@ -122,7 +153,6 @@ impl Parser {
     pub fn new(config: Config) -> Self {
         Self {
             config,
-            chunk: Rc::new(RefCell::new(Chunk::new())),
             compiler: Compiler::default(),
             scanner: Scanner::default(),
             current: Token::default(),
@@ -132,43 +162,43 @@ impl Parser {
         }
     }
 
-    fn set_chunk(&mut self, chunk: Rc<RefCell<Chunk>>) {
-        self.chunk = chunk;
-    }
-
     fn set_scanner(&mut self, source: String) {
         self.scanner = Scanner::new(source)
     }
 
-    fn init_compiler(&mut self) {
+    fn init_compiler(&mut self, fun_kind: FunType) {
+        self.compiler.set_fun_kind(fun_kind);
         self.compiler.local_count = 0;
         self.compiler.scope_depth = 0;
+
+        let local = &mut self.compiler.locals[self.compiler.local_count as usize];
+        self.compiler.local_count += 1;
+        local.depth = 0;
+        // name == ""
+        local.name.kind = TokenType::Identifier;
+        local.name.start = 0;
+        local.name.length = 0;
     }
 
     fn current_chunk(&self) -> Rc<RefCell<Chunk>> {
-        Rc::clone(&self.chunk)
+        Rc::clone(&self.compiler.current_fun().borrow_mut().chunk())
     }
 
-    pub fn compile(
-        &mut self,
-        source: String,
-        chunk: Rc<RefCell<Chunk>>,
-    ) -> Result<(), CompileError> {
+    pub fn compile(&mut self, source: String) -> Result<Rc<RefCell<Function>>, CompileError> {
         self.set_scanner(source);
-        self.init_compiler();
-        self.set_chunk(chunk);
+        self.init_compiler(FunType::Script);
         self.advance();
 
         while !self.fit(TokenType::EoF) {
             self.declaration();
         }
 
-        self.end_compiler();
+        let function = self.end_compiler();
 
         if self.had_error {
             return Err(CompileError::new("had_error = true."));
         }
-        Ok(())
+        Ok(function)
     }
 
     fn parse_precedence(&mut self, precedence: Precedence) {
@@ -947,11 +977,21 @@ impl Parser {
         }
     }
 
-    fn end_compiler(&self) {
+    fn end_compiler(&self) -> Rc<RefCell<Function>> {
         self.emit_return();
+        let function = self.compiler.current_fun();
+
         if self.config.debug && self.had_error {
-            disassemble_chunk(&self.chunk.borrow(), "code")
+            let name = if function.borrow().name().is_empty() {
+                "<script>".to_string()
+            } else {
+                function.borrow().name()
+            };
+            println!();
+            disassemble_chunk(&self.current_chunk().borrow(), &name)
         }
+
+        function
     }
 
     fn begin_scope(&mut self) {

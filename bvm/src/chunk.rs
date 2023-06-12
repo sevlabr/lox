@@ -1,5 +1,6 @@
 use crate::value::Value;
 
+#[derive(Clone)]
 pub struct Chunk {
     pub code: Vec<u8>,
     pub lines: Vec<isize>,
@@ -34,6 +35,16 @@ impl Chunk {
     pub fn write_value(&mut self, value: Value) -> usize {
         self.constants.push(value);
         self.constants.len() - 1
+    }
+
+    // Example function for deallocation. May change later.
+    // Supposed to be used for GC.
+    // (Also check Zeroize crate if needed since this implementation
+    // actually doesn't free anything).
+    pub fn free(&mut self) {
+        self.code.clear();
+        self.lines.clear();
+        self.constants.clear();
     }
 }
 
