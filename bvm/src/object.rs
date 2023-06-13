@@ -84,12 +84,24 @@ impl Function {
         }
     }
 
+    pub fn arity(&self) -> isize {
+        self.arity
+    }
+
+    pub fn change_arity(&mut self, arity: isize) {
+        self.arity = arity;
+    }
+
     pub fn chunk(&self) -> Rc<RefCell<Chunk>> {
         Rc::clone(&self.chunk)
     }
 
     pub fn name(&self) -> String {
         self.name.clone()
+    }
+
+    pub fn set_name(&mut self, name: String) {
+        self.name = name;
     }
 
     // Example function for deallocation. May change later.

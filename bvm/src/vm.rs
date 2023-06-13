@@ -121,7 +121,9 @@ impl VM {
             let mut parser = Parser::new(self.config);
             match parser.compile(source) {
                 Ok(function) => {
-                    self.push(Value::Obj(Obj::Fun(function.borrow().clone())));
+                    self.push(Value::Obj(Obj::Fun((*function).borrow().clone())));
+
+                    // self.call(function.clone() // .borrow().clone(), 0);
                     let frame = self
                         .frames
                         .get_mut(self.frame_count as usize)
@@ -287,8 +289,26 @@ impl VM {
                         .expect("Instruction pointer is out of vm.frames bounds.");
                     frame.ip -= offset as usize;
                 }
+                OpCode::Call => {
+                    let arg_count = self.read_byte() as usize;
+                    if !self.call_value(self.peek(arg_count), arg_count) {
+                        return Err(InterpretResult::RuntimeError);
+                    }
+                }
                 OpCode::Return => {
-                    return Ok(InterpretResult::Ok);
+                    let result = self.pop();
+                    self.frame_count -= 1;
+                    if self.frame_count == 0 {
+                        self.pop();
+                        return Ok(InterpretResult::Ok);
+                    }
+
+                    let frame = self
+                        .frames
+                        .get(self.frame_count as usize)
+                        .expect("Instruction pointer is out of vm.frames bounds.");
+                    self.stack_top = frame.slots;
+                    self.push(result);
                 }
 
                 #[allow(unreachable_patterns)]
@@ -389,24 +409,75 @@ impl VM {
         self.stack[self.stack_top - 1 - distance].clone()
     }
 
-    fn runtime_error(&mut self, message: String) {
+    fn call(&mut self, function: Function, arg_count: usize) -> bool {
+        if arg_count != function.arity() as usize {
+            self.runtime_error(format!(
+                "Expected {} arguments but got {}.",
+                function.arity(),
+                arg_count
+            ));
+            return false;
+        }
+
+        if self.frame_count as usize == FRAMES_MAX {
+            self.runtime_error("Stack overflow.".to_string());
+            return false;
+        }
+
         let frame = self
             .frames
-            .get(self.frame_count as usize - 1)
+            .get_mut(self.frame_count as usize)
             .expect("Instruction pointer is out of vm.frames bounds.");
-        let chunk = (*frame.function).borrow().chunk();
-        let chunk = (*chunk).borrow();
+        self.frame_count += 1;
+        frame.function = Rc::new(RefCell::new(function));
+        frame.ip = 0;
+        frame.slots = self.stack_top - arg_count - 1;
+        true
+    }
 
-        eprintln!("{message}");
-        let instruction = frame.ip - 1;
-        let line = chunk.lines[instruction];
-        eprintln!("[line {}] in script", line);
+    fn call_value(&mut self, callee: Value, arg_count: usize) -> bool {
+        if callee.is_obj() {
+            #[allow(clippy::single_match)]
+            match callee {
+                Value::Obj(Obj::Fun(callee)) => {
+                    return self.call(callee, arg_count);
+                }
+                // Non-callable object type.
+                _ => (),
+            }
+        }
+        self.runtime_error("Can only call functions and classes.".to_string());
+        false
+    }
+
+    fn runtime_error(&mut self, message: String) {
+        eprintln!("\nRuntimeError: {message}");
+        for frame in self.frames.iter().take(self.frame_count as usize).rev() {
+            let function = frame.function.borrow();
+            let instruction = frame.ip - 1;
+            let chunk = function.chunk();
+            let chunk = chunk.borrow();
+            let line = chunk.lines[instruction];
+            eprint!("[line {}] in ", line);
+            if function.name().is_empty() {
+                eprintln!("script");
+            } else {
+                eprintln!("{}()", function.name());
+            }
+        }
 
         if self.config.debug {
-            let name = if frame.function.borrow().name().is_empty() {
+            let frame = self
+                .frames
+                .get(self.frame_count as usize - 1)
+                .expect("Instruction pointer is out of vm.frames bounds.");
+            let chunk = (*frame.function).borrow().chunk();
+            let chunk = (*chunk).borrow();
+
+            let name = if (*frame.function).borrow().name().is_empty() {
                 "<script>".to_string()
             } else {
-                frame.function.borrow().name()
+                (*frame.function).borrow().name()
             };
             println!();
             disassemble_chunk(&chunk, &name)

@@ -46,6 +46,7 @@ pub fn disassemble_instruction(chunk: &Chunk, offset: usize) -> usize {
         OpCode::Jump => jump_instruction("OP_JUMP", 1, chunk, offset),
         OpCode::JumpIfFalse => jump_instruction("OP_JUMP_IF_FALSE", 1, chunk, offset),
         OpCode::Loop => jump_instruction("OP_LOOP", -1, chunk, offset),
+        OpCode::Call => byte_instruction("OP_CALL", chunk, offset),
         OpCode::Return => simple_instruction("OP_RETURN", offset),
 
         #[allow(unreachable_patterns)]
