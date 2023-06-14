@@ -24,7 +24,8 @@ Some kind of a summary of `result.out` contents. The 2nd and the 3rd columns is 
 *OFF* means no optimizations, *ON* means best result with optimizations.
 
 **Note**: in fact, tree-walk variant of *Lox* that I wrote is so slow, that I report results here based not on a
-real evaluation, but on estimation (see details in ...).
+real evaluation, but on estimation
+(see details in [test](../twi/example/fib.lox) and [output](../twi/example/fib.out) files).
 
 | Language | OFF | ON |
 |---|---|---|
@@ -33,7 +34,7 @@ real evaluation, but on estimation (see details in ...).
 | Go | 0.5 | - |
 | Haskell | 9 | 0.5 |
 | Julia | 0.5 | 0.5 |
-| Lox (bvm) | - | - |
+| Lox (bvm) | 1120 | 147 |
 | Lox (twi) | $\sim 10^5$ | $\sim 10^4$ |
 | Python | 15 | - |
 | Rust | 1 | 0.3 |
