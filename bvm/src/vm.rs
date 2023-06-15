@@ -1,7 +1,7 @@
 use crate::chunk::OpCode;
 use crate::compiler::Parser;
 use crate::debug::{disassemble_chunk, disassemble_instruction};
-use crate::object::{Function, Obj};
+use crate::object::{Function, Native, Obj};
 use crate::scanner::print_tokens;
 use crate::value::Value;
 use crate::Config;
@@ -95,6 +95,8 @@ impl VM {
 
     pub fn init(&mut self) {
         self.reset_stack();
+
+        self.define_native("clock");
     }
 
     fn reset_stack(&mut self) {
@@ -437,10 +439,15 @@ impl VM {
 
     fn call_value(&mut self, callee: Value, arg_count: usize) -> bool {
         if callee.is_obj() {
-            #[allow(clippy::single_match)]
             match callee {
                 Value::Obj(Obj::Fun(callee)) => {
                     return self.call(callee, arg_count);
+                }
+                Value::Obj(Obj::BuiltIn(native)) => {
+                    let result = native.call(arg_count, self.stack_top - arg_count);
+                    self.stack_top -= arg_count + 1;
+                    self.push(result);
+                    return true;
                 }
                 // Non-callable object type.
                 _ => (),
@@ -448,6 +455,17 @@ impl VM {
         }
         self.runtime_error("Can only call functions and classes.".to_string());
         false
+    }
+
+    fn define_native(&mut self, name: &str) {
+        let name = name.to_string();
+        self.push(Value::Obj(Obj::Str(name.clone())));
+        self.push(Value::Obj(Obj::BuiltIn(Native::new(name))));
+        let name = unsafe { self.stack[0].as_obj().as_string() };
+        let native_fun = self.stack[1].clone();
+        self.globals.insert(name, native_fun);
+        self.pop();
+        self.pop();
     }
 
     fn runtime_error(&mut self, message: String) {
@@ -515,6 +533,7 @@ impl VM {
         if !loc.is_null() {
             unsafe {
                 match *loc {
+                    Obj::BuiltIn(_) => (),
                     Obj::Fun(ref mut fun) => {
                         fun.free();
                     }

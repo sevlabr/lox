@@ -5,7 +5,8 @@ use std::process;
 
 fn main() {
     let mut config = Config::default();
-    let vm = VM::default();
+    let mut vm = VM::default();
+    vm.init();
 
     let mut args: Vec<String> = env::args().collect();
     match args.len() {

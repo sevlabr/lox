@@ -1,8 +1,10 @@
 use crate::chunk::Chunk;
+use crate::value::Value;
 use std::{cell::RefCell, fmt, rc::Rc};
 
 #[derive(Clone, PartialEq, Eq)]
 pub enum Obj {
+    BuiltIn(Native),
     Fun(Function),
     Str(String),
 }
@@ -10,6 +12,7 @@ pub enum Obj {
 impl fmt::Display for Obj {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
+            Obj::BuiltIn(native) => write!(f, "{}", native),
             Obj::Fun(fun) => write!(f, "{}", fun),
             Obj::Str(s) => write!(f, "{}", s),
         }
@@ -17,6 +20,10 @@ impl fmt::Display for Obj {
 }
 
 impl Obj {
+    pub fn is_builtin(&self) -> bool {
+        matches!(self, Obj::BuiltIn(_))
+    }
+
     pub fn is_fun(&self) -> bool {
         matches!(self, Obj::Fun(_))
     }
@@ -27,9 +34,24 @@ impl Obj {
 
     pub fn is_obj_type(&self, kind: &'static str) -> bool {
         match kind {
+            "BuiltIn" => self.is_builtin(),
             "Function" => self.is_fun(),
             "String" => self.is_string(),
-            _ => panic!("Invalid Obj type specified: {}", kind),
+            _ => panic!("Invalid Obj type specified: {}.", kind),
+        }
+    }
+
+    /// Extract inner `Native`. This function returns cloned object,
+    /// not the original one.
+    ///
+    /// # Safety
+    ///
+    /// Fails if `Obj::is_builtin()` returns `false`.
+    /// Use `Obj::is_builtin()` before applying this function.
+    pub unsafe fn as_builtin(&self) -> Native {
+        match self {
+            Obj::BuiltIn(native) => native.clone(),
+            _ => panic!("Expected Native object."),
         }
     }
 
@@ -131,3 +153,34 @@ impl PartialEq for Function {
 }
 
 impl Eq for Function {}
+
+#[derive(Clone, PartialEq, Eq)]
+pub struct Native {
+    name: String,
+}
+
+impl Native {
+    pub fn new(name: String) -> Self {
+        Native { name }
+    }
+
+    pub fn name(&self) -> String {
+        self.name.clone()
+    }
+
+    pub fn call(&self, _arg_count: usize, _args: usize) -> Value {
+        match self.name.as_str() {
+            "clock" => Value::Num(crate::native::clock()),
+            _ => panic!(
+                "Call of unknown Native function with name: '{}'.",
+                self.name
+            ),
+        }
+    }
+}
+
+impl fmt::Display for Native {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "<native fun {}>", &self.name)
+    }
+}
