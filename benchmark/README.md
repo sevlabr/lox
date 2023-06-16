@@ -13,6 +13,8 @@ Bash script that does the whole work is `compile_run.sh`. Raw results are in `re
 
 PC specs: Intel(R) Core(TM) i7-6700HQ CPU @ 2.60GHz (with CPU max GHz: 3.5) and 16 Gb RAM.
 
+OS: Ubuntu 20.04.6 LTS (Focal Fossa)
+
 **Note**: to calculate the 40th Fibonacci number you need to call `fib()` function *331'160'281* times.
 Since optimized versions of C/C++ and Rust take roughly 0.3 seconds to calculate it, seems like they
 don't really call any functions but sort of "elide" them (not sure if I can call it "inlining").
@@ -31,6 +33,7 @@ real evaluation, but on estimation
 |---|---|---|
 | C | 0.6 | 0.3 |
 | C++ | 0.6 | 0.3 |
+| Fortran | 0.8 | 0.5 |
 | Go | 0.5 | - |
 | Haskell | 9 | 0.5 |
 | Julia | 0.5 | 0.5 |
@@ -38,3 +41,4 @@ real evaluation, but on estimation
 | Lox (twi) | $\sim 10^5$ | $\sim 10^4$ |
 | Python | 15 | - |
 | Rust | 1 | 0.3 |
+| Zig | 1 | 0.3 |
