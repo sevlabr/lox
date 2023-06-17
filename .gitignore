@@ -9,6 +9,9 @@ benchmark/fib-?*
 benchmark/fib.hi
 benchmark/fib.o
 
+# original clox for reference
+bvm/clox/
+
 bvm/fib.lox
 bvm/test.lox
 twi/example/debug/debug.*
