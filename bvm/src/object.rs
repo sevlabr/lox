@@ -5,6 +5,7 @@ use std::{cell::RefCell, fmt, rc::Rc};
 #[derive(Clone, PartialEq, Eq)]
 pub enum Obj {
     BuiltIn(Native),
+    Closure(Closure),
     Fun(Function),
     Str(String),
 }
@@ -13,6 +14,11 @@ impl fmt::Display for Obj {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Obj::BuiltIn(native) => write!(f, "{}", native),
+            Obj::Closure(closure) => {
+                // debug version:
+                // write!(f, "[ Closure: {} ]", closure.function.borrow())
+                write!(f, "{}", closure.function.borrow())
+            }
             Obj::Fun(fun) => write!(f, "{}", fun),
             Obj::Str(s) => write!(f, "{}", s),
         }
@@ -22,6 +28,10 @@ impl fmt::Display for Obj {
 impl Obj {
     pub fn is_builtin(&self) -> bool {
         matches!(self, Obj::BuiltIn(_))
+    }
+
+    pub fn is_closure(&self) -> bool {
+        matches!(self, Obj::Closure(_))
     }
 
     pub fn is_fun(&self) -> bool {
@@ -35,6 +45,7 @@ impl Obj {
     pub fn is_obj_type(&self, kind: &'static str) -> bool {
         match kind {
             "BuiltIn" => self.is_builtin(),
+            "Closure" => self.is_closure(),
             "Function" => self.is_fun(),
             "String" => self.is_string(),
             _ => panic!("Invalid Obj type specified: {}.", kind),
@@ -52,6 +63,20 @@ impl Obj {
         match self {
             Obj::BuiltIn(native) => native.clone(),
             _ => panic!("Expected Native object."),
+        }
+    }
+
+    /// Extract inner `Closure`. This function returns cloned object,
+    /// not the original one.
+    ///
+    /// # Safety
+    ///
+    /// Fails if `Obj::is_closure()` returns `false`.
+    /// Use `Obj::is_closure()` before applying this function.
+    pub unsafe fn as_closure(&self) -> Closure {
+        match self {
+            Obj::Closure(closure) => closure.clone(),
+            _ => panic!("Expected Closure object."),
         }
     }
 
@@ -153,6 +178,41 @@ impl PartialEq for Function {
 }
 
 impl Eq for Function {}
+
+#[derive(Clone)]
+pub struct Closure {
+    function: Rc<RefCell<Function>>,
+}
+
+impl Default for Closure {
+    fn default() -> Self {
+        Self::new(&Rc::new(RefCell::new(Function::default())))
+    }
+}
+
+impl Closure {
+    pub fn new(function: &Rc<RefCell<Function>>) -> Self {
+        Closure {
+            function: function.clone(),
+        }
+    }
+
+    pub fn function(&self) -> Rc<RefCell<Function>> {
+        Rc::clone(&self.function)
+    }
+
+    pub fn chunk(&self) -> Rc<RefCell<Chunk>> {
+        self.function.borrow().chunk()
+    }
+}
+
+impl PartialEq for Closure {
+    fn eq(&self, other: &Self) -> bool {
+        *self.function.borrow() == *other.function.borrow()
+    }
+}
+
+impl Eq for Closure {}
 
 #[derive(Clone, PartialEq, Eq)]
 pub struct Native {

@@ -9,7 +9,7 @@ pub fn disassemble_chunk(chunk: &Chunk, name: &str) {
     }
 }
 
-pub fn disassemble_instruction(chunk: &Chunk, offset: usize) -> usize {
+pub fn disassemble_instruction(chunk: &Chunk, mut offset: usize) -> usize {
     let instruction = chunk
         .code
         .get(offset)
@@ -47,6 +47,16 @@ pub fn disassemble_instruction(chunk: &Chunk, offset: usize) -> usize {
         OpCode::JumpIfFalse => jump_instruction("OP_JUMP_IF_FALSE", 1, chunk, offset),
         OpCode::Loop => jump_instruction("OP_LOOP", -1, chunk, offset),
         OpCode::Call => byte_instruction("OP_CALL", chunk, offset),
+        OpCode::Closure => {
+            offset += 1;
+            let constant = chunk.code[offset];
+            offset += 1;
+            println!(
+                "{:16} {:4} {}",
+                "OP_CLOSURE", constant, chunk.constants[constant as usize]
+            );
+            offset
+        }
         OpCode::Return => simple_instruction("OP_RETURN", offset),
 
         #[allow(unreachable_patterns)]

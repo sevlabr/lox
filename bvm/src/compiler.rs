@@ -723,7 +723,8 @@ impl Parser {
         self.block();
 
         let function = self.end_compiler();
-        self.emit_constant(Value::Obj(Obj::Fun(function.borrow().clone())));
+        let index = Byte::Raw(self.make_constant(Value::Obj(Obj::Fun(function.borrow().clone()))));
+        self.emit_instructions(Byte::Code(OpCode::Closure), index);
     }
 
     fn expression(&mut self) {

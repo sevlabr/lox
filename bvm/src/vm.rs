@@ -1,7 +1,7 @@
 use crate::chunk::OpCode;
 use crate::compiler::Parser;
 use crate::debug::{disassemble_chunk, disassemble_instruction};
-use crate::object::{Function, Native, Obj};
+use crate::object::{Closure, Native, Obj};
 use crate::scanner::print_tokens;
 use crate::value::Value;
 use crate::Config;
@@ -12,24 +12,20 @@ const FRAMES_MAX: usize = 64;
 const STACK_MAX: usize = FRAMES_MAX * 256;
 
 pub struct CallFrame {
-    function: Rc<RefCell<Function>>,
+    closure: Rc<RefCell<Closure>>,
     ip: usize,
     slots: usize,
 }
 
 impl Default for CallFrame {
     fn default() -> Self {
-        Self::new(Rc::new(RefCell::new(Function::default())), 0, 0)
+        Self::new(Rc::new(RefCell::new(Closure::default())), 0, 0)
     }
 }
 
 impl CallFrame {
-    fn new(function: Rc<RefCell<Function>>, ip: usize, slots: usize) -> Self {
-        Self {
-            function,
-            ip,
-            slots,
-        }
+    fn new(closure: Rc<RefCell<Closure>>, ip: usize, slots: usize) -> Self {
+        Self { closure, ip, slots }
     }
 }
 
@@ -124,6 +120,10 @@ impl VM {
             match parser.compile(source) {
                 Ok(function) => {
                     self.push(Value::Obj(Obj::Fun((*function).borrow().clone())));
+                    let closure = Closure::new(&function);
+                    let closure_ref = Rc::new(RefCell::new(closure.clone()));
+                    self.pop();
+                    self.push(Value::Obj(Obj::Closure(closure)));
 
                     // self.call(function.clone() // .borrow().clone(), 0);
                     let frame = self
@@ -131,12 +131,12 @@ impl VM {
                         .get_mut(self.frame_count as usize)
                         .expect("Instruction pointer is out of vm.frames bounds.");
                     self.frame_count += 1;
-                    frame.function = function;
+                    frame.closure = closure_ref;
                     frame.ip = 0;
                     frame.slots = 0;
 
                     if self.config.bytecode {
-                        let chunk = (*frame.function).borrow().chunk();
+                        let chunk = (*frame.closure).borrow().chunk();
                         let chunk = (*chunk).borrow();
                         disassemble_chunk(&chunk, "code");
                         InterpretResult::Ok
@@ -172,7 +172,7 @@ impl VM {
                     .frames
                     .get(self.frame_count as usize - 1)
                     .expect("Instruction pointer is out of vm.frames bounds.");
-                let chunk = (*frame.function).borrow().chunk();
+                let chunk = (*frame.closure).borrow().chunk();
                 let chunk = (*chunk).borrow();
                 disassemble_instruction(&chunk, frame.ip);
             }
@@ -297,6 +297,15 @@ impl VM {
                         return Err(InterpretResult::RuntimeError);
                     }
                 }
+                OpCode::Closure => {
+                    let function = self.read_constant();
+                    if function.is_obj_type("Function") {
+                        let function = unsafe { function.as_obj().as_fun() };
+                        let function = Rc::new(RefCell::new(function));
+                        let closure = Closure::new(&function);
+                        self.push(Value::Obj(Obj::Closure(closure)));
+                    }
+                }
                 OpCode::Return => {
                     let result = self.pop();
                     self.frame_count -= 1;
@@ -328,7 +337,7 @@ impl VM {
             .get_mut(self.frame_count as usize - 1)
             .expect("Instruction pointer is out of vm.frames bounds.");
         let ip = &mut frame.ip;
-        let chunk = (*frame.function).borrow().chunk();
+        let chunk = (*frame.closure).borrow().chunk();
         let chunk = (*chunk).borrow();
         let raw_instruction = chunk
             .code
@@ -344,7 +353,7 @@ impl VM {
             .frames
             .get(self.frame_count as usize - 1)
             .expect("Instruction pointer is out of vm.frames bounds.");
-        let chunk = (*frame.function).borrow().chunk();
+        let chunk = (*frame.closure).borrow().chunk();
         let chunk = (*chunk).borrow();
         chunk
             .constants
@@ -360,7 +369,7 @@ impl VM {
             .expect("Instruction pointer is out of vm.frames bounds.");
         let ip = &mut frame.ip;
         *ip += 2;
-        let chunk = (*frame.function).borrow().chunk();
+        let chunk = (*frame.closure).borrow().chunk();
         let chunk = (*chunk).borrow();
         let offset = chunk.code[*ip - 2] as u16;
         (offset << 8) | (chunk.code[*ip - 1] as u16)
@@ -411,7 +420,9 @@ impl VM {
         self.stack[self.stack_top - 1 - distance].clone()
     }
 
-    fn call(&mut self, function: Function, arg_count: usize) -> bool {
+    fn call(&mut self, closure: Closure, arg_count: usize) -> bool {
+        let function = closure.function();
+        let function = function.borrow();
         if arg_count != function.arity() as usize {
             self.runtime_error(format!(
                 "Expected {} arguments but got {}.",
@@ -431,7 +442,7 @@ impl VM {
             .get_mut(self.frame_count as usize)
             .expect("Instruction pointer is out of vm.frames bounds.");
         self.frame_count += 1;
-        frame.function = Rc::new(RefCell::new(function));
+        frame.closure = Rc::new(RefCell::new(closure));
         frame.ip = 0;
         frame.slots = self.stack_top - arg_count - 1;
         true
@@ -440,7 +451,7 @@ impl VM {
     fn call_value(&mut self, callee: Value, arg_count: usize) -> bool {
         if callee.is_obj() {
             match callee {
-                Value::Obj(Obj::Fun(callee)) => {
+                Value::Obj(Obj::Closure(callee)) => {
                     return self.call(callee, arg_count);
                 }
                 Value::Obj(Obj::BuiltIn(native)) => {
@@ -471,7 +482,9 @@ impl VM {
     fn runtime_error(&mut self, message: String) {
         eprintln!("\nRuntimeError: {message}");
         for frame in self.frames.iter().take(self.frame_count as usize).rev() {
-            let function = frame.function.borrow();
+            let closure = frame.closure.borrow();
+            let function = closure.function();
+            let function = function.borrow();
             let instruction = frame.ip - 1;
             let chunk = function.chunk();
             let chunk = chunk.borrow();
@@ -489,13 +502,14 @@ impl VM {
                 .frames
                 .get(self.frame_count as usize - 1)
                 .expect("Instruction pointer is out of vm.frames bounds.");
-            let chunk = (*frame.function).borrow().chunk();
+            let chunk = (*frame.closure).borrow().chunk();
             let chunk = (*chunk).borrow();
 
-            let name = if (*frame.function).borrow().name().is_empty() {
+            let function = (*frame.closure).borrow().function();
+            let name = if function.borrow().name().is_empty() {
                 "<script>".to_string()
             } else {
-                (*frame.function).borrow().name()
+                function.borrow().name()
             };
             println!();
             disassemble_chunk(&chunk, &name)
@@ -534,6 +548,7 @@ impl VM {
             unsafe {
                 match *loc {
                     Obj::BuiltIn(_) => (),
+                    Obj::Closure(_) => (),
                     Obj::Fun(ref mut fun) => {
                         fun.free();
                     }
