@@ -112,6 +112,7 @@ impl Obj {
 #[derive(Clone)]
 pub struct Function {
     arity: isize,
+    upvalue_count: isize,
     chunk: Rc<RefCell<Chunk>>,
     name: String,
 }
@@ -126,6 +127,7 @@ impl Function {
     pub fn new() -> Self {
         Self {
             arity: 0,
+            upvalue_count: 0,
             chunk: Rc::new(RefCell::new(Chunk::default())),
             name: String::new(),
         }
@@ -137,6 +139,14 @@ impl Function {
 
     pub fn change_arity(&mut self, arity: isize) {
         self.arity = arity;
+    }
+
+    pub fn upvalue_count(&self) -> isize {
+        self.upvalue_count
+    }
+
+    pub fn change_upvalue_count(&mut self, upvalue_count: isize) {
+        self.upvalue_count = upvalue_count;
     }
 
     pub fn chunk(&self) -> Rc<RefCell<Chunk>> {

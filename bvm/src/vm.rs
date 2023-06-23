@@ -322,7 +322,6 @@ impl VM {
                     self.push(result);
                 }
 
-                #[allow(unreachable_patterns)]
                 _ => {
                     eprintln!("Unknown opcode {:?}", instruction);
                     return Err(InterpretResult::RuntimeError);
