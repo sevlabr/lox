@@ -12,7 +12,6 @@ benchmark/fib.o
 # original clox for reference
 bvm/clox/
 
-bvm/fib.lox
-bvm/test.lox
+bvm/*.lox
 twi/example/debug/debug.*
 TODO.md

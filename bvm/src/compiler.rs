@@ -747,6 +747,16 @@ impl Parser {
         let function = self.end_compiler();
         let index = Byte::Raw(self.make_constant(Value::Obj(Obj::Fun(function.borrow().clone()))));
         self.emit_instructions(Byte::Code(OpCode::Closure), index);
+
+        for i in 0..function.borrow().upvalue_count() as usize {
+            let is_local: u8 = match &self.compiler.upvalues[i].is_local {
+                true => 1,
+                false => 0,
+            };
+            let index: u8 = self.compiler.upvalues[i].index;
+            self.emit_raw_instruction(is_local);
+            self.emit_raw_instruction(index);
+        }
     }
 
     fn expression(&mut self) {
@@ -833,11 +843,12 @@ impl Parser {
     }
 
     fn named_variable(&mut self, name: Token, can_assign: bool) {
-        let mut arg = self.resolve_local(&name, "current");
+        let mut arg = self.resolve_local_current(&name);
         let (get_op, set_op) = if arg != -1 {
             (OpCode::GetLocal, OpCode::SetLocal)
         } else {
-            arg = self.resolve_upvalue(&name);
+            let enclosing = self.compiler.enclosing.as_ref().map(Rc::clone);
+            arg = self.resolve_upvalue_current(enclosing, &name);
             if arg != -1 {
                 (OpCode::GetUpvalue, OpCode::SetUpvalue)
             } else {
@@ -1023,63 +1034,51 @@ impl Parser {
         name_a == name_b
     }
 
-    fn resolve_local(&mut self, name: &Token, kind: &'static str) -> isize {
-        // For refactoring find a way to convert &T to Ref<'_, T> or vice versa.
-        match kind {
-            "current" => {
-                for (i, local) in self
-                    .compiler
-                    .locals
-                    .iter()
-                    .take(self.compiler.local_count.try_into().unwrap())
-                    .enumerate()
-                    .rev()
-                {
-                    if self.identifiers_equal(name, &local.name) {
-                        if local.depth == -1 {
-                            self.error(
-                                "Can't read local variable in its own initializer.".to_string(),
-                            );
-                        }
-                        return i as isize;
-                    }
+    fn resolve_local_current(&mut self, name: &Token) -> isize {
+        for (i, local) in self
+            .compiler
+            .locals
+            .iter()
+            .take(self.compiler.local_count.try_into().unwrap())
+            .enumerate()
+            .rev()
+        {
+            if self.identifiers_equal(name, &local.name) {
+                if local.depth == -1 {
+                    self.error("Can't read local variable in its own initializer.".to_string());
                 }
-
-                -1
+                return i as isize;
             }
-            "enclosing" => {
-                let current = self
-                    .compiler
-                    .enclosing
-                    .as_ref()
-                    .expect("Enclosing compiler must not be None here.")
-                    .borrow();
-                let local_count = current.local_count;
-                for (i, local) in current
-                    .locals
-                    .iter()
-                    .take(local_count.try_into().unwrap())
-                    .enumerate()
-                    .rev()
-                {
-                    if self.identifiers_equal(name, &local.name) {
-                        if local.depth == -1 {
-                            drop(current);
-                            self.error(
-                                "Can't read local variable in its own initializer.".to_string(),
-                            );
-                        }
-                        return i as isize;
-                    }
-                }
-
-                -1
-            }
-            _ => unreachable!("'kind' must be either 'current' or 'enclosing'."),
         }
+
+        -1
     }
 
-    fn add_upvalue(&mut self, index: u8, is_local: bool) -> isize {
+    fn resolve_local(&mut self, compiler: &Option<Rc<RefCell<Compiler>>>, name: &Token) -> isize {
+        let current = compiler
+            .as_ref()
+            .expect("Enclosing compiler must not be None here.")
+            .borrow();
+        let local_count = current.local_count;
+        for (i, local) in current
+            .locals
+            .iter()
+            .take(local_count.try_into().unwrap())
+            .enumerate()
+            .rev()
+        {
+            if self.identifiers_equal(name, &local.name) {
+                if local.depth == -1 {
+                    self.error("Can't read local variable in its own initializer.".to_string());
+                }
+                return i as isize;
+            }
+        }
+
+        -1
+    }
+
+    fn add_upvalue_current(&mut self, index: u8, is_local: bool) -> isize {
         let compiler = &mut self.compiler;
         let upvalue_count = compiler.function.borrow().upvalue_count() as usize;
 
@@ -1097,33 +1096,87 @@ impl Parser {
         compiler.upvalues[upvalue_count].is_local = is_local;
         compiler.upvalues[upvalue_count].index = index;
         let upvalue_count = upvalue_count as isize;
-        compiler.function.borrow_mut().change_upvalue_count(upvalue_count + 1);
+        compiler
+            .function
+            .borrow_mut()
+            .change_upvalue_count(upvalue_count + 1);
         upvalue_count
     }
 
-    fn resolve_upvalue(&mut self, name: &Token) -> isize {
-        let compiler = &mut self.compiler;
-        if compiler.enclosing.is_none() {
+    fn add_upvalue(&mut self, compiler: &mut Compiler, index: u8, is_local: bool) -> isize {
+        let upvalue_count = compiler.function.borrow().upvalue_count() as usize;
+
+        for (i, upvalue) in compiler.upvalues.iter().take(upvalue_count).enumerate() {
+            if upvalue.index == index && upvalue.is_local == is_local {
+                return i as isize;
+            }
+        }
+
+        if upvalue_count == UINT8_COUNT {
+            self.error("Too many closure variables in function.".to_string());
+            return 0;
+        }
+
+        compiler.upvalues[upvalue_count].is_local = is_local;
+        compiler.upvalues[upvalue_count].index = index;
+        let upvalue_count = upvalue_count as isize;
+        compiler
+            .function
+            .borrow_mut()
+            .change_upvalue_count(upvalue_count + 1);
+        upvalue_count
+    }
+
+    fn resolve_upvalue_current(
+        &mut self,
+        enclosing: Option<Rc<RefCell<Compiler>>>,
+        name: &Token,
+    ) -> isize {
+        if enclosing.is_none() {
             return -1;
         }
 
-        let local = self.resolve_local(name, "enclosing");
+        let local = self.resolve_local(&enclosing, name);
         if local != -1 {
-            return self.add_upvalue(local as u8, true);
+            return self.add_upvalue_current(local as u8, true);
         }
 
-        // let upvalue = self.resolve_enclosing_upvalue(name);
-        // if upvalue != -1 {
-        //     return self.add_upvalue(upvalue as u8, false);
-        // }
+        let enclosing = enclosing.unwrap();
+        let enclosing = &mut *enclosing.borrow_mut();
+        let enclosing_enclosing = enclosing.enclosing.as_ref().map(Rc::clone);
+        let upvalue = self.resolve_upvalue(enclosing, enclosing_enclosing, name);
+        if upvalue != -1 {
+            return self.add_upvalue_current(upvalue as u8, false);
+        }
 
         -1
     }
 
-    // TODO: change all functions to take &Compiler or enclosing one.
-    // fn resolve_enclosing_upvalue(&mut self, compiler: Option<Rc<RefCell<Compiler>>>, name: &Token) -> isize {
-    //     -1
-    // }
+    fn resolve_upvalue(
+        &mut self,
+        compiler: &mut Compiler,
+        enclosing: Option<Rc<RefCell<Compiler>>>,
+        name: &Token,
+    ) -> isize {
+        if enclosing.is_none() {
+            return -1;
+        }
+
+        let local = self.resolve_local(&enclosing, name);
+        if local != -1 {
+            return self.add_upvalue(compiler, local as u8, true);
+        }
+
+        let enclosing = enclosing.unwrap();
+        let enclosing = &mut *enclosing.borrow_mut();
+        let enclosing_enclosing = enclosing.enclosing.as_ref().map(Rc::clone);
+        let upvalue = self.resolve_upvalue(enclosing, enclosing_enclosing, name);
+        if upvalue != -1 {
+            return self.add_upvalue(compiler, upvalue as u8, false);
+        }
+
+        -1
+    }
 
     fn mark_initialized(&mut self) {
         if self.compiler.scope_depth == 0 {

@@ -33,6 +33,8 @@ pub fn disassemble_instruction(chunk: &Chunk, mut offset: usize) -> usize {
         OpCode::GetGlobal => constant_instruction("OP_GET_GLOBAL", chunk, offset),
         OpCode::DefineGlobal => constant_instruction("OP_DEFINE_GLOBAL", chunk, offset),
         OpCode::SetGlobal => constant_instruction("OP_SET_GLOBAL", chunk, offset),
+        OpCode::GetUpvalue => byte_instruction("OP_GET_UPVALUE", chunk, offset),
+        OpCode::SetUpvalue => byte_instruction("OP_SET_UPVALUE", chunk, offset),
         OpCode::Equal => simple_instruction("OP_EQUAL", offset),
         OpCode::Greater => simple_instruction("OP_GREATER", offset),
         OpCode::Less => simple_instruction("OP_LESS", offset),
@@ -55,11 +57,35 @@ pub fn disassemble_instruction(chunk: &Chunk, mut offset: usize) -> usize {
                 "{:16} {:4} {}",
                 "OP_CLOSURE", constant, chunk.constants[constant as usize]
             );
+
+            let function = &chunk.constants[constant as usize];
+            let function = if function.is_obj_type("Function") {
+                unsafe { function.as_obj().as_fun() }
+            } else {
+                unreachable!("There should be Function.");
+            };
+
+            for _ in 0..function.upvalue_count() {
+                let is_local = match &chunk.code[offset] {
+                    1 => "local",
+                    0 => "upvalue",
+                    _ => unreachable!("`is_local` can be either 0 or 1."),
+                };
+                offset += 1;
+                let index = chunk.code[offset];
+                offset += 1;
+                println!(
+                    "{:04}      |                     {} {}",
+                    offset - 2,
+                    is_local,
+                    index
+                );
+            }
+
             offset
         }
         OpCode::Return => simple_instruction("OP_RETURN", offset),
 
-        #[allow(unreachable_patterns)]
         _ => {
             eprintln!("Unknown opcode {:?}", instruction);
             offset + 1
