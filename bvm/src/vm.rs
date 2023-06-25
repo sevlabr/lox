@@ -1,7 +1,7 @@
 use crate::chunk::OpCode;
 use crate::compiler::Parser;
 use crate::debug::{disassemble_chunk, disassemble_instruction};
-use crate::object::{Closure, Native, Obj};
+use crate::object::{Closure, Native, Obj, Upvalue};
 use crate::scanner::print_tokens;
 use crate::value::Value;
 use crate::Config;
@@ -238,6 +238,26 @@ impl VM {
                         return Err(InterpretResult::RuntimeError);
                     }
                 }
+                OpCode::GetUpvalue => {
+                    let slot = self.read_byte() as usize;
+                    let frame = self
+                        .frames
+                        .get_mut(self.frame_count as usize - 1)
+                        .expect("Instruction pointer is out of vm.frames bounds.");
+                    let location = frame.closure.borrow().upvalue(slot).location();
+                    let value = self.stack[location].clone();
+                    self.push(value);
+                }
+                OpCode::SetUpvalue => {
+                    let slot = self.read_byte() as usize;
+                    let frame = self
+                        .frames
+                        .get_mut(self.frame_count as usize - 1)
+                        .expect("Instruction pointer is out of vm.frames bounds.");
+                    let location = frame.closure.borrow().upvalue(slot).location();
+                    let value = self.peek(0);
+                    self.stack[location] = value;
+                }
                 OpCode::Equal => {
                     let b = self.pop();
                     let a = self.pop();
@@ -302,7 +322,30 @@ impl VM {
                     if function.is_obj_type("Function") {
                         let function = unsafe { function.as_obj().as_fun() };
                         let function = Rc::new(RefCell::new(function));
-                        let closure = Closure::new(&function);
+                        let mut closure = Closure::new(&function);
+                        self.push(Value::Obj(Obj::Closure(closure.clone())));
+
+                        for i in 0..closure.upvalue_count() as usize {
+                            let is_local = self.read_byte();
+                            let index = self.read_byte() as usize;
+                            let frame = self
+                                .frames
+                                .get_mut(self.frame_count as usize - 1)
+                                .expect("Instruction pointer is out of vm.frames bounds.");
+                            match is_local {
+                                1 => {
+                                    let upvalue = Self::capture_upvalue(frame.slots + index);
+                                    closure.set_upvalue(i, upvalue);
+                                }
+                                0 => {
+                                    let upvalue = frame.closure.borrow().upvalue(index);
+                                    closure.set_upvalue(i, upvalue)
+                                }
+                                _ => unreachable!("`is_local` can be either 0 or 1."),
+                            }
+                        }
+
+                        self.pop();
                         self.push(Value::Obj(Obj::Closure(closure)));
                     }
                 }
@@ -467,6 +510,10 @@ impl VM {
         false
     }
 
+    fn capture_upvalue(local: usize) -> Upvalue {
+        Upvalue::new(local)
+    }
+
     fn define_native(&mut self, name: &str) {
         let name = name.to_string();
         self.push(Value::Obj(Obj::Str(name.clone())));
@@ -541,19 +588,32 @@ impl VM {
     // Supposed to be used for GC.
     // This variant is more safe than the other.
     // (Also check Zeroize crate if needed).
+    #[allow(clippy::unused_unit)]
     fn _free_obj(&mut self, index: usize) {
         let loc = self.objects.remove(index);
         if !loc.is_null() {
             unsafe {
                 match *loc {
                     Obj::BuiltIn(_) => (),
-                    Obj::Closure(_) => (),
+                    Obj::Closure(_) => {
+                        // free Vec with upvalues.
+                        ()
+                    }
                     Obj::Fun(ref mut fun) => {
                         fun.free();
                     }
                     Obj::Str(ref mut s) => {
                         s.clear() // This does not do the job.
                                   // s.zeroize();
+                    }
+                    // Do smth reasonable here.
+                    Obj::Upval(ref _value) => {
+                        ()
+                        // let value = value.location();
+                        // let value = value.borrow();
+                        // match value {
+                        //     _ => (),
+                        // }
                     }
                 }
             }

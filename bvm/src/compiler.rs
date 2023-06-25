@@ -77,7 +77,7 @@ impl Local {
     }
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 struct Upvalue {
     index: u8,
     is_local: bool,
@@ -228,7 +228,7 @@ impl Parser {
             self.declaration();
         }
 
-        let function = self.end_compiler();
+        let (function, _) = self.end_compiler();
 
         if self.had_error {
             return Err(CompileError::new("had_error = true."));
@@ -744,16 +744,16 @@ impl Parser {
         self.consume(TokenType::LeftBrace, "Expect '{' before function body.");
         self.block();
 
-        let function = self.end_compiler();
+        let (function, compiler) = self.end_compiler();
         let index = Byte::Raw(self.make_constant(Value::Obj(Obj::Fun(function.borrow().clone()))));
         self.emit_instructions(Byte::Code(OpCode::Closure), index);
 
         for i in 0..function.borrow().upvalue_count() as usize {
-            let is_local: u8 = match &self.compiler.upvalues[i].is_local {
+            let is_local: u8 = match compiler.upvalues[i].is_local {
                 true => 1,
                 false => 0,
             };
-            let index: u8 = self.compiler.upvalues[i].index;
+            let index: u8 = compiler.upvalues[i].index;
             self.emit_raw_instruction(is_local);
             self.emit_raw_instruction(index);
         }
@@ -1235,7 +1235,7 @@ impl Parser {
         }
     }
 
-    fn end_compiler(&mut self) -> Rc<RefCell<Function>> {
+    fn end_compiler(&mut self) -> (Rc<RefCell<Function>>, Compiler) {
         self.emit_return();
         let function = self.compiler.current_fun();
 
@@ -1249,6 +1249,7 @@ impl Parser {
             disassemble_chunk(&self.current_chunk().borrow(), &name)
         }
 
+        let saved_compiler = self.compiler.clone();
         match &self.compiler.enclosing {
             Some(compiler) => {
                 let compiler = compiler.borrow().clone();
@@ -1256,7 +1257,7 @@ impl Parser {
             }
             None => (),
         }
-        function
+        (function, saved_compiler)
     }
 
     fn begin_scope(&mut self) {

@@ -8,6 +8,7 @@ pub enum Obj {
     Closure(Closure),
     Fun(Function),
     Str(String),
+    Upval(Upvalue),
 }
 
 impl fmt::Display for Obj {
@@ -21,6 +22,11 @@ impl fmt::Display for Obj {
             }
             Obj::Fun(fun) => write!(f, "{}", fun),
             Obj::Str(s) => write!(f, "{}", s),
+            Obj::Upval(_value) => {
+                // debug version (probably outdated):
+                // write!(f, "{}", value.location.borrow())
+                write!(f, "upvalue")
+            }
         }
     }
 }
@@ -192,18 +198,36 @@ impl Eq for Function {}
 #[derive(Clone)]
 pub struct Closure {
     function: Rc<RefCell<Function>>,
+    upvalues: Vec<Upvalue>,
+    upvalue_count: isize,
 }
 
 impl Default for Closure {
     fn default() -> Self {
-        Self::new(&Rc::new(RefCell::new(Function::default())))
+        Self::create(&Rc::new(RefCell::new(Function::default())), Vec::new(), 0)
     }
 }
 
 impl Closure {
-    pub fn new(function: &Rc<RefCell<Function>>) -> Self {
+    pub fn create(
+        function: &Rc<RefCell<Function>>,
+        upvalues: Vec<Upvalue>,
+        upvalue_count: isize,
+    ) -> Self {
         Closure {
             function: function.clone(),
+            upvalues,
+            upvalue_count,
+        }
+    }
+
+    pub fn new(function: &Rc<RefCell<Function>>) -> Self {
+        let upvalue_count = function.borrow().upvalue_count() as usize;
+        let upvalues = vec![Upvalue::default(); upvalue_count];
+        Closure {
+            function: function.clone(),
+            upvalues,
+            upvalue_count: upvalue_count as isize,
         }
     }
 
@@ -213,6 +237,18 @@ impl Closure {
 
     pub fn chunk(&self) -> Rc<RefCell<Chunk>> {
         self.function.borrow().chunk()
+    }
+
+    pub fn upvalue_count(&self) -> isize {
+        self.upvalue_count
+    }
+
+    pub fn set_upvalue(&mut self, index: usize, value: Upvalue) {
+        self.upvalues[index] = value;
+    }
+
+    pub fn upvalue(&self, index: usize) -> Upvalue {
+        self.upvalues[index].clone()
     }
 }
 
@@ -254,3 +290,53 @@ impl fmt::Display for Native {
         write!(f, "<native fun {}>", &self.name)
     }
 }
+
+#[derive(Clone, PartialEq, Eq)]
+pub struct Upvalue {
+    location: usize,
+}
+
+impl Default for Upvalue {
+    fn default() -> Self {
+        Self::new(0)
+    }
+}
+
+impl Upvalue {
+    pub fn new(location: usize) -> Self {
+        Self { location }
+    }
+
+    pub fn location(&self) -> usize {
+        self.location
+    }
+}
+
+// #[derive(Clone)]
+// pub struct Upvalue {
+//     location: Rc<RefCell<Value>>,
+// }
+
+// impl Default for Upvalue {
+//     fn default() -> Self {
+//         Self::new(Value::Nil)
+//     }
+// }
+
+// impl Upvalue {
+//     pub fn new(location: Value) -> Self {
+//         Self { location: Rc::new(RefCell::new(location)) }
+//     }
+
+//     pub fn location(&self) -> Rc<RefCell<Value>> {
+//         Rc::clone(&self.location)
+//     }
+// }
+
+// impl PartialEq for Upvalue {
+//     fn eq(&self, other: &Self) -> bool {
+//         *self.location.borrow() == *other.location.borrow()
+//     }
+// }
+
+// impl Eq for Upvalue {}
