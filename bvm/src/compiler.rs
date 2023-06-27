@@ -63,17 +63,22 @@ struct ParseRule {
 struct Local {
     name: Token,
     depth: isize,
+    is_captured: bool,
 }
 
 impl Default for Local {
     fn default() -> Self {
-        Self::new(Token::default(), -10)
+        Self::new(Token::default(), -10, false)
     }
 }
 
 impl Local {
-    pub fn new(name: Token, depth: isize) -> Self {
-        Self { name, depth }
+    pub fn new(name: Token, depth: isize, is_captured: bool) -> Self {
+        Self {
+            name,
+            depth,
+            is_captured,
+        }
     }
 }
 
@@ -159,6 +164,10 @@ impl Compiler {
     fn set_fun_kind(&mut self, fun_kind: FunType) {
         self.kind = fun_kind;
     }
+
+    fn set_captured(&mut self, index: isize, is_captured: bool) {
+        self.locals[index as usize].is_captured = is_captured;
+    }
 }
 
 pub struct Parser {
@@ -209,6 +218,7 @@ impl Parser {
         let local = &mut self.compiler.locals[self.compiler.local_count as usize];
         self.compiler.local_count += 1;
         local.depth = 0;
+        local.is_captured = false;
         // name == ""
         local.name.kind = TokenType::Identifier;
         local.name.start = 0;
@@ -984,6 +994,7 @@ impl Parser {
         self.compiler.local_count += 1;
         local.name = name;
         local.depth = -1;
+        local.is_captured = false;
     }
 
     fn advance(&mut self) {
@@ -1138,6 +1149,7 @@ impl Parser {
 
         let local = self.resolve_local(&enclosing, name);
         if local != -1 {
+            enclosing.unwrap().borrow_mut().set_captured(local, true);
             return self.add_upvalue_current(local as u8, true);
         }
 
@@ -1164,6 +1176,7 @@ impl Parser {
 
         let local = self.resolve_local(&enclosing, name);
         if local != -1 {
+            enclosing.unwrap().borrow_mut().set_captured(local, true);
             return self.add_upvalue(compiler, local as u8, true);
         }
 
@@ -1271,7 +1284,11 @@ impl Parser {
             && self.compiler.locals[self.compiler.local_count as usize - 1].depth
                 > self.compiler.scope_depth
         {
-            self.emit_instruction(OpCode::Pop);
+            if self.compiler.locals[self.compiler.local_count as usize - 1].is_captured {
+                self.emit_instruction(OpCode::CloseUpvalue);
+            } else {
+                self.emit_instruction(OpCode::Pop);
+            }
             self.compiler.local_count -= 1;
         }
     }

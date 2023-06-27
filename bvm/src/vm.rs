@@ -44,6 +44,8 @@ pub struct VM {
     stack: Vec<Value>,
     stack_top: usize,
 
+    open_upvalues: Option<Rc<RefCell<Upvalue>>>,
+
     // maybe use Rc::try_unwrap
     objects: LinkedList<*mut Obj>,
 
@@ -58,6 +60,7 @@ impl Default for VM {
             config: Config::default(),
             stack: vec![Value::Nil; STACK_MAX],
             stack_top: 0,
+            open_upvalues: None,
             objects: LinkedList::new(),
             globals: HashMap::new(),
         }
@@ -65,12 +68,14 @@ impl Default for VM {
 }
 
 impl VM {
+    #[allow(clippy::too_many_arguments)]
     pub fn new(
         frames: [CallFrame; FRAMES_MAX],
         frame_count: isize,
         config: Config,
         stack: Vec<Value>,
         stack_top: usize,
+        open_upvalues: Option<Rc<RefCell<Upvalue>>>,
         objects: LinkedList<*mut Obj>,
         globals: HashMap<String, Value>,
     ) -> Self {
@@ -80,6 +85,7 @@ impl VM {
             config,
             stack,
             stack_top,
+            open_upvalues,
             objects,
             globals,
         }
@@ -97,6 +103,8 @@ impl VM {
 
     fn reset_stack(&mut self) {
         self.stack_top = 0;
+        self.frame_count = 0;
+        self.open_upvalues = None;
     }
 
     // Maybe add check of a value type here to add it to `self.objects`,
@@ -244,8 +252,14 @@ impl VM {
                         .frames
                         .get_mut(self.frame_count as usize - 1)
                         .expect("Instruction pointer is out of vm.frames bounds.");
-                    let location = frame.closure.borrow().upvalue(slot).location();
-                    let value = self.stack[location].clone();
+                    let upvalue = frame.closure.borrow().upvalue(slot);
+                    let upvalue = upvalue.borrow();
+                    let value = if upvalue.is_closed() {
+                        upvalue.closed_value()
+                    } else {
+                        let location = upvalue.location();
+                        self.stack[location].clone()
+                    };
                     self.push(value);
                 }
                 OpCode::SetUpvalue => {
@@ -254,9 +268,15 @@ impl VM {
                         .frames
                         .get_mut(self.frame_count as usize - 1)
                         .expect("Instruction pointer is out of vm.frames bounds.");
-                    let location = frame.closure.borrow().upvalue(slot).location();
+                    let upvalue = frame.closure.borrow().upvalue(slot);
+                    let mut upvalue = upvalue.borrow_mut();
                     let value = self.peek(0);
-                    self.stack[location] = value;
+                    if upvalue.is_closed() {
+                        upvalue.set_closed_value(Box::new(value));
+                    } else {
+                        let location = upvalue.location();
+                        self.stack[location] = value;
+                    }
                 }
                 OpCode::Equal => {
                     let b = self.pop();
@@ -334,7 +354,8 @@ impl VM {
                                 .expect("Instruction pointer is out of vm.frames bounds.");
                             match is_local {
                                 1 => {
-                                    let upvalue = Self::capture_upvalue(frame.slots + index);
+                                    let frame_slots = frame.slots;
+                                    let upvalue = self.capture_upvalue(frame_slots + index);
                                     closure.set_upvalue(i, upvalue);
                                 }
                                 0 => {
@@ -349,8 +370,18 @@ impl VM {
                         self.push(Value::Obj(Obj::Closure(closure)));
                     }
                 }
+                OpCode::CloseUpvalue => {
+                    let location = self.stack_top - 1;
+                    self.close_upvalues(location);
+                    self.pop();
+                }
                 OpCode::Return => {
                     let result = self.pop();
+                    let frame = self
+                        .frames
+                        .get(self.frame_count as usize - 1)
+                        .expect("Instruction pointer is out of vm.frames bounds.");
+                    self.close_upvalues(frame.slots);
                     self.frame_count -= 1;
                     if self.frame_count == 0 {
                         self.pop();
@@ -510,8 +541,48 @@ impl VM {
         false
     }
 
-    fn capture_upvalue(local: usize) -> Upvalue {
-        Upvalue::new(local)
+    fn capture_upvalue(&mut self, local: usize) -> Rc<RefCell<Upvalue>> {
+        let mut prev_upvalue = None;
+        let mut upvalue = self.open_upvalues.as_ref().map(Rc::clone);
+        while upvalue.is_some() && upvalue.as_ref().unwrap().borrow().location() > local {
+            prev_upvalue = Some(Rc::clone(upvalue.as_ref().unwrap()));
+            upvalue = upvalue.unwrap().borrow().next();
+        }
+
+        if let Some(ref upval) = upvalue {
+            if upval.borrow().location() == local {
+                return Rc::clone(upval);
+            }
+        }
+
+        let mut created_upvalue = Upvalue::new(local);
+        created_upvalue.set_next(upvalue);
+        let created_upvalue = Rc::new(RefCell::new(created_upvalue));
+
+        if prev_upvalue.is_none() {
+            self.open_upvalues = Some(Rc::clone(&created_upvalue));
+        } else {
+            prev_upvalue
+                .as_ref()
+                .unwrap()
+                .borrow_mut()
+                .set_next(Some(Rc::clone(&created_upvalue)));
+        }
+
+        created_upvalue
+    }
+
+    fn close_upvalues(&mut self, last: usize) {
+        while self.open_upvalues.is_some()
+            && self.open_upvalues.as_ref().unwrap().borrow().location() >= last
+        {
+            let upvalue = Rc::clone(self.open_upvalues.as_ref().unwrap());
+            let location = upvalue.borrow().location();
+            let value = Box::new(self.stack[location].clone());
+            upvalue.borrow_mut().set_closed_value(value);
+            upvalue.borrow_mut().set_closed();
+            self.open_upvalues = upvalue.borrow().next();
+        }
     }
 
     fn define_native(&mut self, name: &str) {

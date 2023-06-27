@@ -198,7 +198,7 @@ impl Eq for Function {}
 #[derive(Clone)]
 pub struct Closure {
     function: Rc<RefCell<Function>>,
-    upvalues: Vec<Upvalue>,
+    upvalues: Vec<Rc<RefCell<Upvalue>>>,
     upvalue_count: isize,
 }
 
@@ -211,7 +211,7 @@ impl Default for Closure {
 impl Closure {
     pub fn create(
         function: &Rc<RefCell<Function>>,
-        upvalues: Vec<Upvalue>,
+        upvalues: Vec<Rc<RefCell<Upvalue>>>,
         upvalue_count: isize,
     ) -> Self {
         Closure {
@@ -223,7 +223,11 @@ impl Closure {
 
     pub fn new(function: &Rc<RefCell<Function>>) -> Self {
         let upvalue_count = function.borrow().upvalue_count() as usize;
-        let upvalues = vec![Upvalue::default(); upvalue_count];
+        let upvalues = {
+            // Note: each element points to the same `Rc` instance
+            let data = Rc::new(RefCell::new(Upvalue::default()));
+            vec![data; upvalue_count]
+        };
         Closure {
             function: function.clone(),
             upvalues,
@@ -243,12 +247,12 @@ impl Closure {
         self.upvalue_count
     }
 
-    pub fn set_upvalue(&mut self, index: usize, value: Upvalue) {
+    pub fn set_upvalue(&mut self, index: usize, value: Rc<RefCell<Upvalue>>) {
         self.upvalues[index] = value;
     }
 
-    pub fn upvalue(&self, index: usize) -> Upvalue {
-        self.upvalues[index].clone()
+    pub fn upvalue(&self, index: usize) -> Rc<RefCell<Upvalue>> {
+        Rc::clone(&self.upvalues[index])
     }
 }
 
@@ -291,26 +295,105 @@ impl fmt::Display for Native {
     }
 }
 
-#[derive(Clone, PartialEq, Eq)]
+#[derive(Clone)]
 pub struct Upvalue {
     location: usize,
+    is_closed: bool,
+    closed: Box<Value>,
+    next: Option<Rc<RefCell<Upvalue>>>,
 }
 
 impl Default for Upvalue {
     fn default() -> Self {
-        Self::new(0)
+        Self::create(0, false, Box::new(Value::Nil), None)
     }
 }
 
 impl Upvalue {
+    pub fn create(
+        location: usize,
+        is_closed: bool,
+        closed: Box<Value>,
+        next: Option<Rc<RefCell<Self>>>,
+    ) -> Self {
+        Self {
+            location,
+            is_closed,
+            closed,
+            next,
+        }
+    }
+
     pub fn new(location: usize) -> Self {
-        Self { location }
+        Self {
+            location,
+            is_closed: false,
+            closed: Box::new(Value::Nil),
+            next: None,
+        }
     }
 
     pub fn location(&self) -> usize {
         self.location
     }
+
+    pub fn is_closed(&self) -> bool {
+        self.is_closed
+    }
+
+    pub fn next(&self) -> Option<Rc<RefCell<Upvalue>>> {
+        if self.next.is_some() {
+            Some(Rc::clone(self.next.as_ref().unwrap()))
+        } else {
+            // panic!("Next Upvalue expected to be non-null.");
+            None
+        }
+    }
+
+    pub fn set_next(&mut self, next: Option<Rc<RefCell<Upvalue>>>) {
+        self.next = next;
+    }
+
+    pub fn set_closed(&mut self) {
+        self.is_closed = true;
+    }
+
+    pub fn set_closed_value(&mut self, closed: Box<Value>) {
+        self.closed = closed;
+    }
+
+    pub fn closed_value(&self) -> Value {
+        *self.closed.clone()
+    }
 }
+
+impl PartialEq for Upvalue {
+    fn eq(&self, other: &Self) -> bool {
+        if !self.is_closed && !other.is_closed {
+            self.location == other.location
+        } else if self.is_closed && other.is_closed {
+            match *self.closed {
+                Value::Bool(l) => match *other.closed {
+                    Value::Bool(r) => l == r,
+                    _ => false,
+                },
+                Value::Nil => matches!(*other.closed, Value::Nil),
+                Value::Obj(ref l) => match *other.closed {
+                    Value::Obj(ref r) => *l == *r,
+                    _ => false,
+                },
+                Value::Num(l) => match *other.closed {
+                    Value::Num(r) => l == r,
+                    _ => false,
+                },
+            }
+        } else {
+            false
+        }
+    }
+}
+
+impl Eq for Upvalue {}
 
 // #[derive(Clone)]
 // pub struct Upvalue {

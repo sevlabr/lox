@@ -84,6 +84,7 @@ pub fn disassemble_instruction(chunk: &Chunk, mut offset: usize) -> usize {
 
             offset
         }
+        OpCode::CloseUpvalue => simple_instruction("OP_CLOSE_UPVALUE", offset),
         OpCode::Return => simple_instruction("OP_RETURN", offset),
 
         _ => {
