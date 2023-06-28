@@ -43,4 +43,9 @@ Also I learnt some *Java*. At least reading it.
 
 # Current status of the project
 
-Unfinished. I plan to do more things.
+Unfinished. I plan to do more things. For example:
+
+- Fix the way `twi` deals with environments, so the execution speed and some bugs will be fixed
+- Finish `bvm` implementation, as it does not support OOP yet
+
+I also have some ideas like adding new datatypes (arrays, hash maps) and other features.

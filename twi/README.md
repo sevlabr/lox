@@ -28,7 +28,7 @@ All basic and human-readable examples are in `/example` folder
 Currently, there are 4 examples: classes, closures, basic functions and control flow constructs. *.lox* files are the source code
 and *.out* files contain outputs.
 
-TODO: example of working class inside a block while failing outside.
+<!-- TODO: example of working class inside a block while failing outside. -->
 
 # AST visualization
 
